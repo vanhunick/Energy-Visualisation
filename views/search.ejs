@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search Results</title>
+    <!--Include the header template-->
+    <% include ../views/templates/head %>
+</head>
+
+<body>
+
+<!--Include the search bar template-->
+
+<div class="container-fluid">
+    <% include ../views/templates/search-bar %>
+
+    <div class="row" id="results">
+        <div class="col-md-12">
+            <h1 id="test">Not saying Hello</h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div id="bar"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    // Grab the new data array
+    var clientGameState =  JSON.parse('<%- data %>');
+
+    console.log("Client New");
+    console.log(clientGameState[0]);
+    console.log(clientGameState[1]);
+
+    showYearBarGraph(clientGameState);
+
+</script>
+
+</body>
+</html>
