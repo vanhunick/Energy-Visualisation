@@ -7,10 +7,8 @@
 </head>
 
 <body>
-
-<!--Include the search bar template-->
-
 <div class="container-fluid">
+    <!--Include the search bar template-->
     <% include ../views/templates/search-bar %>
 
     <div class="row" id="results">
@@ -27,17 +25,11 @@
 </div>
 
 <script>
-
     // Grab the new data array
     var clientGameState =  JSON.parse('<%- data %>');
 
-    console.log("Client New");
-    console.log(clientGameState[0]);
-    console.log(clientGameState[1]);
-
+    // Show the graph with the data
     showYearBarGraph(clientGameState);
-
 </script>
-
 </body>
 </html>

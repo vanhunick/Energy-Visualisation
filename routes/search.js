@@ -3,13 +3,13 @@
  */
 var express = require('express');
 var router = express.Router();
-//var pg = require('pg').native;
+var pg = require('pg');
 
 router.get('/', function(req, res){
 
     console.log(req.query.search);
-    test(res);
-
+    //test(res);
+    searchDatabase("e",res);
 
     return;
 
@@ -117,6 +117,8 @@ function searchDatabase(queryString,res){
 
         // Execute the query -- an empty result indicates that the username:password pair does
         // not exist in the database
+        var queryString = "SELECT * FROM Test;"
+
         client.query(queryString, function(error, result){
             done();
             console.log(result);
@@ -127,7 +129,8 @@ function searchDatabase(queryString,res){
             }
             else {
                 for (row in result.rows){
-                    result.rows[row].valued_at = mean(result.rows[row].valuations);
+                    console.log(row);
+                    //result.rows[row].valued_at = mean(result.rows[row].valuations);
                 }
                 var data = [{"name": "nicky", "color" : "blue"},{"name": "Jim", "color" : "Red"}];
 
@@ -136,13 +139,6 @@ function searchDatabase(queryString,res){
             }
         })
     });
-}
-
-function mean(list){
-    if (list.length > 0){
-        sum = list.reduce(function(a, b){return a + b;});
-        return sum/list.length;
-    }
 }
 
 module.exports = router;

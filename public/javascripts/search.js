@@ -2,27 +2,18 @@
  * Created by Nicky on 12/01/2017.
  */
 function search(){
-    var value = document.getElementById('search-box').value;
 
-    if(value == null)return;
+    // Grab the main search string from the search bar
+    var val = $('search-box').text();
 
-    // Advanced search variables
-    //var cat = $('#sel-catagory :selected').text();
-    //var min =  $('#min-price').val();
-    //var max =  $('#max-price').val();
-    //var valued = $("#chk-stock").is(':checked');
-    //var category = $("#category").val();
-    //var isExpanded = $("#filter-panel").attr("aria-expanded");
+    // If empty return
+    if(val == null)return;
 
-    var parameters = { q: value
-        //category: category,
-        //minPrice:min,
-        //maxPrice:max,
-        //valued:valued,
-        //adv:advanced
+    // Create all the parameters
+    var parameters = {
+        search : val
     };
 
-    console.log(parameters);
     window.location.replace("/search?" + serialise(parameters));
 }
 
@@ -35,9 +26,7 @@ function serialise(obj) {
     return str.join("&");
 }
 
-
 $(document).ready( function() {
-
     //Responds to enter being pressed in the search bar
     $('#main-search').on('keyup keypress', function(e) {
         var keyCode = e.keyCode || e.which;

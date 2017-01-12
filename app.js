@@ -8,7 +8,14 @@ var bodyParser = require('body-parser');
 var index = require('./routes/index');
 var search = require('./routes/search');
 
+var postgres = require('pg');
+
 var app = express();
+
+//global.databaseURI = "postgres://energy:SWEN303@localhost:5432/SWEN303";
+//global.databaseURI =  "postgres://swen303:dolphins@depot:5432/SWEN303vanhunick";
+global.databaseURI = "postgres://Admin:admin@localhost:5432/Energy";
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
