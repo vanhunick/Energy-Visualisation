@@ -117,7 +117,10 @@ function searchDatabase(queryString,res){
 
         // Execute the query -- an empty result indicates that the username:password pair does
         // not exist in the database
-        var queryString = "SELECT * FROM Test;"
+        var queryString = "SELECT * FROM test_strata_energy where disc_yr=2013;"
+
+        queryString = uniqueSectionQuery();
+        console.log(queryString);
 
         client.query(queryString, function(error, result){
             done();
@@ -139,6 +142,11 @@ function searchDatabase(queryString,res){
             }
         })
     });
+}
+
+
+function uniqueSectionQuery(){
+    return "SELECT DISTINCT section FROM test_strata_energy;";
 }
 
 module.exports = router;
