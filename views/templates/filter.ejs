@@ -5,11 +5,11 @@
     </select>
 
 
-    <select class="selectpicker" multiple title="Category" id="category-select">
+    <select class="selectpicker" title="Category" id="category-select">
         <option>No data</option>
     </select>
 
-    <select class="selectpicker" multiple title="Subsection" id="subsection-select">
+    <select class="selectpicker" title="Subsection" id="subsection-select">
         <option>No data</option>
     </select>
 
@@ -17,16 +17,14 @@
         // Grab the new data array
         var sections =  JSON.parse('<%- sections %>');
 
-        $('#section-select').append('<option>Test</option>').selectpicker('refresh');
         if(sections.length !== 0){
             $('#section-select').html(""); // Empty temp options
         }
 
         for(var i = 0; i < sections.length; i++){
-            $('#section-select').append('<option>' + sections[i] + '</option>').selectpicker('refresh');
+            $('#section-select').append('<option>' + sections[i] + '</option>');
         }
         $(".selectpicker").selectpicker('refresh');
-
     </script>
 
 </div>

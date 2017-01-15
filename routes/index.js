@@ -35,9 +35,6 @@ router.get('/', function(req, res, next) {
       done();
 
       var sections = [];
-      var categories = [];
-      var subsections = [];
-
 
       if(error) {
         console.error('Failed to execute query');
@@ -57,20 +54,6 @@ router.get('/', function(req, res, next) {
       }
     })
   });
-
-  //res.render('index', { title: 'Express' });
 });
-
-
-// TODO when user clicks a category query the subcategory
-
-function categoriesForSection(section){
-  queryString = squel.select()
-      .from("test_strata_energy")
-      .field("category")
-      .where("section =" + section)
-      .distinct()
-      .toString()
-}
 
 module.exports = router;

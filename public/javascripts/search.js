@@ -29,6 +29,7 @@ function serialise(obj) {
 
 
 $(document).ready( function() {
+
     //Responds to enter being pressed in the search bar
     $('#main-search').on('keyup keypress', function(e) {
         var keyCode = e.keyCode || e.which;
