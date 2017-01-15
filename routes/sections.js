@@ -83,7 +83,7 @@ router.get('/company', function(req, res) {
 router.post('/search', function(req, res, next) {
 
     //TODO escape req.body.selected
-    var queryString = "SELECT edb, description, units, value FROM test_strata_energy WHERE section = '" + req.body.section + "' AND category = '" + req.body.category + "';";
+    var queryString = "SELECT edb, disc_yr, description,  units,  value FROM test_strata_energy WHERE section = '" + req.body.section + "' AND category = '" + req.body.category + "';";
 
     // Connect to the database
     pg.connect(global.databaseURI, function (err, client, done) {
@@ -107,9 +107,10 @@ router.post('/search', function(req, res, next) {
                 return;
             } else {
                 for (row in result.rows) {
-                    var c = result.rows[row].category;
-                    rowsSimplified.push(c);
+                    console.log("Pushing " + row);
+                    rowsSimplified.push(result.rows[row]);
                 }
+                console.log(rowsSimplified.length);
                 res.send({rows : rowsSimplified});
                 return;
             }

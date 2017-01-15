@@ -51,13 +51,12 @@ $(document).ready( function() {
         //TODO subsection
         // Send category, section and company
         $.post("/sections/search",{section : section, category : category, company : company}, function(data){
-
-
-            // create table
-            for(var i = 0; i < data.rows.length; i++){
-
+            if(data.rows.length > 0){
+                console.log("insering table")
+                insertDataTable(data.rows);
+            } else {
+                console.log("not inserting table");
             }
-
         });
 
 
@@ -65,6 +64,60 @@ $(document).ready( function() {
 
 
 });
+
+function insertDataTable(rows){
+    // first create caption title with description
+    $('#results-table').append('<caption>' + rows[0].description + '</caption>');
+    //TODO check if discovered or observed
+
+    // Find the min and max year
+    var min = rows.reduce(function(prev, curr) {
+        return prev.disc_yr < curr.disc_yr? prev : curr;
+    });
+
+    var max = rows.reduce(function(prev, curr) {
+        return prev.disc_yr > curr.disc_yr? prev : curr;
+    });
+
+    //Create the columns
+    var years = "";
+    for(var i = min.disc_yr; i <=max.disc_yr; i++){
+        years += "<th>" + i + "</th>";
+    }
+
+    $('#results-table').append('<tr> <th>EDB</th>'+ years + '</tr>');
+
+
+    // An array of companies already processed
+    var done = [];
+
+    // Create the rows of data
+    for(var i = 0; i < rows.length; i++){
+        if(!done.includes(rows[i].edb)){
+
+            done.push(rows[i].edb);
+
+            // Insert name in column
+            var row = "<tr><th>" + rows[i].edb + "</th>";
+
+            for(var cur = min.disc_yr; cur <=max.disc_yr; cur++){
+
+                // Iterate through all rows finding ones with the current edb
+                for(var j = 0; j < rows.length; j++){
+
+                    // Check it matches edb and year inserting into
+                    if(rows[j].edb === rows[i].edb && rows[j].disc_yr === cur){
+                        row += "<th>" + rows[i].value + "</th>";
+                    }
+                }
+            }
+
+            //console.log("Data Row " + row);
+            $('#results-table').append(row + '</tr>');
+
+        }
+    }
+}
 
 function insertCompanies(){
     $.get("/sections/company", function(data){
