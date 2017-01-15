@@ -13,6 +13,14 @@
         <option>No data</option>
     </select>
 
+    <h4>Company</h4>
+    <select class="selectpicker" title="EDB" id="company-select">
+        <option>No data</option>
+    </select>
+
+    <button type="button" class="btn btn-default" onclick="search()">Search</button>
+
+
     <script>
         // Grab the new data array
         var sections =  JSON.parse('<%- sections %>');

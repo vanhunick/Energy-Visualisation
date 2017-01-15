@@ -11,7 +11,8 @@ function search(){
 
     // Create all the parameters
     var parameters = {
-        search : val
+        category : val
+
     };
 
     window.location.replace("/search?" + serialise(parameters));
