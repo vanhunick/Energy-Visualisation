@@ -6,6 +6,9 @@ function search(){
     // Grab the main search string from the search bar
     var val = $('search-box').text();
 
+    var selected = $('.selectpicker option:selected').val();
+
+
     // If empty return
     if(val == null)return;
 
