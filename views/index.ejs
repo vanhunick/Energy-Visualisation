@@ -5,17 +5,21 @@
     <% include ../views/templates/head %>
   </head>
   <body>
+  <h1>Energy Data</h1>
   <% include ../views/templates/search-bar %>
   <% include ../views/templates/filter%>
 
-
   <div class="row" style="margin-top: 2%;">
-    <div class="col-md-12 text-center">
+    <div class="col-md-6 text-center">
       <table class="table" id="results-table">
 
       </table>
     </div>
+    <div class="col-md-6" id="graph-div">
+
+    </div>
   </div>
 
   </body>
+  <script src="/javascripts/bar.js"></script>
 </html>
