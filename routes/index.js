@@ -1,11 +1,9 @@
 var express = require('express');
 var router = express.Router();
-
 var pg = require('pg');
 
 // Formats sql queries in a nice way
 var squel = require("squel");
-
 
 router.get('/', function(req, res, next) {
 
@@ -20,36 +18,25 @@ router.get('/', function(req, res, next) {
       return;
     }
 
-    console.log('Connected to database');
-
-    var queryString = "SELECT DISTINCT section FROM large_strata_energy;";
-
-    //
-    queryString = squel.select()
-        .from("large_strata_energy")
-        .field("section")
-        .distinct()
-        .toString()
+    // Create query to get all the distinct sections
+    var queryString = squel.select().from("large_strata_energy").field("section").distinct().toString()
 
     client.query(queryString, function(error, result){
       done();
-
-      var sections = [];
 
       if(error) {
         console.error('Failed to execute query');
         console.error(error);
         return;
       } else {
+        var sections = [];
 
         for (row in result.rows){
           var section = result.rows[row].section;
           sections.push(section);
         }
 
-        console.log(sections.length);
-
-        res.render('index', {sections: JSON.stringify(sections)}); // Send the search results
+        res.render('index', {sections: JSON.stringify(sections)}); // Send the search results and render index
         return;
       }
     })

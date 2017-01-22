@@ -7,17 +7,13 @@ var bodyParser = require('body-parser');
 
 //var routes = require('./routes');
 var index = require('./routes/index');
-var search = require('./routes/search');
+//var search = require('./routes/search');
 var sections = require('./routes/sections');
 
 
 var postgres = require('pg');
 
 var app = express();
-
-//Routes
-
-
 
 global.databaseURI = "postgres://Admin:admin@localhost:5432/Energy";
 
@@ -34,9 +30,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-//app.use('./routes', routes);
 app.use('/', index);
-app.use('/search', search);
 app.use('/sections',sections);
 
 

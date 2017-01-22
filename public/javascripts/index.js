@@ -3,6 +3,7 @@
  */
 
 
+// Hold the currently selected sections
 var section = "";
 var category = "";
 var subcategory = "";
@@ -13,36 +14,46 @@ $(document).ready( function() {
     // Queries DB and inserts options in selection dropdown
     insertCompanies();
 
-    // Add listeners to selectors
+    // Add listeners to section select called when section is selected
     $('#section-select').on('change', function(){
+
+        // Set the currently selected section
         section = $(this).find("option:selected").text();
-        var selected = $(this).find("option:selected").text();
 
-        $.post("/sections/s",{selected : selected }, function(data){
+        // Find all the categories associated with this section
+        $.post("/sections/s",{selected : section }, function(data){
             if(data.categories.length > 0){
-                //$('#category-select').html('<option selected>' + data.categories[0] + '</option>'); // Empty temp options
+                $('#category-select').html(''); // Empty temp options
             }
 
+            // Add the options to the drop down
             for(var i = 0; i < data.categories.length; i++){
-                $('#category-select').append('<option>' + data.categories[i] + '</option>').selectpicker('refresh');
+                $('#category-select').append('<option>' + data.categories[i] + '</option>');
             }
+
+            // Refresh all drop downs
             $(".selectpicker").selectpicker('refresh');
         });
     });
 
-    // Sets field for selector
+
+    // listener for category change
     $('#category-select').on('change', function(){
+
+        // Set the currently selected category
         category = $(this).find("option:selected").text();
-        console.log("Cat " + category);
+
         //TODO might have to make sure the section is also the same
 
+        // Find all sub categories for the currently selected category
         $.post("/sections/sc",{category : category}, function(data){
             if(data.subCategories.length > 0){
-                $('#subsection-select').html('<option selected>' + data.subCategories[0] + '</option>'); // Empty temp options
+                $('#subsection-select').html(''); // Empty temp options
             }
 
-            for(var i = 1; i < data.subCategories.length; i++){
-                $('#subsection-select').append('<option>' + data.subCategories[i] + '</option>').selectpicker('refresh');
+            // Add sub section options
+            for(var i = 0; i < data.subCategories.length; i++){
+                $('#subsection-select').append('<option>' + data.subCategories[i] + '</option>');
             }
             $(".selectpicker").selectpicker('refresh');
         });
@@ -50,32 +61,34 @@ $(document).ready( function() {
     });
 
     $('#subcategory-select').on('change', function(){
+        // Set the sub category
         subcategory = $(this).find("option:selected").text();
     });
 
     $('#company-select').on('change', function(){
+        // set the selected company
         company = $(this).find("option:selected").text();
     });
 
     // Clicked the search button
     $( "#search-btn" ).click(function() {
 
-        // First check if any values null
+        //TODO First check if any values null
 
-        //TODO subsection
-        // Send category, section and company
-
-        $.post("/sections/search",{section : section, category : category, company : company}, function(data){
+        // Send category, section, sub category and company
+        $.post("/sections/search",{section : section, category : category, subCategory : subcategory, company : company}, function(data){
             if(data.rows.length > 0){
                 insertDataTable(data.rows);
             } else {
-                console.log("not inserting table");
+                console.log("No results");
             }
         });
     });
 });
 
+// Creates a table with the given rows
 function insertDataTable(rows){
+
     // first create caption title with description
     $('#results-table').append('<caption>' + rows[0].description + '</caption>');
     //TODO check if discovered or observed
@@ -84,6 +97,8 @@ function insertDataTable(rows){
     } else if(rows[0].fcast_yr !== "") {
         console.log("Forecast");
     }
+
+
 
 
     // Find the min and max year
