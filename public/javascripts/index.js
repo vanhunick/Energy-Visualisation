@@ -20,10 +20,10 @@ $(document).ready( function() {
 
         $.post("/sections/s",{selected : selected }, function(data){
             if(data.categories.length > 0){
-                $('#category-select').html('<option selected>' + data.categories[0] + '</option>'); // Empty temp options
+                //$('#category-select').html('<option selected>' + data.categories[0] + '</option>'); // Empty temp options
             }
 
-            for(var i = 1; i < data.categories.length; i++){
+            for(var i = 0; i < data.categories.length; i++){
                 $('#category-select').append('<option>' + data.categories[i] + '</option>').selectpicker('refresh');
             }
             $(".selectpicker").selectpicker('refresh');
@@ -33,6 +33,20 @@ $(document).ready( function() {
     // Sets field for selector
     $('#category-select').on('change', function(){
         category = $(this).find("option:selected").text();
+        console.log("Cat " + category);
+        //TODO might have to make sure the section is also the same
+
+        $.post("/sections/sc",{category : category}, function(data){
+            if(data.subCategories.length > 0){
+                $('#subsection-select').html('<option selected>' + data.subCategories[0] + '</option>'); // Empty temp options
+            }
+
+            for(var i = 1; i < data.subCategories.length; i++){
+                $('#subsection-select').append('<option>' + data.subCategories[i] + '</option>').selectpicker('refresh');
+            }
+            $(".selectpicker").selectpicker('refresh');
+        });
+
     });
 
     $('#subcategory-select').on('change', function(){
@@ -50,6 +64,7 @@ $(document).ready( function() {
 
         //TODO subsection
         // Send category, section and company
+
         $.post("/sections/search",{section : section, category : category, company : company}, function(data){
             if(data.rows.length > 0){
                 insertDataTable(data.rows);
@@ -64,14 +79,20 @@ function insertDataTable(rows){
     // first create caption title with description
     $('#results-table').append('<caption>' + rows[0].description + '</caption>');
     //TODO check if discovered or observed
+    if(rows[0].obs_yr !== ""){
+        console.log("Observed");
+    } else if(rows[0].fcast_yr !== "") {
+        console.log("Forecast");
+    }
+
 
     // Find the min and max year
     var min = rows.reduce(function(prev, curr) {
-        return prev.disc_yr < curr.disc_yr? prev : curr;
+        return prev.disc_yr < curr.disc_yr ? prev : curr;
     });
 
     var max = rows.reduce(function(prev, curr) {
-        return prev.disc_yr > curr.disc_yr? prev : curr;
+        return prev.disc_yr > curr.disc_yr ? prev : curr;
     });
 
     //Create the columns

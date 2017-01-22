@@ -28,6 +28,9 @@
         if(sections.length !== 0){
             $('#section-select').html(""); // Empty temp options
         }
+        sections.sort(function(a, b) {
+            return parseFloat(a.price) - parseFloat(b.price);
+        });
 
         for(var i = 0; i < sections.length; i++){
             $('#section-select').append('<option>' + sections[i] + '</option>');

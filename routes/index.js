@@ -22,11 +22,11 @@ router.get('/', function(req, res, next) {
 
     console.log('Connected to database');
 
-    var queryString = "SELECT DISTINCT section FROM test_strata_energy;";
+    var queryString = "SELECT DISTINCT section FROM large_strata_energy;";
 
     //
     queryString = squel.select()
-        .from("test_strata_energy")
+        .from("large_strata_energy")
         .field("section")
         .distinct()
         .toString()
