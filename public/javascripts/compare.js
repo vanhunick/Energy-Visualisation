@@ -7,6 +7,7 @@ var numberSections = 1; // The id count for each row
 // Holds the currently selected items in the filter rows
 var selections = [];
 
+var selectedCompany = "";
 
 // Adds a new row of filters for section category and sub category
 function addSection(){
@@ -19,18 +20,15 @@ function addSection(){
     // Push the information for the new row into the selections array
     selections.push({id : numberSections, section : "", category : "", subCategory : ""});
 
-
+    // Add a change listener for when a section is selected
     $("#section-select"+numberSections).on('change', function(event){
-        var section = $(this).find("option:selected").text();
-        console.log("Section selected")
+        var section = $(this).find("option:selected").text(); // Grab the selection
+        var idNumb = event.target.id.charAt(event.target.id.length-1); // Grab the last character of the id that generated the event to work out correct id
 
         // Find all the categories associated with this section
         $.post("/sections/s",{selected : section }, function(data){
             if(data.categories.length > 0){
-                var idNumb = event.target.id.charAt(event.target.id.length-1);
-
                 $('#category-select'+idNumb).html(''); // Empty temp options
-
             }
 
             // Add the options to the drop down
@@ -41,18 +39,17 @@ function addSection(){
             // Refresh all drop downs
             $(".selectpicker").selectpicker('refresh');
         });
-
-        addToselection(numberSections,"section",section);
+        addToselection(idNumb,"section",section); // Record change in the array of selections
     });
 
     // add category selector
     $('#compare-div').append('<select class="selectpicker" title="Category" id="category-select'+numberSections+'"> <option>No data</option> </select>');
     $('#category-select'+numberSections).on('change', function(event){
         var category = $(this).find("option:selected").text();
+        var idNumb = event.target.id.charAt(event.target.id.length-1);
 
         // Find all sub categories for the currently selected category
         $.post("/sections/sc",{category : category}, function(data){
-            var idNumb = event.target.id.charAt(event.target.id.length-1);
 
             if(data.subCategories.length > 0){
                 $('#subsection-select'+idNumb).html(''); // Empty temp options
@@ -64,23 +61,24 @@ function addSection(){
             }
             $(".selectpicker").selectpicker('refresh');
         });
-
-        addToselection(numberSections,"category", category);
+        addToselection(idNumb,"category", category);
     });
 
     // add sub category selector
     $('#compare-div').append('<select class="selectpicker" title="Subsection" id="subsection-select'+numberSections+'"><option>No data</option></select>');
-    $('#subsection-select'+numberSections).on('change', function(){
-        var data = $(this).find("option:selected").text();
-        addToselection(numberSections,"subcategory", data);
-    });
+    $('#subsection-select'+numberSections).on('change', function(event){
+        var idNumb = event.target.id.charAt(event.target.id.length-1);
 
+        var data = $(this).find("option:selected").text();
+        addToselection(idNumb,"subcategory", data);
+    });
     numberSections++;
 }
 
 function addToselection(id, type, data){
+    console.log("Trying");
     for(var i = 0; i < selections.length; i++){
-        if(selections[i].id === id){
+        if(selections[i].id+"" === id+""){ // Convert them both to strings
             if(type === "section"){
                 selections[i].section = data;
             } else if(type === "category"){
@@ -96,15 +94,31 @@ function addToselection(id, type, data){
 
 $(document).ready( function() {
 
+
+    $('#company-select').on('change', function(event){
+        console.log(selectedCompany);
+        selectedCompany = $(this).find("option:selected").text();
+    });
+
     $('#genSection-btn').click(function(){
         addSection();
     });
+
+    $('#search-btn-compare').click(function(){
+        console.log("selected " + selectedCompany);
+        // Send array of selected sections to server and the company
+        console.log(selections);
+        $.post("/compare/search",{company : selectedCompany, selections : JSON.stringify(selections)}, function(data){
+            console.log("Returned from compare search " + data);
+        });
+    });
+
+
     // Grab all the sections
     /// Query for all sections
     $.get("/sections/sections", function(data){
 
         // Create the filters
-        addSection();
         addSection();
         addSection();
 
