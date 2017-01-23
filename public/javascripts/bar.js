@@ -40,9 +40,16 @@ function createBarGraph(title, data){
     y.domain([0, d3.max(data, function(d) { return d.value; })]); // object should contain a value
     y.nice(); // Rounds up to the nearest whole number
 
+    yAxis.scale(y);
+
+
     if(created){
         svg.selectAll(".bar") // None exist yet but will be created with enter
             .data(data) // enter the data array
+            .transition()
+            .duration(1000)
+            .attr("y", function(d) { return y(d.value); }) // set the y value according to the value
+            .attr("height", function(d) { return height - y(d.value); }); // set the height
     } else {
         // Next step is to create the rectangles and add to the svg
         svg.selectAll(".bar") // None exist yet but will be created with enter
@@ -56,7 +63,6 @@ function createBarGraph(title, data){
             .attr("height", function(d) { return height - y(d.value); }); // set the height
     }
 
-    yAxis.scale(y);
 
     // If the axis already exists animate it with the new domain
     if(created){

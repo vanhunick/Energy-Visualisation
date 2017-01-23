@@ -121,10 +121,58 @@ router.get('/company', function(req, res) {
     });
 });
 
+
+router.get('/sections', function(req, res) {
+
+    //TODO escape req.body.selected
+    //TODO maybe check if the company data exists for the section and category
+    var queryString = "SELECT DISTINCT section FROM large_strata_energy;";
+
+    // Connect to the database
+    pg.connect(global.databaseURI, function (err, client, done) {
+        done(); // closes the connection once result has been returned
+
+        // Check whether the connection to the database was successful
+        if (err) {
+            console.error('Could not connect to the database');
+            console.error(err);
+            return;
+        }
+
+        client.query(queryString, function (error, result) {
+            done();
+
+            var sections = [];
+
+            if (error) {
+                console.error('Failed to execute query');
+                console.error(error);
+                return;
+            } else {
+                for (row in result.rows) {
+                    var c = result.rows[row].section;
+                    sections.push(c);
+                }
+                console.log("L " + sections.length);
+                res.send({sections: sections});
+                return;
+            }
+        })
+    });
+});
+
 router.post('/search', function(req, res, next) {
 
     //TODO escape req.body.selected
-    var queryString = "SELECT edb, disc_yr, description, obs_yr, fcast_yr,  units,  value FROM large_strata_energy WHERE section = '" + req.body.section + "' AND category = '" + req.body.category + "';";
+
+    var queryString = "";
+
+    if(req.body.subCategory !== ''){
+        queryString = "SELECT edb, disc_yr, description, obs_yr, fcast_yr,  units,  value FROM large_strata_energy WHERE section = '" + req.body.section + "' AND category = '" + req.body.category + "' AND sub_category = '" + req.body.subCategory + "';";// AND sch_ref = 19;";
+    } else {
+        queryString = "SELECT edb, disc_yr, description, obs_yr, fcast_yr,  units,  value FROM large_strata_energy WHERE section = '" + req.body.section + "' AND category = '" + req.body.category + "';";
+    }
+
     console.log(queryString);
     // Connect to the database
     pg.connect(global.databaseURI, function (err, client, done) {

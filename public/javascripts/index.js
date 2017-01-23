@@ -60,9 +60,10 @@ $(document).ready( function() {
 
     });
 
-    $('#subcategory-select').on('change', function(){
+    $('#subsection-select').on('change', function(){
         // Set the sub category
         subcategory = $(this).find("option:selected").text();
+
     });
 
     $('#company-select').on('change', function(){
@@ -86,33 +87,64 @@ $(document).ready( function() {
     });
 });
 
+
+
+
+
 // Creates a table with the given rows
 function insertDataTable(rows){
 
     // first create caption title with description
     $('#results-table').append('<caption>' + rows[0].description + '</caption>');
     //TODO check if discovered or observed
+    var observerd = false;
+
     if(rows[0].obs_yr !== ""){
         console.log("Observed");
+        observerd = true;
     } else if(rows[0].fcast_yr !== "") {
         console.log("Forecast");
     }
 
+    var min = null;
+    var max = null;
+
+    if(observerd){
+        // Find the min and max year
+        min = rows.reduce(function(prev, curr) {
+            return prev.disc_yr < curr.disc_yr ? prev : curr;
+        }).obs_yr;
+
+        max = rows.reduce(function(prev, curr) {
+            return prev.disc_yr > curr.disc_yr ? prev : curr;
+        }).obs_yr;
+    } else {
+        // Find the min and max year
+        min = rows.reduce(function(prev, curr) {
+            return prev.fcast_yr < curr.fcast_yr ? prev : curr;
+        }).fcast_yr;
+
+        max = rows.reduce(function(prev, curr) {
+            return prev.fcast_yr > curr.fcast_yr ? prev : curr;
+        }).fcast_yr;
+    }
+
+    console.log("Min " + min + " Max " + max);
 
 
-
-    // Find the min and max year
-    var min = rows.reduce(function(prev, curr) {
-        return prev.disc_yr < curr.disc_yr ? prev : curr;
-    });
-
-    var max = rows.reduce(function(prev, curr) {
-        return prev.disc_yr > curr.disc_yr ? prev : curr;
-    });
+    //// Find the min and max year
+    //var min = rows.reduce(function(prev, curr) {
+    //    return prev.disc_yr < curr.disc_yr ? prev : curr;
+    //});
+    //
+    //var max = rows.reduce(function(prev, curr) {
+    //    return prev.disc_yr > curr.disc_yr ? prev : curr;
+    //});
 
     //Create the columns
     var years = "";
-    for(var i = min.disc_yr; i <=max.disc_yr; i++){
+
+    for(var i = min; i <= max; i++){
         years += "<th>" + i + "</th>";
     }
 
@@ -131,26 +163,24 @@ function insertDataTable(rows){
             // Insert name in column and assign an id to the row
             var row = "<tr id=row"+i+"><th>" + rows[i].edb + "</th>";
 
-            for(var cur = min.disc_yr; cur <=max.disc_yr; cur++){
+            for(var cur = min; cur <=max; cur++){
 
                 // Iterate through all rows finding ones with the current edb
                 for(var j = 0; j < rows.length; j++){
 
                     // Check it matches edb and year inserting into
-                    if(rows[j].edb === rows[i].edb && rows[j].disc_yr === cur){
-                        row += "<th>" + rows[i].value + "</th>";
+                    if(rows[j].edb === rows[i].edb && (observerd ? rows[j].disc_yr : rows[j].fcast_yr) === cur){
+                        row += "<th>" + rows[j].value + "</th>";
                     }
                 }
             }
 
-            //console.log("Data Row " + row);
             $('#results-table').append(row + '</tr>');
 
             // Assing a on click function to each of the rows to generate the bar graph with the row specific data
             $( "#row"+i+"").click(function(event) {
                 showBarWithRowElem(this.id);
             });
-
         }
     }
 }
@@ -191,7 +221,7 @@ function insertCompanies(){
         }
 
         for(var i = 1; i < data.companies.length; i++){
-            $('#company-select').append('<option>' + data.companies[i] + '</option>').selectpicker('refresh');
+            $('#company-select').append('<option>' + data.companies[i] + '</option>');
         }
         $(".selectpicker").selectpicker('refresh');
     });
