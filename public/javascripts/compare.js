@@ -110,6 +110,7 @@ $(document).ready( function() {
         console.log(selections);
         $.post("/compare/search",{company : selectedCompany, selections : JSON.stringify(selections)}, function(data){
             console.log("Returned from compare search " + data);
+            console.log(data.rows);
         });
     });
 

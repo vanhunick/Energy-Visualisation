@@ -70,7 +70,7 @@ router.post('/search', function(req, res, next) {
                 var validRows = [];
 
                 for (row in result.rows){
-                    var section = result.rows[row].section;
+                    var section = result.rows[row];
                     validRows.push(section);
                 }
 
