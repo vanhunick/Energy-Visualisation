@@ -27,16 +27,16 @@ router.post('/search', function(req, res, next) {
 
     var q = squel.select().from("large_strata_energy");
 
-    var expr = squel.expr().and("edb = " + company);
+    var expr = squel.expr().and("edb = '" + company + "'");
 
     // create query
     for(var i = 0; i < selections.length; i++){
         if(i === 0){
             expr.and(squel.expr().and("section = '" + selections[i].section + "'")
-                .and("category = " + selections[i].category)
-                .and("sub_category = '" + selections[i].subCategory))
+                .and("category = '" + selections[i].category + "'")
+                .and("sub_category = '" + selections[i].subCategory + "'"))
         } else {
-            expr.or(squel.expr().and("section = " + selections[i].section  + "'")
+            expr.or(squel.expr().and("section = '" + selections[i].section  + "'")
                 .and("category = '" + selections[i].category  + "'")
                 .and("sub_category = '" + selections[i].subCategory  + "'"))
         }
@@ -45,6 +45,42 @@ router.post('/search', function(req, res, next) {
     q.where(expr);
 
     console.log(q.toString());
+
+
+    // Connect to the database
+    pg.connect(global.databaseURI, function(err, client, done) {
+        done(); // closes the connection once result has been returned
+
+        // Check whether the connection to the database was successful
+        if(err){
+            console.error('Could not connect to the database');
+            console.error(err);
+            return;
+        }
+
+
+        client.query(q.toString(), function(error, result){
+            done();
+
+            if(error) {
+                console.error('Failed to execute query');
+                console.error(error);
+                return;
+            } else {
+                var validRows = [];
+
+                for (row in result.rows){
+                    var section = result.rows[row].section;
+                    validRows.push(section);
+                }
+
+                res.send({rows : validRows});
+                return;
+            }
+        })
+    });
+
+
 });
 
 module.exports = router;
