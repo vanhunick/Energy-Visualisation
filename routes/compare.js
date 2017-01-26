@@ -21,10 +21,6 @@ router.post('/search', function(req, res, next) {
     //console.log("Selections " + selections);
 
 
-    //console.log(selections);
-
-
-
     var q = squel.select().from("large_strata_energy");
 
     var expr = squel.expr().and("edb = '" + company + "'");

@@ -5,11 +5,17 @@ var express = require('express');
 var router = express.Router();
 var pg = require('pg');
 
+var squel = require("squel");
+
 // finds all categories that match a section
 router.post('/s', function(req, res, next) {
 
     //TODO escape req.body.selected
-    var queryString = "SELECT DISTINCT category FROM large_strata_energy WHERE section = '" + req.body.selected + "';";
+    var queryString = squel.select()
+        .from("large_strata_energy")
+        .field("category").distinct()
+        .where("section = '"+req.body.selected+"'").toString();
+
 
     // Connect to the database
     pg.connect(global.databaseURI, function (err, client, done) {
@@ -49,7 +55,12 @@ router.post('/sc', function(req, res, next) {
 
     //TODO escape req.body.category
     //var queryString = "SELECT DISTINCT category FROM large_strata_energy WHERE section = '" + req.body.selected +  "AND category = '" + req.body.category + "';";
-    var queryString = "SELECT DISTINCT sub_category FROM large_strata_energy WHERE category = '" + req.body.category + "';";
+
+    var queryString = squel.select()
+        .from("large_strata_energy")
+        .field("sub_category").distinct()
+        .where("category = '"+req.body.category+"'").toString();
+
 
     // Connect to the database
     pg.connect(global.databaseURI, function (err, client, done) {
@@ -87,7 +98,10 @@ router.get('/company', function(req, res) {
 
     //TODO escape req.body.selected
     //TODO maybe check if the company data exists for the section and category
-    var queryString = "SELECT DISTINCT EDB FROM large_strata_energy;";// WHERE section = '" + req.body.selected + "';";
+    var queryString = squel.select()
+        .from("large_strata_energy")
+        .field("edb").distinct()
+        .toString();
 
     // Connect to the database
     pg.connect(global.databaseURI, function (err, client, done) {
@@ -126,7 +140,10 @@ router.get('/sections', function(req, res) {
 
     //TODO escape req.body.selected
     //TODO maybe check if the company data exists for the section and category
-    var queryString = "SELECT DISTINCT section FROM large_strata_energy;";
+    var queryString = squel.select()
+        .from("large_strata_energy")
+        .field("section").distinct()
+        .toString();
 
     // Connect to the database
     pg.connect(global.databaseURI, function (err, client, done) {
@@ -164,16 +181,25 @@ router.get('/sections', function(req, res) {
 router.post('/search', function(req, res, next) {
 
     //TODO escape req.body.selected
-
-    var queryString = "";
+    var queryString = squel.select()
+        .from("large_strata_energy")
+        .field("edb")
+        .field("disc_yr")
+        .field("description")
+        .field("obs_yr")
+        .field("fcast_yr")
+        .field("units")
+        .field("value");
 
     if(req.body.subCategory !== ''){
-        queryString = "SELECT edb, disc_yr, description, obs_yr, fcast_yr,  units,  value FROM large_strata_energy WHERE section = '" + req.body.section + "' AND category = '" + req.body.category + "' AND sub_category = '" + req.body.subCategory + "';";// AND sch_ref = 19;";
+        queryString = queryString.where("section = '"+ req.body.section + "'")
+            .where("category = '"+ req.body.category+ "'")
+            .where("sub_category = '"+ req.body.subCategory+ "'").toString(); // Adds subcategory clause
     } else {
-        queryString = "SELECT edb, disc_yr, description, obs_yr, fcast_yr,  units,  value FROM large_strata_energy WHERE section = '" + req.body.section + "' AND category = '" + req.body.category + "';";
+        queryString = queryString.where("section = '"+ req.body.section + "'")
+            .where("category = '"+ req.body.category+ "'").toString();
     }
 
-    console.log(queryString);
     // Connect to the database
     pg.connect(global.databaseURI, function (err, client, done) {
         done(); // closes the connection once result has been returned
@@ -195,7 +221,6 @@ router.post('/search', function(req, res, next) {
                 console.error(error);
                 return;
             } else {
-                console.log("Rsult " + result.rows.length);
                 for (row in result.rows) {
                     console.log("Pushing " + row);
                     rowsSimplified.push(result.rows[row]);
