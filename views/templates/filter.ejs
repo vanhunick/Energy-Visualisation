@@ -1,36 +1,61 @@
 <div class="row">
 
+    <!--Selector for section-->
     <select class="selectpicker"  title="Section" id="section-select">
         <option>No data</option>
     </select>
 
-
+    <!--Selector for category-->
     <select class="selectpicker" title="Category" id="category-select">
         <option>No data</option>
     </select>
 
+    <!--Selector for sub section-->
     <select class="selectpicker" title="Subsection" id="subsection-select">
         <option>No data</option>
     </select>
+
 
     <h4>Company</h4>
     <select class="selectpicker" title="EDB" id="company-select">
         <option>No data</option>
     </select>
 
+    <!--Search button-->
     <button type="button" class="btn btn-default" id="search-btn">Search</button>
 
 
     <script>
         // Grab the new data array
         var sections =  JSON.parse('<%- sections %>');
+        sections.sort(function(a,b){
+            // First check simple case of number difference
+            var i = 0;
+            while(!isNaN(a.charAt(i))){
+                i++
+            }
+            var numberA = a.substring(0,i); // Gets the number from the section
+
+            i = 0;
+            while(!isNaN(b.charAt(i))){
+                i++
+            }
+
+            var numberB = b.substring(0,i);
+
+            if(numberA !== numberB) {
+                return numberA - numberB;
+            }
+
+            return [a,b].sort()[0] === a ? -1 : 1;
+        });
 
         if(sections.length !== 0){
             $('#section-select').html(""); // Empty temp options
         }
-        sections.sort(function(a, b) {
-            return parseFloat(a.price) - parseFloat(b.price);
-        });
+//        sections.sort(function(a, b) {
+//            return parseFloat(a.price) - parseFloat(b.price);
+//        });
 
         for(var i = 0; i < sections.length; i++){
             $('#section-select').append('<option>' + sections[i] + '</option>');
