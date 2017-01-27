@@ -8,6 +8,7 @@ var section = "";
 var category = "";
 var subcategory = "";
 var company = "";
+var subExists = false;
 
 $(document).ready( function() {
 
@@ -48,7 +49,10 @@ $(document).ready( function() {
         // Find all sub categories for the currently selected category
         $.post("/sections/sc",{category : category}, function(data){
             if(data.subCategories.length > 0){
+                subExists = true;
                 $('#subsection-select').html(''); // Empty temp options
+            } else {
+                subExists = false;
             }
 
             // Add sub section options
@@ -75,6 +79,16 @@ $(document).ready( function() {
     $( "#search-btn" ).click(function() {
 
         //TODO First check if any values null
+        if(section === ""){
+            $('#error').html("Section not selected");
+            return;
+        } else if(category === ""){
+            $('#error').html("Category not selected");
+            return;
+        } else if(subcategory === "" && subExists){
+            $('#error').html("Sub category not selected");
+            return;
+        }
 
         // Send category, section, sub category and company
         $.post("/sections/search",{section : section, category : category, subCategory : subcategory, company : company}, function(data){
@@ -153,6 +167,7 @@ function insertDataTable(rows){
 
     // An array of companies already processed
     var done = [];
+    var cellCount = 0;
 
     // Create the rows of data
     for(var i = 0; i < rows.length; i++){
@@ -163,6 +178,7 @@ function insertDataTable(rows){
             // Insert name in column and assign an id to the row
             var row = "<tr id=row"+i+"><th>" + rows[i].edb + "</th>";
 
+
             for(var cur = min; cur <=max; cur++){
 
                 // Iterate through all rows finding ones with the current edb
@@ -170,7 +186,16 @@ function insertDataTable(rows){
 
                     // Check it matches edb and year inserting into
                     if(rows[j].edb === rows[i].edb && (observerd ? rows[j].disc_yr : rows[j].fcast_yr) === cur){
-                        row += "<th>" + rows[j].value + "</th>";
+                        row += "<th id='t"+cellCount+"'>" + rows[j].value + "</th>";
+
+                        //+cellCount
+                        //TODO fix
+                            $("#t"+cellCount).css(
+                            {
+                                "background" : "-webkit-gradient(linear, left top, right top, color-stop(" + rows[j].value +"%,#F00), color-stop(" + rows[j].value +"%,#FFF))",
+                            }
+                        );
+                        cellCount++;
                     }
                 }
             }
