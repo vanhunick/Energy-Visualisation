@@ -51,11 +51,12 @@ $(document).ready( function() {
 
         // Find all sub categories for the currently selected category
         $.post("/sections/sc",{category : category,section : section}, function(data){
-            if(data.subCategories.length > 0){
+            if(data.subCategories.length > 0 &&  data.subCategories[0] !== null){
                 subExists = true;
                 $('#subsection-select').html(''); // Empty temp options
             } else {
-                subExists = false;
+                subExists = false; //TODO Check for no data when searching server side or remove No data option
+                return;
             }
 
             // Add sub section options
@@ -116,10 +117,10 @@ function insertDataTable(rows){
     //TODO check if discovered or observed
     var observerd = false;
 
-    if(rows[0].obs_yr !== ""){
+    if(rows[0].obs_yr !== null){
         console.log("Observed");
         observerd = true;
-    } else if(rows[0].fcast_yr !== "") {
+    } else if(rows[0].fcast_yr !== null) {
         console.log("Forecast");
     }
 
