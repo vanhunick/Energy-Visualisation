@@ -3,6 +3,21 @@ $(document).ready( function() {
     $(".nav-link").removeClass('active');
     $("#core-link").addClass('active');
 
+    // Set the style of the validation errors
+    $.validator.setDefaults({
+        errorClass : 'help-block',
+            highlight: function (element) {
+                $(element)
+                    .closest('.form-group')
+                    .addClass('has-error')
+            },
+        unhighlight :function (element) {
+            $(element)
+            .closest('.form-group')
+            .removeClass('has-error')
+        }
+        }
+    );
 
     var cpiRules = {
         required : true,
