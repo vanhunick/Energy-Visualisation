@@ -93,7 +93,9 @@ function addToselection(id, type, data){
 
 
 $(document).ready( function() {
-
+    // Highlight the selected link
+    $(".nav-link").removeClass('active');
+    $("#benchmarks-link").addClass('active');
 
     $('#company-select').on('change', function(event){
         console.log(selectedCompany);

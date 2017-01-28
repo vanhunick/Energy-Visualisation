@@ -14,3 +14,8 @@ a {
 .bar {
   fill: steelblue;
 }
+
+.input-horizontal {
+  display: inline-block;
+  vertical-align: top;
+}

@@ -11,6 +11,9 @@ var company = "";
 var subExists = false;
 
 $(document).ready( function() {
+    // Highlight the selected link
+    $(".nav-link").removeClass('active');
+    $("#data-link").addClass('active');
 
     // Queries DB and inserts options in selection dropdown
     insertCompanies();
@@ -118,6 +121,12 @@ function insertDataTable(rows){
         observerd = true;
     } else if(rows[0].fcast_yr !== "") {
         console.log("Forecast");
+    }
+
+    for(var i = 0; i < rows.length; i++){
+        if(rows[i].obs_yr === 2015){
+            console.log("2015");
+        }
     }
 
     var min = null;

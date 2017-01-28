@@ -170,7 +170,6 @@ router.get('/sections', function(req, res) {
                     var c = result.rows[row].section;
                     sections.push(c);
                 }
-                console.log("L " + sections.length);
                 res.send({sections: sections});
                 return;
             }
@@ -232,7 +231,4 @@ router.post('/search', function(req, res, next) {
         })
     });
 });
-
-
-
 module.exports = router;

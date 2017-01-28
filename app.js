@@ -8,6 +8,8 @@ var bodyParser = require('body-parser');
 var index = require('./routes/index');
 var sections = require('./routes/sections');
 var compare = require('./routes/compare');
+var core = require('./routes/core');
+
 
 var postgres = require('pg');
 
@@ -31,6 +33,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', index);
 app.use('/sections',sections);
 app.use('/compare',compare);
+app.use('/core',core);
 
 
 // catch 404 and forward to error handler
