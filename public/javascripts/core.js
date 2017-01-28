@@ -51,3 +51,8 @@ $(document).ready( function() {
     });
 
 });
+
+function applyCPI(){
+    console.log("Apply CPI");
+    return false;
+}

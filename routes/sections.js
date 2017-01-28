@@ -59,6 +59,7 @@ router.post('/sc', function(req, res, next) {
     var queryString = squel.select()
         .from("large_strata_energy")
         .field("sub_category").distinct()
+        .where("section = '"+req.body.section+"'")
         .where("category = '"+req.body.category+"'").toString();
 
 

@@ -14,12 +14,12 @@
 <h1>Core Measures</h1>
 
 <div class="row" style="margin-top: 2%;">
-
+<div class="col-md-12">
     <div class="form-group input-horizontal">
     <h4 style="margin-top: 42%;"><b>Set CPI:</b></h4>
     </div>
 
-    <form id="cpi-form">
+    <form id="cpi-form"  onsubmit="return applyCPI()" >
 
     <div class="form-group input-horizontal">
     <label for="inputdefault">2012</label>
@@ -46,9 +46,20 @@
         <div class="form-group">
             <input class="btn btn-primary" id="apply-btn" type="submit" value="Apply CPI">
         </div>
-
+        
     </form>
+</div>
+</div>
 
+<div class="row">
+    <div class="col-md-12">
+        <!--Selector for measure-->
+        <select class="selectpicker" title="Select measure" id="measure-select">
+            <option>Competition & Reliability</option>
+            <option>Circuit Comparisons</option>
+            <option>Revenue and Expenditure Proportions</option>
+        </select>
+    </div>
 </div>
 
 </body>

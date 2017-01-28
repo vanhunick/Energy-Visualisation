@@ -50,7 +50,7 @@ $(document).ready( function() {
         //TODO might have to make sure the section is also the same
 
         // Find all sub categories for the currently selected category
-        $.post("/sections/sc",{category : category}, function(data){
+        $.post("/sections/sc",{category : category,section : section}, function(data){
             if(data.subCategories.length > 0){
                 subExists = true;
                 $('#subsection-select').html(''); // Empty temp options
