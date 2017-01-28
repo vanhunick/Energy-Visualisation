@@ -3,7 +3,9 @@
 <head>
     <title>Energy Core</title>
     <% include ../views/templates/head %>
-    <script src="/javascripts/core.js"></script>
+
+    <!--Jquery validation-->
+    <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.15.0/jquery.validate.min.js"></script>
 
 </head>
 <body>
@@ -12,34 +14,39 @@
 <h1>Core Measures</h1>
 
 <div class="row" style="margin-top: 2%;">
+
     <div class="form-group input-horizontal">
     <h4 style="margin-top: 42%;"><b>Set CPI:</b></h4>
     </div>
 
+    <form id="cpi-form">
+
     <div class="form-group input-horizontal">
     <label for="inputdefault">2012</label>
-    <input class="form-control " style="width: 100%;" id="" type="text">
+    <input name="Y2012" class="form-control " style="width: 100%;" id="" type="text">
     </div>
 
     <div class="form-group input-horizontal">
         <label for="inputdefault">2013</label>
-        <input class="form-control" style="width: 100%;" id="" type="text">
+        <input name="Y2013" class="form-control" style="width: 100%;" id="" type="text">
     </div>
     <div class="form-group input-horizontal">
         <label for="inputdefault">2014</label>
-        <input class="form-control" style="width: 100%;" id="" type="text">
+        <input name="Y2014" class="form-control" style="width: 100%;" id="" type="text">
     </div>
     <div class="form-group input-horizontal">
         <label for="inputdefault">2015</label>
-        <input class="form-control" style="width: 100%;" id="" type="text">
+        <input name="Y2015" class="form-control" style="width: 100%;" id="" type="text">
     </div>
     <div class="form-group input-horizontal">
         <label for="inputdefault">2016</label>
-        <input class="form-control" style="width: 100%;" id="" type="text">
+        <input  name="Y2016" class="form-control" style="width: 100%;" id="" type="text">
     </div>
-
+    </form>
 
 </div>
 
 </body>
+<script src="/javascripts/core.js"></script>
+
 </html>
