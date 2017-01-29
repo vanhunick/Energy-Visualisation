@@ -111,6 +111,7 @@ $(document).ready( function() {
 
 // Creates a table with the given rows
 function insertDataTable(rows){
+    console.log("Inserting table");
 
     // first create caption title with description
     $('#results-table').append('<caption>' + rows[0].description + '</caption>');
@@ -179,6 +180,9 @@ function insertDataTable(rows){
     var done = [];
     var cellCount = 0;
 
+
+    var cellValues = [];
+
     // Create the rows of data
     for(var i = 0; i < rows.length; i++){
         if(!done.includes(rows[i].edb)){
@@ -198,13 +202,9 @@ function insertDataTable(rows){
                     if(rows[j].edb === rows[i].edb && (observerd ? rows[j].disc_yr : rows[j].fcast_yr) === cur){
                         row += "<th id='t"+cellCount+"'>" + rows[j].value + "</th>";
 
-                        //+cellCount
-                        //TODO fix
-                            $("#t"+cellCount).css(
-                            {
-                                "background" : "-webkit-gradient(linear, left top, right top, color-stop(" + rows[j].value +"%,#F00), color-stop(" + rows[j].value +"%,#FFF))",
-                            }
-                        );
+                        // Save the value and the id of the cell to display percentage
+                        cellValues.push({ id : "#t"+cellCount, value : rows[j].value });
+
                         cellCount++;
                     }
                 }
@@ -218,6 +218,16 @@ function insertDataTable(rows){
             });
         }
     }
+
+    // Apllie css to each cell
+    for(var i = 0; i < cellValues.length; i++){
+        $(cellValues[i].id).css(
+            {
+                "background" : "-webkit-gradient(linear, left top, right top, color-stop(" + cellValues[i].value +"%,#F00), color-stop(" + cellValues[i].value +"%,#FFF))",
+            }
+        );
+    }
+
 }
 
 function showBarWithRowElem(rowID){
