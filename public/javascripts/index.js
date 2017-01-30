@@ -295,3 +295,26 @@ function insertCompanies(){
         $(".selectpicker").selectpicker('refresh');
     });
 }
+
+
+// New potentially for changing the url when search is clicked
+
+function search(){
+    var parameters = { q: "Data",
+    };
+
+    console.log("Changing url");
+    window.location.replace("/?" + serialise(parameters));
+}
+
+
+
+
+function serialise(obj) {
+    var str = [];
+    for(var p in obj)
+        if (obj.hasOwnProperty(p)) {
+            str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+        }
+    return str.join("&");
+}
