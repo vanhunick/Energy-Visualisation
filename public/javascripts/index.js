@@ -8,6 +8,9 @@ var section = "";
 var category = "";
 var subcategory = "";
 var company = "";
+var description = "";
+
+var descriptionExists = false;
 var subExists = false;
 
 $(document).ready( function() {
@@ -68,11 +71,38 @@ $(document).ready( function() {
 
     });
 
+
+    // Sub Category select listener
     $('#subsection-select').on('change', function(){
         // Set the sub category
         subcategory = $(this).find("option:selected").text();
 
+
+        // Find all descriptions for the currently selected sub category
+        $.post("/sections/desc",{category : category,section : section, subCategory : subcategory}, function(data){
+            if(data.descriptions.length > 0 &&  data.descriptions[0] !== null){
+                descriptionExists = true;
+                $('#description-select').html(''); // Empty temp options
+            } else {
+                descriptionExists = false; //TODO Check for no data when searching server side or remove No data option
+                return;
+            }
+
+            // Add sub section options
+            for(var i = 0; i < data.descriptions.length; i++){
+                $('#description-select').append('<option>' + data.descriptions[i] + '</option>');
+            }
+            $(".selectpicker").selectpicker('refresh');
+        });
     });
+
+
+    $('#description-select').on('change', function(){
+        // Set the description
+        description = $(this).find("option:selected").text();
+    });
+
+
 
     $('#company-select').on('change', function(){
         // set the selected company
@@ -95,7 +125,7 @@ $(document).ready( function() {
         }
 
         // Send category, section, sub category and company
-        $.post("/sections/search",{section : section, category : category, subCategory : subcategory, company : company}, function(data){
+        $.post("/sections/search",{section : section, category : category, subCategory : subcategory, company : company, description : description}, function(data){
             if(data.rows.length > 0){
                 insertDataTable(data.rows);
             } else {
@@ -123,12 +153,6 @@ function insertDataTable(rows){
         observerd = true;
     } else if(rows[0].fcast_yr !== null) {
         console.log("Forecast");
-    }
-
-    for(var i = 0; i < rows.length; i++){
-        if(rows[i].obs_yr === 2015){
-            console.log("2015");
-        }
     }
 
     var min = null;
