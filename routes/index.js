@@ -19,7 +19,10 @@ router.get('/', function(req, res, next) {
     }
 
     // Create query to get all the distinct sections
-    var queryString = squel.select().from("large_strata_energy").field("section").distinct().toString()
+    var queryString = squel.select()
+        .from("large_strata_energy")
+        .field("section")
+        .distinct().toString();
 
     client.query(queryString, function(error, result){
       done();

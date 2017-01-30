@@ -15,10 +15,10 @@ function addSection(){
     $('#compare-div').append('<div class="col-md-12">');
 
     // add section selector
-    $('#compare-div').append('<select class="selectpicker"  title="Section" id="section-select'+numberSections+'"><option>No data</option> </select>');
+    $('#compare-div').append('<select class="selectpicker"  title="Section" id="section-select'+numberSections+'"></select>');
 
     // Push the information for the new row into the selections array
-    selections.push({id : numberSections, section : "", category : "", subCategory : ""});
+    selections.push({id : numberSections, section : "", category : "", subCategory : "", description : ""});
 
     // Add a change listener for when a section is selected
     $("#section-select"+numberSections).on('change', function(event){
@@ -43,7 +43,7 @@ function addSection(){
     });
 
     // add category selector
-    $('#compare-div').append('<select class="selectpicker" title="Category" id="category-select'+numberSections+'"> <option>No data</option> </select>');
+    $('#compare-div').append('<select class="selectpicker" title="Category" id="category-select'+numberSections+'"></select>');
     $('#category-select'+numberSections).on('change', function(event){
         var category = $(this).find("option:selected").text();
         var idNumb = event.target.id.charAt(event.target.id.length-1);
@@ -65,18 +65,29 @@ function addSection(){
     });
 
     // add sub category selector
-    $('#compare-div').append('<select class="selectpicker" title="Subsection" id="subsection-select'+numberSections+'"><option>No data</option></select>');
+    $('#compare-div').append('<select class="selectpicker" title="Subsection" id="subsection-select'+numberSections+'"></select>');
     $('#subsection-select'+numberSections).on('change', function(event){
         var idNumb = event.target.id.charAt(event.target.id.length-1);
 
         var data = $(this).find("option:selected").text();
         addToselection(idNumb,"subcategory", data);
     });
+
+    // add description selector
+    $('#compare-div').append('<select class="selectpicker" title="Description" id="description-select'+numberSections+'"></select>');
+    $('#description-select'+numberSections).on('change', function(event){
+        var idNumb = event.target.id.charAt(event.target.id.length-1);
+
+        var data = $(this).find("option:selected").text();
+        addToselection(idNumb,"description", data);
+    });
+
+
     numberSections++;
 }
 
 function addToselection(id, type, data){
-    console.log("Trying");
+
     for(var i = 0; i < selections.length; i++){
         if(selections[i].id+"" === id+""){ // Convert them both to strings
             if(type === "section"){
@@ -85,6 +96,8 @@ function addToselection(id, type, data){
                 selections[i].category = data;
             } else if(type === "subcategory"){
                 selections[i].subCategory = data;
+            } else if(type === "description"){
+                selections[i].description = data;
             }
         }
     }
@@ -111,8 +124,7 @@ $(document).ready( function() {
         // Send array of selected sections to server and the company
         console.log(selections);
         $.post("/compare/search",{company : selectedCompany, selections : JSON.stringify(selections)}, function(data){
-            console.log("Returned from compare search " + data);
-            console.log(data.rows);
+
         });
     });
 
@@ -121,10 +133,11 @@ $(document).ready( function() {
     /// Query for all sections
     $.get("/sections/sections", function(data){
 
-        // Create the filters
+        // Create the four filters
         addSection();
         addSection();
-
+        addSection();
+        addSection();
 
         // Go through each row and add the section in
         for(var i = 0; i < selections.length; i++){
