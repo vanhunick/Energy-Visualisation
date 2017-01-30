@@ -11,11 +11,11 @@ var selectedCompany = "";
 
 // Adds a new row of filters for section category and sub category
 function addSection(){
-    $('#compare-div').append('<div class="row">');
-    $('#compare-div').append('<div class="col-md-12">');
+    $('#compare-div').append('<div class="row compare-row" id="row'+numberSections+'">');
+    $("#row"+numberSections).append('<div class="col-md-12" id="col'+numberSections+'">');
 
     // add section selector
-    $('#compare-div').append('<select class="selectpicker"  title="Section" id="section-select'+numberSections+'"></select>');
+    $("#col"+numberSections).append('<select class="selectpicker select-compare"  title="Section" id="section-select'+numberSections+'"></select>');
 
     // Push the information for the new row into the selections array
     selections.push({id : numberSections, section : "", category : "", subCategory : "", description : ""});
@@ -43,7 +43,7 @@ function addSection(){
     });
 
     // add category selector
-    $('#compare-div').append('<select class="selectpicker" title="Category" id="category-select'+numberSections+'"></select>');
+    $("#col"+numberSections).append('<select class="selectpicker select-compare" title="Category" id="category-select'+numberSections+'"></select>');
     $('#category-select'+numberSections).on('change', function(event){
         var category = $(this).find("option:selected").text();
         var idNumb = event.target.id.charAt(event.target.id.length-1);
@@ -65,7 +65,7 @@ function addSection(){
     });
 
     // add sub category selector
-    $('#compare-div').append('<select class="selectpicker" title="Subsection" id="subsection-select'+numberSections+'"></select>');
+    $("#col"+numberSections).append('<select class="selectpicker select-compare" title="Subsection" id="subsection-select'+numberSections+'"></select>');
     $('#subsection-select'+numberSections).on('change', function(event){
         var idNumb = event.target.id.charAt(event.target.id.length-1);
 
@@ -74,7 +74,7 @@ function addSection(){
     });
 
     // add description selector
-    $('#compare-div').append('<select class="selectpicker" title="Description" id="description-select'+numberSections+'"></select>');
+    $("#col"+numberSections).append('<select class="selectpicker select-compare" title="Description" id="description-select'+numberSections+'"></select>');
     $('#description-select'+numberSections).on('change', function(event){
         var idNumb = event.target.id.charAt(event.target.id.length-1);
 

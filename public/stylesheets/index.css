@@ -20,6 +20,15 @@ a {
   vertical-align: top;
 }
 
+.compare-row {
+  margin-bottom: 2%;
+  margin-top: 2%;
+}
+
+.select-compare {
+  margin-right: 1%;
+}
+
 /*red 820302*/
 
 /*Nav bar css*/
