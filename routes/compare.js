@@ -17,24 +17,39 @@ router.post('/search', function(req, res, next) {
 
     var company = req.body.company;
     var selections = JSON.parse(req.body.selections);
-    console.log("Company " + company);
-    //console.log("Selections " + selections);
-
 
     var q = squel.select().from("large_strata_energy");
 
-    var expr = squel.expr().and("edb = '" + company + "'");
+    var expr = squel.expr();
 
-    // create query
+    // create query go through rows of sections
     for(var i = 0; i < selections.length; i++){
+        if(selections[i].section === "")continue; // TODO find better way to handle B and D table null
         if(i === 0){
-            expr.and(squel.expr().and("section = '" + selections[i].section + "'")
-                .and("category = '" + selections[i].category + "'")
-                .and("sub_category = '" + selections[i].subCategory + "'"))
+            // There is always a section and a category
+            expr.and("section = '" + selections[i].section + "'")
+                .and("category = '" + selections[i].category + "'");
+
+            // Check is the sub category exists
+            if(selections[i].subCategory !== ""){
+                expr.and("sub_category = '" + selections[i].subCategory + "'");
+            }
+
+            // Add the description condition
+            expr.and("description = '" + selections[i].description + "'");
+
         } else {
-            expr.or(squel.expr().and("section = '" + selections[i].section  + "'")
-                .and("category = '" + selections[i].category  + "'")
-                .and("sub_category = '" + selections[i].subCategory  + "'"))
+            var andExpr = squel.expr().and("section = '" + selections[i].section  + "'")
+                .and("category = '" + selections[i].category  + "'");
+
+            // Check is the sub category exists
+            if(selections[i].subCategory !== ""){
+                andExpr.and("sub_category = '" + selections[i].subCategory + "'");
+            }
+
+            andExpr.and("description = '" + selections[i].description + "'");
+
+            expr.or(andExpr);
         }
     }
 
