@@ -27,7 +27,7 @@ function addSection(){
 
         // Find all the categories associated with this section
         $.post("/sections/s",{selected : section }, function(data){
-            if(data.categories.length > 0){
+            if(data.categories.length > 0  &&  data.categories[0] !== null){
                 $('#category-select'+idNumb).html(''); // Empty temp options
             }
 
@@ -53,8 +53,24 @@ function addSection(){
         // Find all sub categories for the currently selected category
         $.post("/sections/sc",{section : selections[idNumb].section, category : category}, function(data){
 
-            if(data.subCategories.length > 0){
+            if(data.subCategories.length > 0  &&  data.subCategories[0] !== null){
                 $('#subsection-select'+idNumb).html(''); // Empty temp options
+            } else { //TODO could split into individual functions
+                // Find all descriptions for the currently selected sub category
+                $.post("/sections/desc",{category : selections[idNumb].category,section : selections[idNumb].section, subCategory : ""}, function(data){
+                    if(data.descriptions.length > 0 &&  data.descriptions[0] !== null){
+                        $('#description-select'+idNumb).html(''); // Empty temp options
+                    } else {
+                        return;
+                    }
+
+                    // Add sub section options
+                    for(var i = 0; i < data.descriptions.length; i++){
+                        $('#description-select'+idNumb).append('<option>' + data.descriptions[i] + '</option>');
+                    }
+                    $(".selectpicker").selectpicker('refresh');
+                });
+                return;
             }
 
             // Add sub section options
@@ -70,11 +86,25 @@ function addSection(){
     $("#col"+numberSections).append('<select class="selectpicker select-compare" title="Subsection" id="subsection-select'+numberSections+'"></select>');
     $('#subsection-select'+numberSections).on('change', function(event){
         var idNumb = event.target.id.charAt(event.target.id.length-1);
+        var subCat = $(this).find("option:selected").text();
+
+        // Find all descriptions for the currently selected sub category
+        $.post("/sections/desc",{category : selections[idNumb].category,section : selections[idNumb].section, subCategory : subCat}, function(data){
+            if(data.descriptions.length > 0 &&  data.descriptions[0] !== null){
+                $('#description-select'+idNumb).html(''); // Empty temp options
+            } else {
+                return;
+            }
+
+            // Add sub section options
+            for(var i = 0; i < data.descriptions.length; i++){
+                $('#description-select'+idNumb).append('<option>' + data.descriptions[i] + '</option>');
+            }
+            $(".selectpicker").selectpicker('refresh');
+        });
 
 
-
-        var data = $(this).find("option:selected").text();
-        addToselection(idNumb,"subcategory", data);
+        addToselection(idNumb,"subcategory", subCat);
     });
 
     // add description selector
