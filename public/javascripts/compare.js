@@ -163,7 +163,6 @@ $(document).ready( function() {
         //$.post("/compare/search",{company : selectedCompany, selections : JSON.stringify(selections)}, function(data){
         //    insertTables(data.rows);
         //});
-
         search();
     });
 
@@ -253,10 +252,20 @@ function insertTables(rows){
 
     insertTable(aRows,'#tableA');
     var table1Data = createDataForGroupedGraph(aRows);
-    createdGroupedBarGraph(table1Data.data, table1Data.keys,"Table A", "Ylabel","#grouped-bar-a");
+    createdGroupedBarGraph(table1Data.data, table1Data.keys,aRows[0].section + " " +aRows[0].description,aRows[0].units,"#grouped-bar-a");
+
     insertTable(bRows,'#tableB');
+    var table2Data = createDataForGroupedGraph(bRows);
+    createdGroupedBarGraph(table2Data.data, table1Data.keys,bRows[0].section + " " +bRows[0].description,bRows[0].units,"#grouped-bar-b");
+
     insertTable(cRows,'#tableC');
+    var table3Data = createDataForGroupedGraph(cRows);
+    createdGroupedBarGraph(table3Data.data, table1Data.keys,cRows[0].section + " " +cRows[0].description,cRows[0].units,"#grouped-bar-c");
+
+
     insertTable(dRows,'#tableD');
+    var table4Data = createDataForGroupedGraph(dRows);
+    createdGroupedBarGraph(table4Data.data, table1Data.keys,dRows[0].section + " " +dRows[0].description,dRows[0].units,"#grouped-bar-d");
 }
 
 // Here every row belongs to the specific table
@@ -292,11 +301,13 @@ function insertTable(tableRows,id){
     }
 
     // If it is the first table add edb column else leave it out
-    if(id === "#tableA"){
-        $(id).append('<tr id="head-row" class="table-row"> <th>EDB</th>'+ years + '</tr>');
-    } else {
-        $(id).append('<tr id="head-row" class="table-row">'+ years + '</tr>');
-    }
+    //if(id === "#tableA"){
+    //    $(id).append('<tr id="head-row" class="table-row"> <th>EDB</th>'+ years + '</tr>');
+    //} else {
+    //    $(id).append('<tr id="head-row" class="table-row">'+ years + '</tr>');
+    //}
+
+    $(id).append('<tr id="head-row" class="table-row"> <th>EDB</th>'+ years + '</tr>');
 
     // An array of companies already processed
     var done = [];
@@ -315,9 +326,9 @@ function insertTable(tableRows,id){
             // Insert name in column and assign an id to the row
 
             // Only add edb for the first table in this case tableA
-            if(id === "#tableA"){
+            //if(id === "#tableA"){
                 row += "<th>" + tableRows[i].edb + "</th>";
-            }
+            //}
 
             for(var cur = min; cur <=max; cur++){
                 // Iterate through all rows finding ones with the current edb

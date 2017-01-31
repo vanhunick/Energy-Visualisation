@@ -1,6 +1,6 @@
-var margin = { top: 20, right: 20, bottom: 100, left: 40 },
+var margin = { top: 35, right: 50, bottom: 150, left: 60 },
     width = 1500 - margin.left - margin.right,
-    height = 800 - margin.top - margin.bottom;
+    height = 1000 - margin.top - margin.bottom;
 
 var x0 = d3.scaleBand()
     .rangeRound([0, width])
@@ -13,7 +13,7 @@ var y = d3.scaleLinear()
     .rangeRound([height, 0]);
 
 var z = d3.scaleOrdinal()
-    .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+    .range(["#5DDEC9", "#EF64AD", "#7b6888", "#BA67E5", "#E0E23B", "#d0743c", "#ff8c00"]);
 
 
 function createdGroupedBarGraph(data,keys,title, yLabel, divID){
@@ -54,7 +54,8 @@ function createdGroupedBarGraph(data,keys,title, yLabel, divID){
         .attr("y", 0)
         .attr("x", 9)
         .attr("dy", ".35em")
-        .attr("transform", "rotate(60)")
+        .style("font-size", "14px")
+        .attr("transform", "rotate(55)")
         .style("text-anchor", "start");
 
     g.append("g")
@@ -67,7 +68,7 @@ function createdGroupedBarGraph(data,keys,title, yLabel, divID){
         .attr("fill", "#000")
         .attr("font-weight", "bold")
         .attr("text-anchor", "start")
-        .text("INSERT Y TITLE");
+        .text(yLabel);
 
     var legend = g.append("g")
         .attr("font-family", "sans-serif")
@@ -88,7 +89,17 @@ function createdGroupedBarGraph(data,keys,title, yLabel, divID){
         .attr("x", width - 64)
         .attr("y", 9.5)
         .attr("dy", "0.32em")
+        .style("font-size", "14px")
         .text(function(d) { return d; });
+
+    // Add a title
+    svg.append("text")
+        .attr("x", (width / 2))
+        .attr("y", 0 - (margin.top / 2))
+        .attr("text-anchor", "middle")
+        .style("font-size", "16px")
+        .style("font-weight", "bold")
+        .text(title);
 }
 
 
