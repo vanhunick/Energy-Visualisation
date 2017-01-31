@@ -161,11 +161,13 @@ $(document).ready( function() {
     });
 
     $('#search-btn-compare').click(function(){
-        lastSearch = new Selection(selections[0],selections[1],selections[2],selections[3]); //TODO copy values
-        // Send array of selected sections to server and the company
-        $.post("/compare/search",{company : selectedCompany, selections : JSON.stringify(selections)}, function(data){
-            insertTables(data.rows);
-        });
+        //lastSearch = new Selection(selections[0],selections[1],selections[2],selections[3]); //TODO copy values
+        //// Send array of selected sections to server and the company
+        //$.post("/compare/search",{company : selectedCompany, selections : JSON.stringify(selections)}, function(data){
+        //    insertTables(data.rows);
+        //});
+
+        search();
     });
 
 
@@ -215,10 +217,30 @@ $(document).ready( function() {
             $(".selectpicker").selectpicker('refresh');
         }
     });
+    // Grab the new data array
+
+    //loadFromURL()
 });
+
+function loadFromURL(selections){
+    //var s = [];
+    //for(var i = 0; i < selections.length; i++){
+    //    s.push({id : numberSections, section : "", category : "", subCategory : "", description : ""});
+    //
+    //}
+
+    lastSearch = new Selection(selections[0],selections[1],selections[2],selections[3]); //TODO copy values
+    console.log(selections);
+    // Send array of selected sections to server and the company
+    $.post("/compare/search",{company : selectedCompany, selections : JSON.stringify(selections)}, function(data){
+        insertTables(data.rows);
+    });
+}
+
 
 // Receives rows from DB and converts to html tables
 function insertTables(rows){
+    console.log("Rows in insert table " + rows.length);
 
     // Filter the rows for each table based on the selected sections
     var aRows = rows.filter(function(e){
@@ -342,15 +364,35 @@ function matchDBRow(DBRow, selection){
     return false;
 }
 
+
 function search(){
-    var parameters = { q: "Data",
+
+    var rows = {
+        id0 : selections[0].id,
+        section0  : selections[0].section,
+        category0 : selections[0].category,
+        subCategory0 : selections[0].subCategory,
+        description0 : selections[0].description,
+        id1 : selections[1].id,
+        section1  : selections[1].section,
+        category1 : selections[1].category,
+        subCategory1 : selections[1].subCategory,
+        description1 : selections[1].description,
+        id2 : selections[2].id,
+        section2  : selections[2].section,
+        category2 : selections[2].category,
+        subCategory2 : selections[2].subCategory,
+        description2 : selections[2].description,
+        id3 : selections[3].id,
+        section3  : selections[3].section,
+        category3 : selections[3].category,
+        subCategory3 : selections[3].subCategory,
+        description3 : selections[3].description
     };
 
-    console.log("Changing url");
-    window.location.replace("/?" + serialise(parameters));
+    params = serialise(rows);
+    window.location.replace("compare?" + params);
 }
-
-
 
 
 function serialise(obj) {
@@ -361,8 +403,6 @@ function serialise(obj) {
         }
     return str.join("&");
 }
-
-
 
 // Object for holder the users selection
 function Selection(a,b,c,d){

@@ -59,4 +59,14 @@
 
 </body>
 <script src="/javascripts/bar.js"></script>
+<script>
+    if('<%- selections %>' !== ""){
+        var s =   JSON.parse('<%- selections %>');
+        console.log("Selections Length " + s);
+        if(s.length > 0){
+            loadFromURL(s);
+        }
+    }
+</script>
+
 </html>
