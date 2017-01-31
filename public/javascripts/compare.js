@@ -2,7 +2,7 @@
  * Created by Nicky on 23/01/2017.
  */
 
-var numberSections = 1; // The id count for each row
+var numberSections = 0; // The id count for each row
 
 // Holds the currently selected items in the filter rows
 var selections = [];
@@ -48,8 +48,10 @@ function addSection(){
         var category = $(this).find("option:selected").text();
         var idNumb = event.target.id.charAt(event.target.id.length-1);
 
+        console.log("T " + selections[idNumb].section);
+
         // Find all sub categories for the currently selected category
-        $.post("/sections/sc",{category : category}, function(data){
+        $.post("/sections/sc",{section : selections[idNumb].section, category : category}, function(data){
 
             if(data.subCategories.length > 0){
                 $('#subsection-select'+idNumb).html(''); // Empty temp options
@@ -68,6 +70,8 @@ function addSection(){
     $("#col"+numberSections).append('<select class="selectpicker select-compare" title="Subsection" id="subsection-select'+numberSections+'"></select>');
     $('#subsection-select'+numberSections).on('change', function(event){
         var idNumb = event.target.id.charAt(event.target.id.length-1);
+
+
 
         var data = $(this).find("option:selected").text();
         addToselection(idNumb,"subcategory", data);
