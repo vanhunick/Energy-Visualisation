@@ -7,13 +7,10 @@ var squel = require("squel");
 
 router.get('/', function(req, res, next) {
     if(Object.keys(req.query).length === 0){
-        console.log("Rendering standard page");
         res.render('compare', {selections: ""}); // Send the search results and render index
     } else {
-        console.log("Rendering searched page");
         search(req ,res);
     }
-
 });
 
 
@@ -56,8 +53,6 @@ function search(req, res){
     selections.push(row2);
     selections.push(row3);
 
-    console.log(selections);
-
     res.render('compare', {selections : JSON.stringify(selections)}); // Send the search results and render index
 
     return;
@@ -90,9 +85,6 @@ function search(req, res){
                     var section = result.rows[row];
                     validRows.push(section);
                 }
-                console.log("Rows for multiple query " + validRows.length);
-
-
                 res.render('compare', {rows : validRows}); // Send the search results and render index
 
                 return;
@@ -111,8 +103,6 @@ router.post('/search', function(req, res, next) {
 
     var company = req.body.company;
     var selections = JSON.parse(req.body.selections);
-
-    console.log(selections);
 
     var q = squel.select().from("large_strata_energy");
 
@@ -151,9 +141,6 @@ router.post('/search', function(req, res, next) {
 
     q.where(expr);
 
-    console.log(q.toString());
-
-
     // Connect to the database
     pg.connect(global.databaseURI, function(err, client, done) {
         done(); // closes the connection once result has been returned
@@ -180,7 +167,6 @@ router.post('/search', function(req, res, next) {
                     var section = result.rows[row];
                     validRows.push(section);
                 }
-                console.log("Rows for multiple query " + validRows.length);
                 res.send({rows : validRows});
                 return;
             }

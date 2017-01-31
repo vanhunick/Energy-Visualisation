@@ -59,8 +59,6 @@ function addSection(){
         var category = $(this).find("option:selected").text();
         var idNumb = event.target.id.charAt(event.target.id.length-1);
 
-        console.log("T " + selections[idNumb].section);
-
         // Find all sub categories for the currently selected category
         $.post("/sections/sc",{section : selections[idNumb].section, category : category}, function(data){
 
@@ -152,7 +150,6 @@ $(document).ready( function() {
     $("#benchmarks-link").addClass('active');
 
     $('#company-select').on('change', function(event){
-        console.log(selectedCompany);
         selectedCompany = $(this).find("option:selected").text();
     });
 
@@ -223,14 +220,7 @@ $(document).ready( function() {
 });
 
 function loadFromURL(selections){
-    //var s = [];
-    //for(var i = 0; i < selections.length; i++){
-    //    s.push({id : numberSections, section : "", category : "", subCategory : "", description : ""});
-    //
-    //}
-
     lastSearch = new Selection(selections[0],selections[1],selections[2],selections[3]); //TODO copy values
-    console.log(selections);
     // Send array of selected sections to server and the company
     $.post("/compare/search",{company : selectedCompany, selections : JSON.stringify(selections)}, function(data){
         insertTables(data.rows);
@@ -240,8 +230,6 @@ function loadFromURL(selections){
 
 // Receives rows from DB and converts to html tables
 function insertTables(rows){
-    console.log("Rows in insert table " + rows.length);
-
     // Filter the rows for each table based on the selected sections
     var aRows = rows.filter(function(e){
         return matchDBRow(e,lastSearch.aTable);
