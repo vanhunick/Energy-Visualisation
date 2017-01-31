@@ -329,7 +329,6 @@ function insertTable(tableRows,id){
             //});
         }
     }
-
 }
 
 // Returns if a row from the DB matches one of the specified rows by the user
@@ -342,6 +341,28 @@ function matchDBRow(DBRow, selection){
     }
     return false;
 }
+
+function search(){
+    var parameters = { q: "Data",
+    };
+
+    console.log("Changing url");
+    window.location.replace("/?" + serialise(parameters));
+}
+
+
+
+
+function serialise(obj) {
+    var str = [];
+    for(var p in obj)
+        if (obj.hasOwnProperty(p)) {
+            str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+        }
+    return str.join("&");
+}
+
+
 
 // Object for holder the users selection
 function Selection(a,b,c,d){
