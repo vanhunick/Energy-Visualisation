@@ -1,4 +1,4 @@
-var margin = { top: 20, right: 20, bottom: 30, left: 40 },
+var margin = { top: 20, right: 20, bottom: 100, left: 40 },
     width = 1500 - margin.left - margin.right,
     height = 800 - margin.top - margin.bottom;
 
@@ -17,8 +17,6 @@ var z = d3.scaleOrdinal()
 
 
 function createdGroupedBarGraph(data,keys,title, yLabel, divID){
-    console.log(keys);
-
 
     // Grab the div and add new svg with length and width to it then move svg according to margins
     var svg = d3.select(divID).append("svg")
@@ -51,7 +49,13 @@ function createdGroupedBarGraph(data,keys,title, yLabel, divID){
     g.append("g")
         .attr("class", "axis")
         .attr("transform", "translate(0," + height + ")")
-        .call(d3.axisBottom(x0));
+        .call(d3.axisBottom(x0))
+        .selectAll("text")
+        .attr("y", 0)
+        .attr("x", 9)
+        .attr("dy", ".35em")
+        .attr("transform", "rotate(60)")
+        .style("text-anchor", "start");
 
     g.append("g")
         .attr("class", "axis")
@@ -63,7 +67,7 @@ function createdGroupedBarGraph(data,keys,title, yLabel, divID){
         .attr("fill", "#000")
         .attr("font-weight", "bold")
         .attr("text-anchor", "start")
-        .text("Population");
+        .text("INSERT Y TITLE");
 
     var legend = g.append("g")
         .attr("font-family", "sans-serif")
@@ -75,13 +79,13 @@ function createdGroupedBarGraph(data,keys,title, yLabel, divID){
         .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
     legend.append("rect")
-        .attr("x", width - 19)
+        .attr("x", width - 40)
         .attr("width", 19)
         .attr("height", 19)
         .attr("fill", z);
 
     legend.append("text")
-        .attr("x", width - 24)
+        .attr("x", width - 64)
         .attr("y", 9.5)
         .attr("dy", "0.32em")
         .text(function(d) { return d; });
