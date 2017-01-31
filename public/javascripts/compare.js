@@ -23,10 +23,10 @@ function addSection(){
     $('#compare-div').append('<div class="row compare-row" id="row'+numberSections+'">');
 
     // Add in a new col div
-    $("#row"+numberSections).append('<div class="col-md-12" id="col'+numberSections+'">');
+    $("#row"+numberSections).append('<div class="col-xs-12" id="col'+numberSections+'">');
 
     // add section selector with the number section as the dynamic id
-    $("#col"+numberSections).append('<select class="selectpicker select-compare"  title="Section" id="section-select'+numberSections+'"></select>');
+    $("#col"+numberSections).append('<select data-width="120px" class="selectpicker select-compare"  title="Section" id="section-select'+numberSections+'"></select>');
 
     // Push the information for the new row into the selections array
     selections.push({id : numberSections, section : "", category : "", subCategory : "", description : ""});
@@ -54,7 +54,7 @@ function addSection(){
     });
 
     // add category selector
-    $("#col"+numberSections).append('<select class="selectpicker select-compare" title="Category" id="category-select'+numberSections+'"></select>');
+    $("#col"+numberSections).append('<select data-width="120px" class="selectpicker select-compare" title="Category" id="category-select'+numberSections+'"></select>');
     $('#category-select'+numberSections).on('change', function(event){
         var category = $(this).find("option:selected").text();
         var idNumb = event.target.id.charAt(event.target.id.length-1);
@@ -92,7 +92,7 @@ function addSection(){
     });
 
     // add sub category selector
-    $("#col"+numberSections).append('<select class="selectpicker select-compare" title="Subsection" id="subsection-select'+numberSections+'"></select>');
+    $("#col"+numberSections).append('<select data-width="120px" class="selectpicker select-compare" title="Subsection" id="subsection-select'+numberSections+'"></select>');
     $('#subsection-select'+numberSections).on('change', function(event){
         var idNumb = event.target.id.charAt(event.target.id.length-1);
         var subCat = $(this).find("option:selected").text();
@@ -115,7 +115,7 @@ function addSection(){
     });
 
     // add description selector
-    $("#col"+numberSections).append('<select class="selectpicker select-compare" title="Description" id="description-select'+numberSections+'"></select>');
+    $("#col"+numberSections).append('<select data-width="120px" class="selectpicker select-compare" title="Description" id="description-select'+numberSections+'"></select>');
     $('#description-select'+numberSections).on('change', function(event){
         var idNumb = event.target.id.charAt(event.target.id.length-1);
 
@@ -173,9 +173,13 @@ $(document).ready( function() {
     $.get("/sections/sections", function(data){
 
         // Create the four filters rows
+        $('#compare-div').append('<div class="row"><div class="col-xs-12"><h5>Make a selection for table A</h5></div></div>');
         addSection();
+        $('#compare-div').append('<div class="row"><div class="col-xs-12"><h5>Make a selection for table B</h5></div></div>');
         addSection();
+        $('#compare-div').append('<div class="row"><div class="col-xs-12"><h5>Make a selection for table C</h5></div></div>');
         addSection();
+        $('#compare-div').append('<div class="row"><div class="col-xs-12"><h5>Make a selection for table D</h5></div></div>');
         addSection();
 
         // Sort the sections
@@ -248,6 +252,8 @@ function insertTables(rows){
     });
 
     insertTable(aRows,'#tableA');
+    var table1Data = createDataForGroupedGraph(aRows);
+    createdGroupedBarGraph(table1Data.data, table1Data.keys,"Table A", "Ylabel","#grouped-bar-a");
     insertTable(bRows,'#tableB');
     insertTable(cRows,'#tableC');
     insertTable(dRows,'#tableD');
@@ -287,9 +293,9 @@ function insertTable(tableRows,id){
 
     // If it is the first table add edb column else leave it out
     if(id === "#tableA"){
-        $(id).append('<tr id="head-row"> <th>EDB</th>'+ years + '</tr>');
+        $(id).append('<tr id="head-row" class="table-row"> <th>EDB</th>'+ years + '</tr>');
     } else {
-        $(id).append('<tr id="head-row">'+ years + '</tr>');
+        $(id).append('<tr id="head-row" class="table-row">'+ years + '</tr>');
     }
 
     // An array of companies already processed
@@ -304,7 +310,7 @@ function insertTable(tableRows,id){
 
             done.push(tableRows[i].edb);
 
-            var row= "<tr id=row"+id+i+">";
+            var row= "<tr class='table-row' id=row"+id+i+">";
 
             // Insert name in column and assign an id to the row
 
@@ -390,6 +396,49 @@ function serialise(obj) {
             str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
         }
     return str.join("&");
+}
+
+
+
+function createDataForGroupedGraph(rows){
+    var data = [];
+    // includes
+    var edbDone = [];
+
+    // Find the min and max year from the data
+    min = rows.reduce(function(prev, curr) {
+        return prev.disc_yr < curr.disc_yr ? prev : curr;
+    }).obs_yr;
+
+    max = rows.reduce(function(prev, curr) {
+        return prev.disc_yr > curr.disc_yr ? prev : curr;
+}).obs_yr;
+
+    for(var i = 0; i < rows.length; i++){
+        if(!edbDone.includes(rows[i].edb)){
+            edbDone.push(rows[i].edb);
+
+            var entry = { "edb" : rows[i].edb};
+
+            entry[rows[i].obs_yr] = +rows[i].value;
+            data.push(entry);
+        } else {
+            for(var j = 0; j < data.length; j++){
+                if(data[j].edb === rows[i].edb){
+                    //var value = +rows[i].value;
+                    data[j][rows[i].obs_yr] = +rows[i].value;
+                }
+            }
+        }
+    }
+
+    var keys = [];
+
+    for(var i = min; i <= max; i++){
+        keys.push(""+i);
+    }
+
+    return {data : data, keys : keys};
 }
 
 // Object for holder the users selection

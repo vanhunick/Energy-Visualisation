@@ -21,17 +21,23 @@ a {
 }
 
 .compare-row {
-  margin-bottom: 2%;
-  margin-top: 2%;
+  margin-bottom: 0.5%;
+  margin-top: 0.5%;
 }
 
 .select-compare {
-  margin-right: 1%;
+  margin-right: 0.2%;
 }
 
 .cell {
   border: 1px solid lightgray;
+  padding: 0px;
 }
+
+.table-row {
+  border: 1px solid lightgray;
+}
+
 
 /*red 820302*/
 
