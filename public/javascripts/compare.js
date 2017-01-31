@@ -7,7 +7,13 @@ var numberSections = 0; // The id count for each row
 // Holds the currently selected items in the filter rows
 var selections = [];
 
+var lastSearch = null;
+
 var selectedCompany = "";
+
+// Hold if these tables have been selected
+var b = false;
+var d = false;
 
 // Adds a new row of filters for section category and sub category
 function addSection(){
@@ -155,10 +161,10 @@ $(document).ready( function() {
 
     $('#search-btn-compare').click(function(){
         console.log("selected " + selectedCompany);
+        lastSearch = new Selection(selections[0],selections[1],selections[2],selections[3]); //TODO copy values
         // Send array of selected sections to server and the company
-        console.log(selections);
         $.post("/compare/search",{company : selectedCompany, selections : JSON.stringify(selections)}, function(data){
-
+            insertTables(data.rows);
         });
     });
 
@@ -200,7 +206,7 @@ $(document).ready( function() {
         for(var i = 0; i < selections.length; i++){
 
             if(data.sections.length > 0){
-                $('#section-select'+selections[i].id).html('<option selected>' + data.sections[0] + '</option>'); // Empty temp options
+                //$('#section-select'+selections[i].id).html('<option selected>' + data.sections[0] + '</option>'); // Empty temp options
             }
 
             for(var j = 0; j < data.sections.length; j++){
@@ -210,3 +216,117 @@ $(document).ready( function() {
         }
     });
 });
+
+function insertTables(rows){
+    // First create the table A as it must exist
+
+    var aRows = rows.filter(function(e){
+        return matchDBRow(e,lastSearch.aTable);
+    });
+
+    var bRows = rows.filter(function(e){
+        return matchDBRow(e,lastSearch.bTable);
+    });
+
+    var cRows = rows.filter(function(e){
+        return matchDBRow(e,lastSearch.cTable);
+    });
+
+    var dRows = rows.filter(function(e){
+        return matchDBRow(e,lastSearch.dTable);
+    });
+
+    insertTable(aRows,'#tableA');
+    insertTable(bRows,'#tableB');
+    insertTable(cRows,'#tableC');
+    insertTable(dRows,'#tableD');
+}
+
+// Here every row belongs to the specific table
+function insertTable(tableRows,id){
+
+    tableRows.sort(function (a,b) {
+        return [a.edb, b.edb].sort()[0] === a.edb ? -1 : 1; // Sort two names and return the first
+    });
+
+    var observerd = true;
+
+    console.log(tableRows.length);
+    if(tableRows.length === 0)return;
+    $(id).append('<caption>' +tableRows[0].section + " " + tableRows[0].description + '</caption>');
+
+    min = tableRows.reduce(function(prev, curr) {
+        return prev.disc_yr < curr.disc_yr ? prev : curr;
+    }).obs_yr;
+
+    max = tableRows.reduce(function(prev, curr) {
+        return prev.disc_yr > curr.disc_yr ? prev : curr;
+    }).obs_yr;
+
+
+    var years = "";
+
+    for(var i = min; i <= max; i++){
+        years += "<th>" + i + "</th>";
+    }
+
+    $(id).append('<tr id="head-row"> <th>EDB</th>'+ years + '</tr>');
+
+    // An array of companies already processed
+    var done = [];
+    var cellCount = 0;
+
+    var cellValues = [];
+
+    // Create the rows of data
+    for(var i = 0; i < tableRows.length; i++){
+        if(!done.includes(tableRows[i].edb)){
+
+            done.push(tableRows[i].edb);
+
+            // Insert name in column and assign an id to the row
+            var row = "<tr id=row"+id+i+"><th>" + tableRows[i].edb + "</th>";
+
+
+            for(var cur = min; cur <=max; cur++){
+
+                // Iterate through all rows finding ones with the current edb
+                for(var j = 0; j < tableRows.length; j++){
+
+                    // Check it matches edb and year inserting into
+                    if(tableRows[j].edb === tableRows[i].edb && (observerd ? tableRows[j].disc_yr : tableRows[j].fcast_yr) === cur){
+                        row += "<th id='t"+id+""+cellCount+"'>" + tableRows[j].value + "</th>";
+
+                        // Save the value and the id of the cell to display percentage
+                        cellValues.push({ id : "#t"+id+""+cellCount, value : tableRows[j].value });
+
+                        cellCount++;
+                    }
+                }
+            }
+
+            $(id).append(row + '</tr>');
+
+            // Assing a on click function to each of the rows to generate the bar graph with the row specific data
+            //$( "#row"+i+"").click(function(event) {
+            //    showBarWithRowElem(this.id);
+            //});
+        }
+    }
+
+}
+
+
+function matchDBRow(DBRow, selection){
+    if(DBRow.section === selection.section && DBRow.category === selection.category && DBRow.sub_category === selection.subCategory && DBRow.description === selection.description){
+        return true;
+    }
+    return false;
+}
+
+function Selection(a,b,c,d){
+    this.aTable = a;
+    this.bTable = b;
+    this.cTable = c;
+    this.dTable = d;
+}

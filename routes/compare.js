@@ -25,9 +25,9 @@ router.post('/search', function(req, res, next) {
     // create query go through rows of sections
     for(var i = 0; i < selections.length; i++){
         if(selections[i].section === "")continue; // TODO find better way to handle B and D table null
-        if(i === 0){
+        if(i === 0){ //Row 0 has to have data
             // There is always a section and a category
-            expr.and("section = '" + selections[i].section + "'")
+            expr.and("(section = '" + selections[i].section + "'")
                 .and("category = '" + selections[i].category + "'");
 
             // Check is the sub category exists
@@ -36,7 +36,7 @@ router.post('/search', function(req, res, next) {
             }
 
             // Add the description condition
-            expr.and("description = '" + selections[i].description + "'");
+            expr.and("description = '" + selections[i].description + "')");
 
         } else {
             var andExpr = squel.expr().and("section = '" + selections[i].section  + "'")
@@ -84,7 +84,7 @@ router.post('/search', function(req, res, next) {
                     var section = result.rows[row];
                     validRows.push(section);
                 }
-
+                console.log("Rows for multiple query " + validRows.length);
                 res.send({rows : validRows});
                 return;
             }
