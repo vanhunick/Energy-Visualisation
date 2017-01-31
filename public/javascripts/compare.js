@@ -7,6 +7,7 @@ var numberSections = 0; // The id count for each row
 // Holds the currently selected items in the filter rows
 var selections = [];
 
+// Holds a object that contains the rows of selections that were last searched
 var lastSearch = null;
 
 var selectedCompany = "";
@@ -17,10 +18,14 @@ var d = false;
 
 // Adds a new row of filters for section category and sub category
 function addSection(){
+
+    // Add in a new row div
     $('#compare-div').append('<div class="row compare-row" id="row'+numberSections+'">');
+
+    // Add in a new col div
     $("#row"+numberSections).append('<div class="col-md-12" id="col'+numberSections+'">');
 
-    // add section selector
+    // add section selector with the number section as the dynamic id
     $("#col"+numberSections).append('<select class="selectpicker select-compare"  title="Section" id="section-select'+numberSections+'"></select>');
 
     // Push the information for the new row into the selections array
@@ -108,8 +113,6 @@ function addSection(){
             }
             $(".selectpicker").selectpicker('refresh');
         });
-
-
         addToselection(idNumb,"subcategory", subCat);
     });
 
@@ -121,11 +124,10 @@ function addSection(){
         var data = $(this).find("option:selected").text();
         addToselection(idNumb,"description", data);
     });
-
-
-    numberSections++;
+    numberSections++; // Increment the int used for id's
 }
 
+// Adds a section, category, sub category, or descriptions to a particular row in selections
 function addToselection(id, type, data){
 
     for(var i = 0; i < selections.length; i++){
@@ -144,7 +146,6 @@ function addToselection(id, type, data){
 }
 
 
-
 $(document).ready( function() {
     // Highlight the selected link
     $(".nav-link").removeClass('active');
@@ -160,7 +161,6 @@ $(document).ready( function() {
     });
 
     $('#search-btn-compare').click(function(){
-        console.log("selected " + selectedCompany);
         lastSearch = new Selection(selections[0],selections[1],selections[2],selections[3]); //TODO copy values
         // Send array of selected sections to server and the company
         $.post("/compare/search",{company : selectedCompany, selections : JSON.stringify(selections)}, function(data){
@@ -217,9 +217,10 @@ $(document).ready( function() {
     });
 });
 
+// Receives rows from DB and converts to html tables
 function insertTables(rows){
-    // First create the table A as it must exist
 
+    // Filter the rows for each table based on the selected sections
     var aRows = rows.filter(function(e){
         return matchDBRow(e,lastSearch.aTable);
     });
@@ -245,16 +246,20 @@ function insertTables(rows){
 // Here every row belongs to the specific table
 function insertTable(tableRows,id){
 
+    // Sorts the EDB names
     tableRows.sort(function (a,b) {
         return [a.edb, b.edb].sort()[0] === a.edb ? -1 : 1; // Sort two names and return the first
     });
 
     var observerd = true;
 
-    console.log(tableRows.length);
-    if(tableRows.length === 0)return;
+
+    if(tableRows.length === 0)return; // No data so return
+
+    // Add the title to the table
     $(id).append('<caption>' +tableRows[0].section + " " + tableRows[0].description + '</caption>');
 
+    // Find the min and max year from the data
     min = tableRows.reduce(function(prev, curr) {
         return prev.disc_yr < curr.disc_yr ? prev : curr;
     }).obs_yr;
@@ -264,13 +269,13 @@ function insertTable(tableRows,id){
     }).obs_yr;
 
 
+    // Create cells for each of the years to use as header
     var years = "";
-
     for(var i = min; i <= max; i++){
         years += "<th>" + i + "</th>";
     }
 
-
+    // If it is the first table add edb column else leave it out
     if(id === "#tableA"){
         $(id).append('<tr id="head-row"> <th>EDB</th>'+ years + '</tr>');
     } else {
@@ -289,23 +294,22 @@ function insertTable(tableRows,id){
 
             done.push(tableRows[i].edb);
 
-
             var row= "<tr id=row"+id+i+">";
 
             // Insert name in column and assign an id to the row
+
+            // Only add edb for the first table in this case tableA
             if(id === "#tableA"){
                 row += "<th>" + tableRows[i].edb + "</th>";
             }
 
-
             for(var cur = min; cur <=max; cur++){
-
                 // Iterate through all rows finding ones with the current edb
                 for(var j = 0; j < tableRows.length; j++){
 
                     // Check it matches edb and year inserting into
                     if(tableRows[j].edb === tableRows[i].edb && (observerd ? tableRows[j].disc_yr : tableRows[j].fcast_yr) === cur){
-                        row += "<th id='t"+id+""+cellCount+"'>" + tableRows[j].value + "</th>";
+                        row += "<th class='cell' id='t"+id+""+cellCount+"'>" + tableRows[j].value + "</th>";
 
                         // Save the value and the id of the cell to display percentage
                         cellValues.push({ id : "#t"+id+""+cellCount, value : tableRows[j].value });
@@ -317,6 +321,8 @@ function insertTable(tableRows,id){
 
             $(id).append(row + '</tr>');
 
+            // Here we can check the unit type and highlight appropriately
+
             // Assing a on click function to each of the rows to generate the bar graph with the row specific data
             //$( "#row"+i+"").click(function(event) {
             //    showBarWithRowElem(this.id);
@@ -326,17 +332,18 @@ function insertTable(tableRows,id){
 
 }
 
-
+// Returns if a row from the DB matches one of the specified rows by the user
 function matchDBRow(DBRow, selection){
     if(DBRow.section === selection.section && DBRow.category === selection.category && DBRow.description === selection.description){
         if(DBRow.sub_category !== null){
-            return selection.subCategory === DBRow.sub_category;
+            return selection.subCategory === DBRow.sub_category; // Sub cat could be null but would still match
         }
         return true;
     }
     return false;
 }
 
+// Object for holder the users selection
 function Selection(a,b,c,d){
     this.aTable = a;
     this.bTable = b;

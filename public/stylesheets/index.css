@@ -29,6 +29,10 @@ a {
   margin-right: 1%;
 }
 
+.cell {
+  border: 1px solid lightgray;
+}
+
 /*red 820302*/
 
 /*Nav bar css*/
