@@ -133,15 +133,38 @@ $(document).ready( function() {
     /// Query for all sections
     $.get("/sections/sections", function(data){
 
-        // Create the four filters
+        // Create the four filters rows
         addSection();
         addSection();
         addSection();
         addSection();
 
-        // Go through each row and add the section in
+        // Sort the sections
+        data.sections.sort(function(a,b){
+            // First check simple case of number difference
+            var i = 0;
+            while(!isNaN(a.charAt(i))){
+                i++
+            }
+            var numberA = a.substring(0,i); // Gets the number from the section
+
+            i = 0;
+            while(!isNaN(b.charAt(i))){
+                i++
+            }
+
+            var numberB = b.substring(0,i);
+
+            if(numberA !== numberB) {
+                return numberA - numberB;
+            }
+
+            return [a,b].sort()[0] === a ? -1 : 1; // Sort two names and return the first
+        });
+
+        // Go through each row and add the sections in
         for(var i = 0; i < selections.length; i++){
-            console.log("Adding");
+
             if(data.sections.length > 0){
                 $('#section-select'+selections[i].id).html('<option selected>' + data.sections[0] + '</option>'); // Empty temp options
             }
