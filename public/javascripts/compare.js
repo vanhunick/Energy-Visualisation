@@ -270,7 +270,12 @@ function insertTable(tableRows,id){
         years += "<th>" + i + "</th>";
     }
 
-    $(id).append('<tr id="head-row"> <th>EDB</th>'+ years + '</tr>');
+
+    if(id === "#tableA"){
+        $(id).append('<tr id="head-row"> <th>EDB</th>'+ years + '</tr>');
+    } else {
+        $(id).append('<tr id="head-row">'+ years + '</tr>');
+    }
 
     // An array of companies already processed
     var done = [];
@@ -284,8 +289,13 @@ function insertTable(tableRows,id){
 
             done.push(tableRows[i].edb);
 
+
+            var row= "<tr id=row"+id+i+">";
+
             // Insert name in column and assign an id to the row
-            var row = "<tr id=row"+id+i+"><th>" + tableRows[i].edb + "</th>";
+            if(id === "#tableA"){
+                row += "<th>" + tableRows[i].edb + "</th>";
+            }
 
 
             for(var cur = min; cur <=max; cur++){
@@ -318,7 +328,10 @@ function insertTable(tableRows,id){
 
 
 function matchDBRow(DBRow, selection){
-    if(DBRow.section === selection.section && DBRow.category === selection.category && DBRow.sub_category === selection.subCategory && DBRow.description === selection.description){
+    if(DBRow.section === selection.section && DBRow.category === selection.category && DBRow.description === selection.description){
+        if(DBRow.sub_category !== null){
+            return selection.subCategory === DBRow.sub_category;
+        }
         return true;
     }
     return false;
