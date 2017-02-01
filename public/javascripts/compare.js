@@ -20,10 +20,10 @@ var d = false;
 function addSection(){
 
     // Add in a new row div
-    $('#compare-div').append('<div class="row compare-row" id="row'+numberSections+'">');
+    $('#compare-div').append('<div class="col-xs-3 compare-col" id="Ocol'+numberSections+'">');
 
     // Add in a new col div
-    $("#row"+numberSections).append('<div class="col-xs-12" id="col'+numberSections+'">');
+    $("#Ocol"+numberSections).append('<div class="row" id="col'+numberSections+'">');
 
     // add section selector with the number section as the dynamic id
     $("#col"+numberSections).append('<select data-width="120px" class="selectpicker select-compare"  title="Section" id="section-select'+numberSections+'"></select>');
@@ -50,7 +50,7 @@ function addSection(){
             // Refresh all drop downs
             $(".selectpicker").selectpicker('refresh');
         });
-        addToselection(idNumb,"section",section); // Record change in the array of selections
+        addToSelection(idNumb,"section",section); // Record change in the array of selections
     });
 
     // add category selector
@@ -88,7 +88,7 @@ function addSection(){
             }
             $(".selectpicker").selectpicker('refresh');
         });
-        addToselection(idNumb,"category", category);
+        addToSelection(idNumb,"category", category);
     });
 
     // add sub category selector
@@ -111,7 +111,7 @@ function addSection(){
             }
             $(".selectpicker").selectpicker('refresh');
         });
-        addToselection(idNumb,"subcategory", subCat);
+        addToSelection(idNumb,"subcategory", subCat);
     });
 
     // add description selector
@@ -120,14 +120,13 @@ function addSection(){
         var idNumb = event.target.id.charAt(event.target.id.length-1);
 
         var data = $(this).find("option:selected").text();
-        addToselection(idNumb,"description", data);
+        addToSelection(idNumb,"description", data);
     });
     numberSections++; // Increment the int used for id's
 }
 
 // Adds a section, category, sub category, or descriptions to a particular row in selections
-function addToselection(id, type, data){
-
+function addToSelection(id, type, data){
     for(var i = 0; i < selections.length; i++){
         if(selections[i].id+"" === id+""){ // Convert them both to strings
             if(type === "section"){
@@ -149,36 +148,32 @@ $(document).ready( function() {
     $(".nav-link").removeClass('active');
     $("#benchmarks-link").addClass('active');
 
+    // On click listener for company selector
     $('#company-select').on('change', function(event){
         selectedCompany = $(this).find("option:selected").text();
     });
 
-    $('#genSection-btn').click(function(){
-        addSection();
-    });
-
     $('#search-btn-compare').click(function(){
-        //lastSearch = new Selection(selections[0],selections[1],selections[2],selections[3]); //TODO copy values
-        //// Send array of selected sections to server and the company
-        //$.post("/compare/search",{company : selectedCompany, selections : JSON.stringify(selections)}, function(data){
-        //    insertTables(data.rows);
-        //});
         search();
     });
 
+    loadInSections();
 
+});
+
+
+function loadInSections(){
     // Grab all the sections
     /// Query for all sections
     $.get("/sections/sections", function(data){
-
         // Create the four filters rows
-        $('#compare-div').append('<div class="row"><div class="col-xs-12"><h5>Make a selection for table A</h5></div></div>');
+        //$('#compare-div').append('<div class="row"><div class="col-xs-12"><h5>Make a selection for table A</h5></div></div>');
         addSection();
-        $('#compare-div').append('<div class="row"><div class="col-xs-12"><h5>Make a selection for table B</h5></div></div>');
+        //$('#compare-div').append('<div class="row"><div class="col-xs-12"><h5>Make a selection for table B</h5></div></div>');
         addSection();
-        $('#compare-div').append('<div class="row"><div class="col-xs-12"><h5>Make a selection for table C</h5></div></div>');
+        //$('#compare-div').append('<div class="row"><div class="col-xs-12"><h5>Make a selection for table C</h5></div></div>');
         addSection();
-        $('#compare-div').append('<div class="row"><div class="col-xs-12"><h5>Make a selection for table D</h5></div></div>');
+        //$('#compare-div').append('<div class="row"><div class="col-xs-12"><h5>Make a selection for table D</h5></div></div>');
         addSection();
 
         // Sort the sections
@@ -217,10 +212,7 @@ $(document).ready( function() {
             $(".selectpicker").selectpicker('refresh');
         }
     });
-    // Grab the new data array
-
-    //loadFromURL()
-});
+}
 
 function loadFromURL(selections){
     lastSearch = new Selection(selections[0],selections[1],selections[2],selections[3]); //TODO copy values
@@ -251,21 +243,29 @@ function insertTables(rows){
     });
 
     insertTable(aRows,'#tableA');
-    var table1Data = createDataForGroupedGraph(aRows);
-    createdGroupedBarGraph(table1Data.data, table1Data.keys,aRows[0].section + " " +aRows[0].description,aRows[0].units,"#grouped-bar-a");
+    if(aRows.length !== 0){
+        var table1Data = createDataForGroupedGraph(aRows);
+        createdGroupedBarGraph(table1Data.data, table1Data.keys,aRows[0].section + " " +aRows[0].description,aRows[0].units,"#grouped-bar-a");
+    }
+
 
     insertTable(bRows,'#tableB');
-    var table2Data = createDataForGroupedGraph(bRows);
-    createdGroupedBarGraph(table2Data.data, table1Data.keys,bRows[0].section + " " +bRows[0].description,bRows[0].units,"#grouped-bar-b");
+    if(bRows.length !== 0) {
+        var table2Data = createDataForGroupedGraph(bRows);
+        createdGroupedBarGraph(table2Data.data, table1Data.keys, bRows[0].section + " " + bRows[0].description, bRows[0].units, "#grouped-bar-b");
+    }
 
     insertTable(cRows,'#tableC');
-    var table3Data = createDataForGroupedGraph(cRows);
-    createdGroupedBarGraph(table3Data.data, table1Data.keys,cRows[0].section + " " +cRows[0].description,cRows[0].units,"#grouped-bar-c");
-
+    if(cRows.length !== 0) {
+        var table3Data = createDataForGroupedGraph(cRows);
+        createdGroupedBarGraph(table3Data.data, table1Data.keys, cRows[0].section + " " + cRows[0].description, cRows[0].units, "#grouped-bar-c");
+    }
 
     insertTable(dRows,'#tableD');
-    var table4Data = createDataForGroupedGraph(dRows);
-    createdGroupedBarGraph(table4Data.data, table1Data.keys,dRows[0].section + " " +dRows[0].description,dRows[0].units,"#grouped-bar-d");
+    if(dRows.length !== 0) {
+        var table4Data = createDataForGroupedGraph(dRows);
+        createdGroupedBarGraph(table4Data.data, table1Data.keys, dRows[0].section + " " + dRows[0].description, dRows[0].units, "#grouped-bar-d");
+    }
 }
 
 // Here every row belongs to the specific table
