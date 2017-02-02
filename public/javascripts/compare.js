@@ -102,7 +102,29 @@ function createTables(tablesData){
     insertTable(tablesData.tableB,'#tableB');
     insertTable(tablesData.tableC,'#tableC');
     insertTable(tablesData.tableD,'#tableD');
+    insertTableOverTable(true,tablesData);
+    insertTableOverTable(false,tablesData);
 }
+
+function insertTableOverTable(ab,tablesData){
+    var combined = []; // Contain object with edb disc_yr value
+
+    var at = ab ? tablesData.tableA : tablesData.tableC;
+    var bt = ab ? tablesData.tableB : tablesData.tableD;
+
+    for(var i = 0; i < at.length; i++){
+        for(var j = 0; j < bt.length; j++){
+            if(at[i].edb === bt[j].edb && at[i].obs_yr === bt[j].obs_yr && at[i].disc_yr === bt[j].disc_yr){
+                combined.push({ disc_yr : bt[j].disc_yr ,edb : bt[j].edb, "obs_yr" : bt[j].obs_yr, value : at[i].value / bt[j].value});// Divide the values
+                break; // can exit the loop
+            }
+        }
+
+    }
+
+    insertTable(combined, ab ? "#tableAB" : "#tableCD");
+}
+
 
 // Here every row belongs to the specific table
 function insertTable(tableRows,id){
@@ -117,13 +139,13 @@ function insertTable(tableRows,id){
     $(id).append('<caption>' +tableRows[0].section + " " + tableRows[0].description + '</caption>');
 
     // Find the min and max year from the data
-    min = tableRows.reduce(function(prev, curr) {
+    var min = tableRows.reduce(function(prev, curr) {
         return prev.disc_yr < curr.disc_yr ? prev : curr;
     }).obs_yr;
 
-    max = tableRows.reduce(function(prev, curr) {
+    var max = tableRows.reduce(function(prev, curr) {
         return prev.disc_yr > curr.disc_yr ? prev : curr;
-    }).obs_yr;
+    }).obs_yr; //TODO this line might need to be disc_yr
 
     // Create cells for each of the years to use as header
     var years = "";
@@ -156,7 +178,7 @@ function insertTable(tableRows,id){
                 for(var j = 0; j < tableRows.length; j++){
 
                     // Check it matches edb and year inserting into
-                    if(tableRows[j].edb === tableRows[i].edb && (observerd ? tableRows[j].disc_yr : tableRows[j].fcast_yr) === cur){
+                    if(tableRows[j].edb === tableRows[i].edb && tableRows[j].disc_yr === cur){
                         row += "<th class='cell' id='t"+id+""+cellCount+"'>" + tableRows[j].value + "</th>";
 
                         // Save the value and the id of the cell to display percentage
