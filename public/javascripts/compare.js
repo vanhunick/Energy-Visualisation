@@ -22,6 +22,9 @@ function addSection(){
     // Add in a new row div
     $('#compare-div').append('<div class="col-xs-3 compare-col" id="Ocol'+numberSections+'">');
 
+    $("#Ocol"+numberSections).append('<div class="row"><h5>Make a selection for table A</h5></div>');
+
+
     // Add in a new col div
     $("#Ocol"+numberSections).append('<div class="row" id="col'+numberSections+'">');
 
@@ -246,6 +249,8 @@ function insertTables(rows){
     if(aRows.length !== 0){
         var table1Data = createDataForGroupedGraph(aRows);
         createdGroupedBarGraph(table1Data.data, table1Data.keys,aRows[0].section + " " +aRows[0].description,aRows[0].units,"#grouped-bar-a");
+
+        createBoxPlot(createDataForBoxPlot(aRows), "#boxplot-div")
     }
 
 
@@ -409,6 +414,65 @@ function serialise(obj) {
     return str.join("&");
 }
 
+function createDataForBoxPlot(tableRows){
+
+
+    var yearsDone = [];
+
+    var years = []; // Will contain an array of rows for each year
+
+    for(var i = 0; i < tableRows.length; i++){
+        if(!yearsDone.includes(tableRows[i].obs_yr)){
+            years.push(tableRows.filter(function(e){return e.obs_yr === tableRows[i].obs_yr}));
+            yearsDone.push(tableRows[i].obs_yr);
+        }
+    }
+
+    var data = []; // Each entry will be an array where array[0] = year and array[1] = values for that year
+
+    var min = Infinity;
+    var max = -Infinity;
+
+    for(var i = 0; i < years.length; i++){
+        var entry = [];
+
+        entry[0] = ""+years[i][0].obs_yr; // Name of the box plot convert year to string
+
+        var values = [];
+        for(var j = 0; j < years[i].length; j++){
+            var curValue = +years[i][j].value;
+            curValue = Math.floor(curValue);
+
+            if (curValue > max){
+                max = curValue;
+            }
+            if (curValue < min){
+                min = curValue;
+            }
+            values.push(curValue);
+        }
+        entry[1] = values;
+        data.push(entry);
+    }
+
+    return {min : min, max : max, data : data};
+}
+
+
+// Makes sure the correct rows are selected before searching
+function validateSelections(){
+    // First
+
+
+}
+
+
+function createDerivedTables(aData,bData,cData,dData){
+        // First create A / B
+        for(var i = 0; i < aData.length; i++){
+
+        }
+}
 
 
 function createDataForGroupedGraph(rows){
@@ -417,13 +481,13 @@ function createDataForGroupedGraph(rows){
     var edbDone = [];
 
     // Find the min and max year from the data
-    min = rows.reduce(function(prev, curr) {
+    var min = rows.reduce(function(prev, curr) {
         return prev.disc_yr < curr.disc_yr ? prev : curr;
     }).obs_yr;
 
-    max = rows.reduce(function(prev, curr) {
+    var max = rows.reduce(function(prev, curr) {
         return prev.disc_yr > curr.disc_yr ? prev : curr;
-}).obs_yr;
+    }).obs_yr;
 
     for(var i = 0; i < rows.length; i++){
         if(!edbDone.includes(rows[i].edb)){
