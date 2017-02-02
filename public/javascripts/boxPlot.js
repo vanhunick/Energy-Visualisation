@@ -61,31 +61,30 @@ function createBoxPlot(dataObject, divID, title){
         .enter().append("circle")
         .attr("class", "dot")
         .attr("r", 3.5)
-        .attr("cx", function(d) { return x(d.year) + 11.25; })
+        .attr("cx", function(d) { return x(d.year) + 12.50; })
         .attr("cy", function(d) { return y(d.value); })
         .on("mouseover", function(d) {
 
             //Get this bar's x/y values, then augment for the tooltip
 
 
-            var xPosition = parseFloat(d3.select(this).attr("x"));
-            var yPosition = parseFloat(d3.select(this).attr("y"));
+            var xPosition = parseFloat(d3.select(this).attr("cx"));
+            var yPosition = parseFloat(d3.select(this).attr("cy") + 10);
 
-            xPosition = d3.event.pageX + 10;
-            yPosition = d3.event.pageY + 10;
+            //xPosition = d3.event.pageX + 10;
+            //yPosition = d3.event.pageY + 10;
 
-            console.log(xPosition + " "  + yPosition + " " + d.edb);
 
             //Create the tooltip label
             svg.append("text")
                 .attr("id", "tooltip")
                 .attr("x", xPosition)
-                .attr("y", yPosition)
+                .attr("y", yPosition - 10)
                 .attr("text-anchor", "middle")
                 .attr("font-family", "sans-serif")
                 .attr("font-size", "14px")
                 .attr("font-weight", "bold")
-                .attr("fill", "red")
+                .attr("fill", "steelblue")
                 .text("" + d.edb);
 
         }).on("mouseout", function() {
