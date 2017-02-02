@@ -170,13 +170,13 @@ function loadInSections(){
     /// Query for all sections
     $.get("/sections/sections", function(data){
         // Create the four filters rows
-        //$('#compare-div').append('<div class="row"><div class="col-xs-12"><h5>Make a selection for table A</h5></div></div>');
+
         addSection();
-        //$('#compare-div').append('<div class="row"><div class="col-xs-12"><h5>Make a selection for table B</h5></div></div>');
+
         addSection();
-        //$('#compare-div').append('<div class="row"><div class="col-xs-12"><h5>Make a selection for table C</h5></div></div>');
+
         addSection();
-        //$('#compare-div').append('<div class="row"><div class="col-xs-12"><h5>Make a selection for table D</h5></div></div>');
+
         addSection();
 
         // Sort the sections
