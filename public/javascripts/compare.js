@@ -250,7 +250,7 @@ function insertTables(rows){
         var table1Data = createDataForGroupedGraph(aRows);
         createdGroupedBarGraph(table1Data.data, table1Data.keys,aRows[0].section + " " +aRows[0].description,aRows[0].units,"#grouped-bar-a");
 
-        createBoxPlot(createDataForBoxPlot(aRows), "#boxplot-div")
+        createBoxPlot(createDataForBoxPlot(aRows), "#boxplotA-div",aRows[0].section + " " +aRows[0].description);
     }
 
 
@@ -258,18 +258,27 @@ function insertTables(rows){
     if(bRows.length !== 0) {
         var table2Data = createDataForGroupedGraph(bRows);
         createdGroupedBarGraph(table2Data.data, table1Data.keys, bRows[0].section + " " + bRows[0].description, bRows[0].units, "#grouped-bar-b");
+
+        createBoxPlot(createDataForBoxPlot(bRows), "#boxplotB-div",bRows[0].section + " " + bRows[0].description);
+
     }
 
     insertTable(cRows,'#tableC');
     if(cRows.length !== 0) {
         var table3Data = createDataForGroupedGraph(cRows);
         createdGroupedBarGraph(table3Data.data, table1Data.keys, cRows[0].section + " " + cRows[0].description, cRows[0].units, "#grouped-bar-c");
+
+        createBoxPlot(createDataForBoxPlot(cRows), "#boxplotC-div", cRows[0].section + " " + cRows[0].description);
+
     }
 
     insertTable(dRows,'#tableD');
     if(dRows.length !== 0) {
         var table4Data = createDataForGroupedGraph(dRows);
         createdGroupedBarGraph(table4Data.data, table1Data.keys, dRows[0].section + " " + dRows[0].description, dRows[0].units, "#grouped-bar-d");
+
+        createBoxPlot(createDataForBoxPlot(dRows), "#boxplotD-div",dRows[0].section + " " + dRows[0].description);
+
     }
 }
 
@@ -415,8 +424,6 @@ function serialise(obj) {
 }
 
 function createDataForBoxPlot(tableRows){
-
-
     var yearsDone = [];
 
     var years = []; // Will contain an array of rows for each year
@@ -429,19 +436,27 @@ function createDataForBoxPlot(tableRows){
     }
 
     var data = []; // Each entry will be an array where array[0] = year and array[1] = values for that year
+    var scatterData = []; // Each entry will have the year the value and edb
+
+    var sValues = [];
 
     var min = Infinity;
     var max = -Infinity;
 
     for(var i = 0; i < years.length; i++){
         var entry = [];
+        var sEntry = [];
 
         entry[0] = ""+years[i][0].obs_yr; // Name of the box plot convert year to string
 
+        var year = ""+years[i][0].obs_yr;
+
         var values = [];
+
         for(var j = 0; j < years[i].length; j++){
             var curValue = +years[i][j].value;
-            curValue = Math.floor(curValue);
+            var edb = years[i][j].edb;
+            //curValue = Math.floor(curValue);
 
             if (curValue > max){
                 max = curValue;
@@ -450,12 +465,13 @@ function createDataForBoxPlot(tableRows){
                 min = curValue;
             }
             values.push(curValue);
+            sValues.push({year : year ,edb : edb, value : curValue});
         }
         entry[1] = values;
         data.push(entry);
     }
-
-    return {min : min, max : max, data : data};
+    console.log(sValues);
+    return {min : min, max : max, data : data, scatterData : sValues};
 }
 
 

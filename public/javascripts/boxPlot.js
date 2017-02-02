@@ -1,19 +1,21 @@
 /**
  * Created by Nicky on 2/02/2017.
  */
-var labels = true; // show the text labels beside individual boxplots?
+var labels = false; // show the text labels beside individual boxplots?
 
 var boxMargin = {top: 30, right: 50, bottom: 70, left: 50};
-var  boxWidth = 800 - margin.left - margin.right;
-var boxHeight = 1000- margin.top - margin.bottom;
+var  boxWidth = 500 - margin.left - margin.right;
+var boxHeight = 600- margin.top - margin.bottom;
 
 
 
 
-function createBoxPlot(dataObject, divID){
+function createBoxPlot(dataObject, divID, title){
     var data = dataObject.data;
     var min = dataObject.min;
     var max = dataObject.max;
+
+    var scatterData = dataObject.scatterData;
 
     var chart = d3.box()
         .whiskers(iqr(1.5))
@@ -28,25 +30,13 @@ function createBoxPlot(dataObject, divID){
         .append("g")
         .attr("transform", "translate(" + boxMargin.left + "," + boxMargin.top + ")");
 
-    // the x-axis
-
-    // V3
-    //var x = d3.scaleOrdinal()
-    //    .domain( data.map(function(d) { console.log(d); return d[0] } ) )
-    //    .rangeRoundBands([0 , boxWidth], 0.7, 0.3);
-
-    // V4
     var x = d3.scaleBand()
         .rangeRound([0, boxWidth])
         .padding(0.7,0.3);
 
-    x.domain( data.map(function(d) { console.log(d); return d[0] } ) );
+    x.domain( data.map(function(d) {return d[0] } ) );
 
     var xAxis = d3.axisBottom(x); // V4
-
-        // V3
-        //.scale(x)
-        //.orient("bottom");
 
     // the y-axis
     var y = d3.scaleLinear()
@@ -65,6 +55,63 @@ function createBoxPlot(dataObject, divID){
         .call(chart.width(x.bandwidth())); //V4 Updated
 
 
+    // Create the scatter plot over top
+    svg.selectAll(".dot")
+        .data(scatterData)
+        .enter().append("circle")
+        .attr("class", "dot")
+        .attr("r", 3.5)
+        .attr("cx", function(d) { return x(d.year) + 11.25; })
+        .attr("cy", function(d) { return y(d.value); })
+        .on("mouseover", function(d) {
+
+            //Get this bar's x/y values, then augment for the tooltip
+
+
+            var xPosition = parseFloat(d3.select(this).attr("x"));
+            var yPosition = parseFloat(d3.select(this).attr("y"));
+
+            xPosition = d3.event.pageX + 10;
+            yPosition = d3.event.pageY + 10;
+
+            console.log(xPosition + " "  + yPosition + " " + d.edb);
+
+            //Create the tooltip label
+            svg.append("text")
+                .attr("id", "tooltip")
+                .attr("x", xPosition)
+                .attr("y", yPosition)
+                .attr("text-anchor", "middle")
+                .attr("font-family", "sans-serif")
+                .attr("font-size", "14px")
+                .attr("font-weight", "bold")
+                .attr("fill", "red")
+                .text("" + d.edb);
+
+        }).on("mouseout", function() {
+        //Remove the tooltip
+        d3.select("#tooltip").remove();
+    });
+
+    // Create the scatter plot over top
+    //svg.selectAll("text")
+    //    .data(scatterData)
+    //    .enter()
+    //    .append("text")
+    //    .text(function(d) {
+    //        return d.edb;
+    //    })
+    //    .attr("x", function(d) {
+    //        return x(d.year);  // Returns scaled location of x
+    //    })
+    //    .attr("y", function(d) {
+    //        return y(d.value) - 10;  // Returns scaled circle y
+    //    })
+    //    .attr("font_family", "sans-serif")  // Font type
+    //    .attr("font-size", "11px")  // Font size
+    //    .attr("fill", "darkgreen");   // Font color
+
+
     // add a title
     svg.append("text")
         .attr("x", (boxWidth / 2))
@@ -72,7 +119,7 @@ function createBoxPlot(dataObject, divID){
         .attr("text-anchor", "middle")
         .style("font-size", "18px")
         //.style("text-decoration", "underline")
-        .text("Revenue 2012");
+        .text(title);
 
     // draw y axis
     svg.append("g")
