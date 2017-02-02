@@ -16,6 +16,15 @@ var selectedCompany = "";
 var b = false;
 var d = false;
 
+function DataTables(tableA,tableB,tableC,tableD){
+    this.tableA = tableA;
+    this.tableB = tableB;
+    this.tableC = tableC;
+    this.tableD = tableD;
+}
+
+var dataTables;
+
 // Adds a new row of filters for section category and sub category
 function addSection(){
 
@@ -161,7 +170,6 @@ $(document).ready( function() {
     });
 
     loadInSections();
-
 });
 
 
@@ -172,11 +180,8 @@ function loadInSections(){
         // Create the four filters rows
 
         addSection();
-
         addSection();
-
         addSection();
-
         addSection();
 
         // Sort the sections
@@ -198,17 +203,11 @@ function loadInSections(){
             if(numberA !== numberB) {
                 return numberA - numberB;
             }
-
             return [a,b].sort()[0] === a ? -1 : 1; // Sort two names and return the first
         });
 
         // Go through each row and add the sections in
         for(var i = 0; i < selections.length; i++){
-
-            if(data.sections.length > 0){
-                //$('#section-select'+selections[i].id).html('<option selected>' + data.sections[0] + '</option>'); // Empty temp options
-            }
-
             for(var j = 0; j < data.sections.length; j++){
                 $("#section-select"+selections[i].id+"").append('<option>' + data.sections[j] + '</option>');
             }
@@ -221,66 +220,75 @@ function loadFromURL(selections){
     lastSearch = new Selection(selections[0],selections[1],selections[2],selections[3]); //TODO copy values
     // Send array of selected sections to server and the company
     $.post("/compare/search",{company : selectedCompany, selections : JSON.stringify(selections)}, function(data){
-        insertTables(data.rows);
+        dataTables = filterRowsToTables(data.rows); // Filter the rows into their tables
+        showAll(); // Loads in tables bar graphs and box plots
     });
+}
+
+// Takes all rows and filers into corresponding tables
+function filterRowsToTables(rows){
+    var aRows = rows.filter(function(e){return matchDBRow(e,lastSearch.aTable);});
+    var bRows = rows.filter(function(e){return matchDBRow(e,lastSearch.bTable);});
+    var cRows = rows.filter(function(e){return matchDBRow(e,lastSearch.cTable);});
+    var dRows = rows.filter(function(e){return matchDBRow(e,lastSearch.dTable);});
+
+    return new DataTables(aRows,bRows,cRows,dRows);
+}
+
+function showAll(){
+    createTables(dataTables);
+    createBoxPlots(dataTables);
+    createGroupedBardGraphs(dataTables);
+}
+
+// Create the 4 box plots from the tables data object if they contain rows
+function createBoxPlots(tablesData){
+    if(tablesData.tableA.length > 0){
+        createBoxPlot(createDataForBoxPlot(tablesData.tableA), "#boxplotA-div", tablesData.tableA[0].section + " " +tablesData.tableA[0].description);
+    }
+    if(tablesData.tableB.length > 0){
+        createBoxPlot(createDataForBoxPlot(tablesData.tableB), "#boxplotB-div", tablesData.tableB[0].section + " " + tablesData.tableB[0].description);
+    }
+    if(tablesData.tableC.length > 0){
+        createBoxPlot(createDataForBoxPlot(tablesData.tableC), "#boxplotC-div", tablesData.tableC[0].section + " " + tablesData.tableC[0].description);
+    }
+    if(tablesData.tableD.length > 0){
+        createBoxPlot(createDataForBoxPlot(tablesData.tableD), "#boxplotD-div", tablesData.tableD[0].section + " " + tablesData.tableD[0].description);
+    }
+}
+
+
+// Create the 4 grouped bar graphs from the tables data object if they contain rows
+function createGroupedBardGraphs(tablesData){
+    if(tablesData.tableA.length > 0){
+        var table1Data = createDataForGroupedGraph(tablesData.tableA);
+        createdGroupedBarGraph(table1Data.data, table1Data.keys,tablesData.tableA[0].section + " " +tablesData.tableA[0].description,tablesData.tableA[0].units,"#grouped-bar-a");
+    }
+    if(tablesData.tableB.length > 0){
+        var table2Data = createDataForGroupedGraph(tablesData.tableB);
+        createdGroupedBarGraph(table2Data.data, table1Data.keys, tablesData.tableB[0].section + " " + tablesData.tableB[0].description, tablesData.tableB[0].units, "#grouped-bar-b");
+    }
+    if(tablesData.tableC.length > 0){
+        var table3Data = createDataForGroupedGraph(tablesData.tableC);
+        createdGroupedBarGraph(table3Data.data, table1Data.keys, tablesData.tableC[0].section + " " + tablesData.tableC[0].description, tablesData.tableC[0].units, "#grouped-bar-c");
+    }
+    if(tablesData.tableD.length > 0){
+        var table4Data = createDataForGroupedGraph(tablesData.tableD);
+        createdGroupedBarGraph(table4Data.data, table1Data.keys, tablesData.tableD[0].section + " " + tablesData.tableD[0].description, tablesData.tableD[0].units, "#grouped-bar-d");
+    }
 }
 
 
 // Receives rows from DB and converts to html tables
-function insertTables(rows){
-    // Filter the rows for each table based on the selected sections
-    var aRows = rows.filter(function(e){
-        return matchDBRow(e,lastSearch.aTable);
-    });
-
-    var bRows = rows.filter(function(e){
-        return matchDBRow(e,lastSearch.bTable);
-    });
-
-    var cRows = rows.filter(function(e){
-        return matchDBRow(e,lastSearch.cTable);
-    });
-
-    var dRows = rows.filter(function(e){
-        return matchDBRow(e,lastSearch.dTable);
-    });
-
-    insertTable(aRows,'#tableA');
-    if(aRows.length !== 0){
-        var table1Data = createDataForGroupedGraph(aRows);
-        createdGroupedBarGraph(table1Data.data, table1Data.keys,aRows[0].section + " " +aRows[0].description,aRows[0].units,"#grouped-bar-a");
-
-        createBoxPlot(createDataForBoxPlot(aRows), "#boxplotA-div",aRows[0].section + " " +aRows[0].description);
-    }
-
-
-    insertTable(bRows,'#tableB');
-    if(bRows.length !== 0) {
-        var table2Data = createDataForGroupedGraph(bRows);
-        createdGroupedBarGraph(table2Data.data, table1Data.keys, bRows[0].section + " " + bRows[0].description, bRows[0].units, "#grouped-bar-b");
-
-        createBoxPlot(createDataForBoxPlot(bRows), "#boxplotB-div",bRows[0].section + " " + bRows[0].description);
-
-    }
-
-    insertTable(cRows,'#tableC');
-    if(cRows.length !== 0) {
-        var table3Data = createDataForGroupedGraph(cRows);
-        createdGroupedBarGraph(table3Data.data, table1Data.keys, cRows[0].section + " " + cRows[0].description, cRows[0].units, "#grouped-bar-c");
-
-        createBoxPlot(createDataForBoxPlot(cRows), "#boxplotC-div", cRows[0].section + " " + cRows[0].description);
-
-    }
-
-    insertTable(dRows,'#tableD');
-    if(dRows.length !== 0) {
-        var table4Data = createDataForGroupedGraph(dRows);
-        createdGroupedBarGraph(table4Data.data, table1Data.keys, dRows[0].section + " " + dRows[0].description, dRows[0].units, "#grouped-bar-d");
-
-        createBoxPlot(createDataForBoxPlot(dRows), "#boxplotD-div",dRows[0].section + " " + dRows[0].description);
-
-    }
+function createTables(tablesData){
+    insertTable(tablesData.tableA,'#tableA');
+    insertTable(tablesData.tableA,'#tableB');
+    insertTable(tablesData.tableA,'#tableC');
+    insertTable(tablesData.tableA,'#tableD');
 }
+
+
+
 
 // Here every row belongs to the specific table
 function insertTable(tableRows,id){
@@ -289,9 +297,6 @@ function insertTable(tableRows,id){
     tableRows.sort(function (a,b) {
         return [a.edb, b.edb].sort()[0] === a.edb ? -1 : 1; // Sort two names and return the first
     });
-
-    var observerd = true;
-
 
     if(tableRows.length === 0)return; // No data so return
 
@@ -307,42 +312,31 @@ function insertTable(tableRows,id){
         return prev.disc_yr > curr.disc_yr ? prev : curr;
     }).obs_yr;
 
-
     // Create cells for each of the years to use as header
     var years = "";
     for(var i = min; i <= max; i++){
         years += "<th>" + i + "</th>";
     }
 
-    // If it is the first table add edb column else leave it out
-    //if(id === "#tableA"){
-    //    $(id).append('<tr id="head-row" class="table-row"> <th>EDB</th>'+ years + '</tr>');
-    //} else {
-    //    $(id).append('<tr id="head-row" class="table-row">'+ years + '</tr>');
-    //}
-
     $(id).append('<tr id="head-row" class="table-row"> <th>EDB</th>'+ years + '</tr>');
 
     // An array of companies already processed
     var done = [];
     var cellCount = 0;
-
     var cellValues = [];
+
+    var observerd = true;
 
     // Create the rows of data
     for(var i = 0; i < tableRows.length; i++){
         if(!done.includes(tableRows[i].edb)){
-
             done.push(tableRows[i].edb);
 
             var row= "<tr class='table-row' id=row"+id+i+">";
 
             // Insert name in column and assign an id to the row
+            row += "<th>" + tableRows[i].edb + "</th>";
 
-            // Only add edb for the first table in this case tableA
-            //if(id === "#tableA"){
-                row += "<th>" + tableRows[i].edb + "</th>";
-            //}
 
             for(var cur = min; cur <=max; cur++){
                 // Iterate through all rows finding ones with the current edb
@@ -354,16 +348,13 @@ function insertTable(tableRows,id){
 
                         // Save the value and the id of the cell to display percentage
                         cellValues.push({ id : "#t"+id+""+cellCount, value : tableRows[j].value });
-
                         cellCount++;
                     }
                 }
             }
 
             $(id).append(row + '</tr>');
-
             // Here we can check the unit type and highlight appropriately
-
             // Assing a on click function to each of the rows to generate the bar graph with the row specific data
             //$( "#row"+i+"").click(function(event) {
             //    showBarWithRowElem(this.id);
@@ -475,22 +466,6 @@ function createDataForBoxPlot(tableRows){
 }
 
 
-// Makes sure the correct rows are selected before searching
-function validateSelections(){
-    // First
-
-
-}
-
-
-function createDerivedTables(aData,bData,cData,dData){
-        // First create A / B
-        for(var i = 0; i < aData.length; i++){
-
-        }
-}
-
-
 function createDataForGroupedGraph(rows){
     var data = [];
     // includes
@@ -528,7 +503,6 @@ function createDataForGroupedGraph(rows){
     for(var i = min; i <= max; i++){
         keys.push(""+i);
     }
-
     return {data : data, keys : keys};
 }
 
