@@ -2,8 +2,6 @@
  * Created by Nicky on 23/01/2017.
  */
 
-var numberSections = 0; // The id count for each row
-
 // Holds the currently selected items in the filter rows
 var selections = [];
 
@@ -26,7 +24,7 @@ function DataTables(tableA,tableB,tableC,tableD){
 var dataTables;
 
 // Adds a new row of filters for section category and sub category
-function addSection(){
+function addSection(numberSections){
 
     // Add in a new row div
     $('#compare-div').append('<div class="col-xs-3 compare-col" id="Ocol'+numberSections+'">');
@@ -134,7 +132,7 @@ function addSection(){
         var data = $(this).find("option:selected").text();
         addToSelection(idNumb,"description", data);
     });
-    numberSections++; // Increment the int used for id's
+    //numberSections++; // Increment the int used for id's
 }
 
 // Adds a section, category, sub category, or descriptions to a particular row in selections
@@ -179,10 +177,10 @@ function loadInSections(){
     $.get("/sections/sections", function(data){
         // Create the four filters rows
 
-        addSection();
-        addSection();
-        addSection();
-        addSection();
+        addSection(0);
+        addSection(1);
+        addSection(2);
+        addSection(3);
 
         // Sort the sections
         data.sections.sort(function(a,b){
@@ -282,13 +280,10 @@ function createGroupedBardGraphs(tablesData){
 // Receives rows from DB and converts to html tables
 function createTables(tablesData){
     insertTable(tablesData.tableA,'#tableA');
-    insertTable(tablesData.tableA,'#tableB');
-    insertTable(tablesData.tableA,'#tableC');
-    insertTable(tablesData.tableA,'#tableD');
+    insertTable(tablesData.tableB,'#tableB');
+    insertTable(tablesData.tableC,'#tableC');
+    insertTable(tablesData.tableD,'#tableD');
 }
-
-
-
 
 // Here every row belongs to the specific table
 function insertTable(tableRows,id){
