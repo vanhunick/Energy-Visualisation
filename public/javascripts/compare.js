@@ -58,6 +58,7 @@ function showAll(){
     createTables(dataTables);
     createBoxPlots(dataTables);
     createGroupedBardGraphs(dataTables);
+    createDataForVectorGraph(dataTables.tableA,dataTables.tableC);
 }
 
 // Create the 4 box plots from the tables data object if they contain rows
@@ -245,6 +246,74 @@ function serialise(obj) {
             str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
         }
     return str.join("&");
+}
+
+
+// table 1 can be A and table two C or table 1 is A / B and table two is
+function createDataForVectorGraph(table1Rows,table2Rows) {
+    var at = table1Rows;
+    var bt = table2Rows;
+
+    var edbDone = []; // The edbs that have been processed
+
+    var vecData = []; // The final entry in the form { EDB, [ { year1, valueA, valueB }, {year2, valueA, valueB }]}
+
+
+    // Go through every row
+    for (var i = 0; i < at.length; i++) {
+
+        // Check if the EDB has already been processed
+        if (!edbDone.includes(at[i].edb)) {
+            console.log("looping " + at[i].edb);
+            // Grab all the rows for the current edb in both tables
+            var edbRowsAt = at.filter(function (d) {
+                return d.edb === at[i].edb
+            });
+            var edbRowsBt = bt.filter(function (d) {
+                return d.edb === at[i].edb
+            });
+
+            edbDone.push(at[i].edb); // Add year to done so it is not repeated
+
+
+            var yearsDone = []; // Processed years
+
+            var edbYearArray = [];
+
+            // Iterate through rows in edb
+            for (var j = 0; j < edbRowsAt.length; j++) {
+
+                // Check it has not been processed
+                if (!yearsDone.includes(edbRowsAt[j].disc_yr)) {
+                    yearsDone.push(edbRowsAt[j].disc_yr); // Add to processed
+
+                    // Here we have to rows for a particular year for a particular edb now we can create the entry
+                    var yearRowsAt = edbRowsAt.filter(function (d) {
+                        return d.disc_yr === edbRowsAt[j].disc_yr
+                    });
+                    var yearRowsBt = edbRowsBt.filter(function (d) {
+                        return d.disc_yr === edbRowsAt[j].disc_yr
+                    });
+
+
+
+                    for (var k = 0; k < yearRowsAt.length; k++) {
+                        edbYearArray.push({
+                            year: +yearRowsAt[k].disc_yr,
+                            valueA: +yearRowsAt[k].value,
+                            valueB: +yearRowsBt[k].value
+                        });
+                    }
+                }
+            }
+            edbYearArray.sort(function (a,b) {
+                return a.year - b.year;
+            });
+            vecData.push({edb: at[i].edb, years: edbYearArray});
+            console.log({edb: at[i].edb, years: edbYearArray});
+        }
+    }
+
 }
 
 // Creates the data needed to create box plots for one table
