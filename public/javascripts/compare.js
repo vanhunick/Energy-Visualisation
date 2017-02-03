@@ -58,7 +58,8 @@ function showAll(){
     createTables(dataTables);
     createBoxPlots(dataTables);
     createGroupedBardGraphs(dataTables);
-    createDataForVectorGraph(dataTables.tableA,dataTables.tableC);
+    createVectorGraph(createDataForVectorGraph(dataTables.tableA,dataTables.tableC));
+
 }
 
 // Create the 4 box plots from the tables data object if they contain rows
@@ -264,7 +265,7 @@ function createDataForVectorGraph(table1Rows,table2Rows) {
 
         // Check if the EDB has already been processed
         if (!edbDone.includes(at[i].edb)) {
-            console.log("looping " + at[i].edb);
+
             // Grab all the rows for the current edb in both tables
             var edbRowsAt = at.filter(function (d) {
                 return d.edb === at[i].edb
@@ -310,10 +311,9 @@ function createDataForVectorGraph(table1Rows,table2Rows) {
                 return a.year - b.year;
             });
             vecData.push({edb: at[i].edb, years: edbYearArray});
-            console.log({edb: at[i].edb, years: edbYearArray});
         }
     }
-
+    return vecData;
 }
 
 // Creates the data needed to create box plots for one table
