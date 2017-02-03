@@ -16,35 +16,35 @@ router.get('/', function(req, res, next) {
 
 function search(req, res){
     var row0 = {
-        id : req.query.id0,
-        section  : req.query.section0,
-        category : req.query.category0,
-        subCategory : req.query.subCategory0,
-        description :req.query.description0
+        id : req.query.i0,
+        section  : req.query.s0,
+        category : req.query.c0,
+        subCategory : req.query.sc0,
+        description :req.query.d0
     };
 
     var row1 = {
-        id : req.query.id0,
-        section  : req.query.section1,
-        category : req.query.category1,
-        subCategory : req.query.subCategory1,
-        description :req.query.description1
+        id : req.query.i0,
+        section  : req.query.s1,
+        category : req.query.c1,
+        subCategory : req.query.sc1,
+        description :req.query.d1
     };
 
     var row2 = {
-        id : req.query.id2,
-        section  : req.query.section2,
-        category : req.query.category2,
-        subCategory : req.query.subCategory2,
-        description :req.query.description2
+        id : req.query.i2,
+        section  : req.query.s2,
+        category : req.query.c2,
+        subCategory : req.query.sc2,
+        description :req.query.d2
     };
 
     var row3 = {
-        id : req.query.id3,
-        section  : req.query.section3,
-        category : req.query.category3,
-        subCategory : req.query.subCategory3,
-        description :req.query.description3
+        id : req.query.i3,
+        section  : req.query.s3,
+        category : req.query.c3,
+        subCategory : req.query.sc3,
+        description :req.query.d3
     };
 
     selections = [];

@@ -214,26 +214,26 @@ function matchDBRow(DBRow, selection){
 // Creates search parameters and creates url
 function search(){
     var rows = {
-        id0 : selections[0].id,
-        section0  : selections[0].section,
-        category0 : selections[0].category,
-        subCategory0 : selections[0].subCategory,
-        description0 : selections[0].description,
-        id1 : selections[1].id,
-        section1  : selections[1].section,
-        category1 : selections[1].category,
-        subCategory1 : selections[1].subCategory,
-        description1 : selections[1].description,
-        id2 : selections[2].id,
-        section2  : selections[2].section,
-        category2 : selections[2].category,
-        subCategory2 : selections[2].subCategory,
-        description2 : selections[2].description,
-        id3 : selections[3].id,
-        section3  : selections[3].section,
-        category3 : selections[3].category,
-        subCategory3 : selections[3].subCategory,
-        description3 : selections[3].description
+        i0 : selections[0].id,
+        s0  : selections[0].section,
+        c0 : selections[0].category,
+        sc0 : selections[0].subCategory,
+        d0 : selections[0].description,
+        i1 : selections[1].id,
+        s1  : selections[1].section,
+        c1 : selections[1].category,
+        sc1 : selections[1].subCategory,
+        d1 : selections[1].description,
+        i2 : selections[2].id,
+        s2  : selections[2].section,
+        c2 : selections[2].category,
+        sc2 : selections[2].subCategory,
+        d2 : selections[2].description,
+        i3 : selections[3].id,
+        s3  : selections[3].section,
+        c3 : selections[3].category,
+        sc3 : selections[3].subCategory,
+        d3 : selections[3].description
     };
     params = serialise(rows);
     window.location.replace("compare?" + params);
