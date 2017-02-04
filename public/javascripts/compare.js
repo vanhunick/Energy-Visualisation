@@ -42,9 +42,7 @@ function loadFromURL(selections){
     // Send array of selected sections to server and the company
     $.post("/compare/search",{company : selectedCompany, selections : JSON.stringify(selections)}, function(data){
         setSelectionsFromURL(selections[0]); //TODO check for null to be more efficient
-        console.log("T");
-        console.log(selections[1]);
-        setSelectionsFromURL(selections[1]); //TODO not working for 1
+        setSelectionsFromURL(selections[1]);
         setSelectionsFromURL(selections[2]);
         setSelectionsFromURL(selections[3]);
 
@@ -459,6 +457,8 @@ function setSelectionsFromURL(selection){
 
         if(data.subCategories.length > 0  &&  data.subCategories[0] !== null){
             $('#subsection-select'+selection.id).html(''); // Empty temp options
+        } else {
+            return;
         }
 
         // Add sub section options
