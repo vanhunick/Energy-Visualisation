@@ -24,7 +24,7 @@ function search(req, res){
     };
 
     var row1 = {
-        id : req.query.i0,
+        id : req.query.i1,
         section  : req.query.s1,
         category : req.query.c1,
         subCategory : req.query.sc1,

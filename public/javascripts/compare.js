@@ -34,7 +34,7 @@ $(document).ready( function() {
 
 // Uses the url to find what was searches and asks server for rows relating to that search
 function loadFromURL(selections){
-    loadInSections(); // First load in the section rows
+    loadInSections(true,selections); // First load in the section rows
 
     console.log("Being called");
 
@@ -42,6 +42,8 @@ function loadFromURL(selections){
     // Send array of selected sections to server and the company
     $.post("/compare/search",{company : selectedCompany, selections : JSON.stringify(selections)}, function(data){
         setSelectionsFromURL(selections[0]); //TODO check for null to be more efficient
+        console.log("T");
+        console.log(selections[1]);
         setSelectionsFromURL(selections[1]); //TODO not working for 1
         setSelectionsFromURL(selections[2]);
         setSelectionsFromURL(selections[3]);
@@ -515,7 +517,7 @@ function sortSections(data){
 }
 
 // Loads in sections along with the rows of selection boxes
-function loadInSections(){
+function loadInSections(fromURL, userSelections){ // if from url false selections is null
     // Grab all the sections
     /// Query for all sections
     $.get("/sections/sections", function(data){
@@ -532,7 +534,11 @@ function loadInSections(){
         // Go through each row and add the sections in
         for(var i = 0; i < selections.length; i++){
             for(var j = 0; j < data.sections.length; j++){
-                $("#section-select"+selections[i].id+"").append('<option>' + data.sections[j] + '</option>');
+                if(fromURL && userSelections[i].section === data.sections[j]){
+                    $("#section-select"+selections[i].id+"").append('<option selected>' + data.sections[j] + '</option>');
+                } else {
+                    $("#section-select"+selections[i].id+"").append('<option>' + data.sections[j] + '</option>');
+                }
             }
             $(".selectpicker").selectpicker('refresh');
         }
