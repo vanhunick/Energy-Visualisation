@@ -78,6 +78,17 @@ a {
   shape-rendering: crispEdges;
 }
 
+/*.data-table {*/
+  /*margin-left : 5%;*/
+  /*margin-right : 5%;*/
+/*}*/
+
+.table-nonfluid {
+  /*width: auto !important;*/
+
+
+}
+
 .dot {
   /*fill: red;*/
 }
