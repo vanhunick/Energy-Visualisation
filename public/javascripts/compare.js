@@ -30,17 +30,30 @@ $(document).ready( function() {
     $('#search-btn-compare').click(function(){
         search();
     });
-    loadInSections(); // Creates the rows for selections
 });
 
 // Uses the url to find what was searches and asks server for rows relating to that search
 function loadFromURL(selections){
+    loadInSections(); // First load in the section rows
+
+    console.log("Being called");
+
     lastSearch = new Selection(selections[0],selections[1],selections[2],selections[3]); //TODO copy values
     // Send array of selected sections to server and the company
     $.post("/compare/search",{company : selectedCompany, selections : JSON.stringify(selections)}, function(data){
+        setSelectionsFromURL(selections[0]); //TODO check for null to be more efficient
+        setSelectionsFromURL(selections[1]); //TODO not working for 1
+        setSelectionsFromURL(selections[2]);
+        setSelectionsFromURL(selections[3]);
+
         dataTables = filterRowsToTables(data.rows); // Filter the rows into their tables
         showAll(); // Loads in tables bar graphs and box plots
     });
+}
+
+// Selects the users last selection from url
+function loadSections(selectionRow){
+    // First populate the section selection
 }
 
 // Takes all rows and filers into corresponding tables
@@ -59,7 +72,6 @@ function showAll(){
     createBoxPlots(dataTables);
     createGroupedBardGraphs(dataTables);
     createVectorGraph(createDataForVectorGraph(dataTables.tableA,dataTables.tableC));
-
 }
 
 // Create the 4 box plots from the tables data object if they contain rows
@@ -172,7 +184,7 @@ function insertTable(tableRows,id){
             var row= "<tr class='table-row' id=row"+id+i+">";
 
             // Insert name in column and assign an id to the row
-            row += "<th>" + tableRows[i].edb + "</th>";
+            row += "<th class='edb-cell'>" + tableRows[i].edb + "</th>";
 
 
             for(var cur = min; cur <=max; cur++){
@@ -403,6 +415,105 @@ function createDataForGroupedGraph(rows){
     return {data : data, keys : keys};
 }
 
+
+function setSections(callback){
+    $.get("/sections/sections", function(data){
+        sortSections(data);
+
+        // Go through each row and add the sections in
+        for(var i = 0; i < selections.length; i++){
+            for(var j = 0; j < data.sections.length; j++){
+                $("#section-select"+selections[i].id+"").append('<option>' + data.sections[j] + '</option>');
+            }
+            $(".selectpicker").selectpicker('refresh');
+        }
+    });
+}
+
+function setSelectionsFromURL(selection){
+    // Find all the categories associated with this section
+    $.post("/sections/s",{selected : selection.section }, function(data){
+        if(data.categories.length > 0  &&  data.categories[0] !== null){
+            $('#category-select'+selection.id).html(''); // Empty temp options
+        }
+
+        // Add the options to the drop down
+        for(var i = 0; i < data.categories.length; i++){
+            if(data.categories[i] === selection.category){
+                $('#category-select'+selection.id).append('<option value="' + data.categories[i] + '"selected> ' + data.categories[i] + '</option>');
+            } else {
+                $('#category-select'+selection.id).append('<option value="' + data.categories[i] + '"> ' + data.categories[i] + '</option>');
+            }
+
+        }
+
+        // Refresh all drop downs
+        $(".selectpicker").selectpicker('refresh');
+    });
+
+
+    // Find all sub categories for the currently selected category
+    $.post("/sections/sc",{section : selection.section, category : selection.category}, function(data){
+
+        if(data.subCategories.length > 0  &&  data.subCategories[0] !== null){
+            $('#subsection-select'+selection.id).html(''); // Empty temp options
+        }
+
+        // Add sub section options
+        for(var i = 0; i < data.subCategories.length; i++){
+            if(data.subCategories[i] === selection.subCategory){
+                $('#subsection-select'+selection.id).append('<option selected>' + data.subCategories[i] + '</option>');
+            } else {
+                $('#subsection-select'+selection.id).append('<option>' + data.subCategories[i] + '</option>');
+            }
+        }
+        $(".selectpicker").selectpicker('refresh');
+    });
+
+    // Grab the descriptions
+    $.post("/sections/desc",{category : selection.category,section : selection.section, subCategory : selection.subCategory}, function(data){
+        if(data.descriptions.length > 0 &&  data.descriptions[0] !== null){
+            $('#description-select'+selection.id).html(''); // Empty temp options
+        } else {
+            return;
+        }
+
+        // Add sub section options
+        for(var i = 0; i < data.descriptions.length; i++){
+            if(data.descriptions[i] === selection.description){
+                $('#description-select'+selection.id).append('<option selected>' + data.descriptions[i] + '</option>');
+            } else {
+                $('#description-select'+selection.id).append('<option>' + data.descriptions[i] + '</option>');
+            }
+        }
+        $(".selectpicker").selectpicker('refresh');
+    });
+}
+
+
+function sortSections(data){
+    data.sections.sort(function(a,b){
+        // First check simple case of number difference
+        var i = 0;
+        while(!isNaN(a.charAt(i))){
+            i++
+        }
+        var numberA = a.substring(0,i); // Gets the number from the section
+
+        i = 0;
+        while(!isNaN(b.charAt(i))){
+            i++
+        }
+
+        var numberB = b.substring(0,i);
+
+        if(numberA !== numberB) {
+            return numberA - numberB;
+        }
+        return [a,b].sort()[0] === a ? -1 : 1; // Sort two names and return the first
+    });
+}
+
 // Loads in sections along with the rows of selection boxes
 function loadInSections(){
     // Grab all the sections
@@ -416,26 +527,7 @@ function loadInSections(){
         addSection(3);
 
         // Sort the sections
-        data.sections.sort(function(a,b){
-            // First check simple case of number difference
-            var i = 0;
-            while(!isNaN(a.charAt(i))){
-                i++
-            }
-            var numberA = a.substring(0,i); // Gets the number from the section
-
-            i = 0;
-            while(!isNaN(b.charAt(i))){
-                i++
-            }
-
-            var numberB = b.substring(0,i);
-
-            if(numberA !== numberB) {
-                return numberA - numberB;
-            }
-            return [a,b].sort()[0] === a ? -1 : 1; // Sort two names and return the first
-        });
+        sortSections(data);
 
         // Go through each row and add the sections in
         for(var i = 0; i < selections.length; i++){
@@ -444,6 +536,7 @@ function loadInSections(){
             }
             $(".selectpicker").selectpicker('refresh');
         }
+        console.log("Created sections");
     });
 }
 
