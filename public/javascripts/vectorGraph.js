@@ -2,14 +2,14 @@
  * Created by Nicky on 3/02/2017.
  */
 
-var vMargin = {top: 20, right: 20, bottom: 30, left: 40},
+var vMargin = {top: 30, right: 20, bottom: 30, left: 60},
     vWidth = 960 - vMargin.left - vMargin.right,
     vHeight = 500 - vMargin.top - vMargin.bottom;
 
-function createVectorGraph(data){
-
-
-    var length = 29;
+function createVectorGraph(data,xLabel, yLabel, title){
+    console.log(xLabel);
+    console.log(yLabel);
+    console.log(title);
 
     var edbs = [];
     data.forEach(function (e) {
@@ -17,10 +17,8 @@ function createVectorGraph(data){
     })
 
 
-
     var color = d3.scaleOrdinal().domain(edbs)
         .range(["#e69a61", "#9817ff", "#18c61a", "#33b4ff", "#c9167e", "#297853", "#d7011b", "#7456c7", "#7e6276", "#afb113", "#fd879c", "#fb78fa", "#24c373", "#45bbc5", "#766b21", "#abad93", "#c19ce3", "#fd8f11", "#2f56ff", "#307a11", "#b3483c", "#0d7396", "#94b665", "#9d4d91", "#b807c8", "#086cbf", "#a2abc5", "#a35702", "#d3084b"]);
-
 
 
     var allValues =[];
@@ -126,5 +124,26 @@ function createVectorGraph(data){
         .attr("stroke-width", 2)
         .attr("stroke", function(d) { return color(d.edb);});
 
+    // Add in title
+    svg.append("text")
+        .attr("x", (vWidth / 2))
+        .attr("y", 0 - (vMargin.top / 2))
+        .attr("id","vector-title")
+        .attr("text-anchor", "middle")
+        .style("font-size", "14px")
+        .text(title);
 
+    // Add X label
+    svg.append("text")
+        .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
+        .attr("transform", "translate("+ -vMargin.left/2 +","+( vHeight/2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
+        .style("font-size", "14px")
+        .text(yLabel);
+
+    // Add Y label
+    svg.append("text")
+        .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
+        .attr("transform", "translate("+ vWidth/2 +","+( vHeight+ vMargin.bottom /2 + 15) + ")")  // text is drawn off the screen top left, move down and out and rotate
+        .style("font-size", "14px")
+        .text(xLabel);
 }

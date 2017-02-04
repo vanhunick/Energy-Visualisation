@@ -11,11 +11,15 @@ var lastSearch = null;
 var selectedCompany = "";
 
 // Hold if these tables have been selected
-var b = false;
-var d = false;
+var aSelected = false;
+var bSelected = false;
+var cSelected = false;
+var dSelected = false;
+
 
 // Holds the rows for each table separately
 var dataTables;
+var titles;
 
 $(document).ready( function() {
     // Highlight the selected link
@@ -36,7 +40,6 @@ $(document).ready( function() {
 function loadFromURL(selections){
     loadInSections(true,selections); // First load in the section rows
 
-    console.log("Being called");
 
     lastSearch = new Selection(selections[0],selections[1],selections[2],selections[3]); //TODO copy values
     // Send array of selected sections to server and the company
@@ -47,13 +50,26 @@ function loadFromURL(selections){
         setSelectionsFromURL(selections[3]);
 
         dataTables = filterRowsToTables(data.rows); // Filter the rows into their tables
+        if(dataTables.tableA.length > 0){
+            aSelected = true;
+        }
+
+        if(dataTables.tableB.length > 0){
+            bSelected = true;
+        }
+
+        if(dataTables.tableC.length > 0){
+            cSelected = true;
+        }
+
+        if(dataTables.tableD.length > 0){
+            dSelected = true;
+        }
+
+        titles = createTableTitles(dataTables);
+
         showAll(); // Loads in tables bar graphs and box plots
     });
-}
-
-// Selects the users last selection from url
-function loadSections(selectionRow){
-    // First populate the section selection
 }
 
 // Takes all rows and filers into corresponding tables
@@ -66,47 +82,98 @@ function filterRowsToTables(rows){
     return new DataTables(aRows,bRows,cRows,dRows);
 }
 
+function createTableTitles(tablesData){
+
+    var aTitle = "";
+    var aUnit = "";
+    if(aSelected){
+        aTitle = tablesData.tableA[0].category + " " + tablesData.tableA[0].description;
+        aUnit = tablesData.tableA[0].units;
+    }
+
+    var bTitle = "";
+    var bUnit = "";
+    if(bSelected){
+        bTitle = tablesData.tableB[0].category + " " + tablesData.tableB[0].description;
+        bUnit = tablesData.tableB[0].units;
+    }
+
+    var cTitle = "";
+    var cUnit = "";
+    if(cSelected){
+        cTitle = tablesData.tableC[0].category + " " + tablesData.tableC[0].description;
+        cUnit = tablesData.tableC[0].units;
+    }
+
+    var dTitle = "";
+    var dUnit = "";
+    if(dSelected){
+        dTitle = tablesData.tableD[0].category + " " + tablesData.tableD[0].description;
+        dUnit = tablesData.tableD[0].units;
+    }
+
+    return new DataTableTitles(aTitle,bTitle,cTitle,dTitle,aUnit,bUnit,cUnit,dUnit);
+}
+
 // Shows all tables bar graphs and box plots
 function showAll(){
     createTables(dataTables);
-    createBoxPlots(dataTables);
-    createGroupedBardGraphs(dataTables);
-    createVectorGraph(createDataForVectorGraph(dataTables.tableA,dataTables.tableC));
+    createBoxPlots(dataTables,titles);
+    createGroupedBardGraphs(dataTables, titles);
+
+    // If all selected line graph is A/B / C/D
+    var xTitle = "";
+    var yTitle = "";
+    var xUnit = "";
+    var yUnit = "";
+    if(aSelected && bSelected && cSelected && dSelected){
+        xTitle = titles.aTitle + " Over " + titles.bTitle;
+        yTitle = titles.cTitle + " Over " + titles.dTitle;
+        xUnit = titles.aUnit + " / " + titles.bUnit;
+    } else {
+        xTitle = titles.aTitle;
+        xUnit = titles.aUnit;
+        yTitle = titles.cTitle;
+        yUnit = titles.cUnit;
+    }
+    title = xTitle + " Over " + yTitle;
+
+    createVectorGraph(createDataForVectorGraph(dataTables.tableA,dataTables.tableC),xUnit,yUnit,title); // TODO check if A/B / C/D
 }
 
 // Create the 4 box plots from the tables data object if they contain rows
-function createBoxPlots(tablesData){
+function createBoxPlots(tablesData, titles){
     if(tablesData.tableA.length > 0){
-        createBoxPlot(createDataForBoxPlot(tablesData.tableA), "#boxplotA-div", tablesData.tableA[0].section + " " +tablesData.tableA[0].description);
+        createBoxPlot(createDataForBoxPlot(tablesData.tableA), "#boxplotA-div", titles.aTitle, titles.aUnit);
     }
     if(tablesData.tableB.length > 0){
-        createBoxPlot(createDataForBoxPlot(tablesData.tableB), "#boxplotB-div", tablesData.tableB[0].section + " " + tablesData.tableB[0].description);
+        createBoxPlot(createDataForBoxPlot(tablesData.tableB), "#boxplotB-div", titles.bTitle, titles.bUnit);
     }
     if(tablesData.tableC.length > 0){
-        createBoxPlot(createDataForBoxPlot(tablesData.tableC), "#boxplotC-div", tablesData.tableC[0].section + " " + tablesData.tableC[0].description);
+        createBoxPlot(createDataForBoxPlot(tablesData.tableC), "#boxplotC-div", titles.cTitle, titles.cUnit);
     }
     if(tablesData.tableD.length > 0){
-        createBoxPlot(createDataForBoxPlot(tablesData.tableD), "#boxplotD-div", tablesData.tableD[0].section + " " + tablesData.tableD[0].description);
+        createBoxPlot(createDataForBoxPlot(tablesData.tableD), "#boxplotD-div", titles.dTitle, titles.dUnit);
     }
 }
 
 // Create the 4 grouped bar graphs from the tables data object if they contain rows
-function createGroupedBardGraphs(tablesData){
+function createGroupedBardGraphs(tablesData, titles){
     if(tablesData.tableA.length > 0){
         var table1Data = createDataForGroupedGraph(tablesData.tableA);
-        createdGroupedBarGraph(table1Data.data, table1Data.keys,tablesData.tableA[0].section + " " +tablesData.tableA[0].description,tablesData.tableA[0].units,"#grouped-bar-a");
+        createdGroupedBarGraph(table1Data.data, table1Data.keys,titles.aTitle,titles.aUnit,"#grouped-bar-a");
     }
     if(tablesData.tableB.length > 0){
         var table2Data = createDataForGroupedGraph(tablesData.tableB);
-        createdGroupedBarGraph(table2Data.data, table1Data.keys, tablesData.tableB[0].section + " " + tablesData.tableB[0].description, tablesData.tableB[0].units, "#grouped-bar-b");
+        createdGroupedBarGraph(table2Data.data, table1Data.keys, titles.bTitle, titles.bUnit, "#grouped-bar-b");
     }
     if(tablesData.tableC.length > 0){
         var table3Data = createDataForGroupedGraph(tablesData.tableC);
-        createdGroupedBarGraph(table3Data.data, table1Data.keys, tablesData.tableC[0].section + " " + tablesData.tableC[0].description, tablesData.tableC[0].units, "#grouped-bar-c");
+        createdGroupedBarGraph(table3Data.data, table1Data.keys,titles.cTitle, titles.cUnit, "#grouped-bar-c");
     }
     if(tablesData.tableD.length > 0){
         var table4Data = createDataForGroupedGraph(tablesData.tableD);
-        createdGroupedBarGraph(table4Data.data, table1Data.keys, tablesData.tableD[0].section + " " + tablesData.tableD[0].description, tablesData.tableD[0].units, "#grouped-bar-d");
+        createdGroupedBarGraph(table4Data.data, table1Data.keys, titles.dTitle, titles.dUnit, "#grouped-bar-d");
     }
 }
 
@@ -542,7 +609,6 @@ function loadInSections(fromURL, userSelections){ // if from url false selection
             }
             $(".selectpicker").selectpicker('refresh');
         }
-        console.log("Created sections");
     });
 }
 
@@ -690,3 +756,16 @@ function DataTables(tableA,tableB,tableC,tableD){
     this.tableC = tableC;
     this.tableD = tableD;
 }
+
+// Holds the title for each table
+function DataTableTitles(aTitle,bTitle,cTitle,dTitle,aUnit,bUnit,cUnit,dUnit){
+    this.aTitle = aTitle;
+    this.bTitle = bTitle;
+    this.cTitle = cTitle;
+    this.dTitle = dTitle;
+    this.aUnit = aUnit;
+    this.bUnit = bUnit;
+    this.cUnit = cUnit;
+    this.dUnit = dUnit;
+}
+

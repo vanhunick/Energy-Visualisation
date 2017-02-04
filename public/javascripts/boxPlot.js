@@ -3,14 +3,14 @@
  */
 var labels = false; // show the text labels beside individual boxplots?
 
-var boxMargin = {top: 30, right: 50, bottom: 70, left: 50};
-var  boxWidth = 500 - margin.left - margin.right;
+var boxMargin = {top: 30, right: 100, bottom: 70, left: 100};
+var  boxWidth = 700 - margin.left - margin.right;
 var boxHeight = 600- margin.top - margin.bottom;
 
 
 
 
-function createBoxPlot(dataObject, divID, title){
+function createBoxPlot(dataObject, divID, title, unit){
     var data = dataObject.data;
     var min = dataObject.min;
     var max = dataObject.max;
@@ -61,19 +61,12 @@ function createBoxPlot(dataObject, divID, title){
         .enter().append("circle")
         .attr("class", "dot")
         .attr("r", 3.5)
-        .attr("cx", function(d) { return x(d.year) + 12.50; })
+        .attr("cx", function(d) { return x(d.year) + (boxMargin.left / 4) - 6; })
         .attr("cy", function(d) { return y(d.value); })
         .on("mouseover", function(d) {
 
-            //Get this bar's x/y values, then augment for the tooltip
-
-
             var xPosition = parseFloat(d3.select(this).attr("cx"));
             var yPosition = parseFloat(d3.select(this).attr("cy") + 10);
-
-            //xPosition = d3.event.pageX + 10;
-            //yPosition = d3.event.pageY + 10;
-
 
             //Create the tooltip label
             svg.append("text")
@@ -91,25 +84,6 @@ function createBoxPlot(dataObject, divID, title){
         //Remove the tooltip
         d3.select("#tooltip").remove();
     });
-
-    // Create the scatter plot over top
-    //svg.selectAll("text")
-    //    .data(scatterData)
-    //    .enter()
-    //    .append("text")
-    //    .text(function(d) {
-    //        return d.edb;
-    //    })
-    //    .attr("x", function(d) {
-    //        return x(d.year);  // Returns scaled location of x
-    //    })
-    //    .attr("y", function(d) {
-    //        return y(d.value) - 10;  // Returns scaled circle y
-    //    })
-    //    .attr("font_family", "sans-serif")  // Font type
-    //    .attr("font-size", "11px")  // Font size
-    //    .attr("fill", "darkgreen");   // Font color
-
 
     // add a title
     svg.append("text")
@@ -144,6 +118,12 @@ function createBoxPlot(dataObject, divID, title){
         .style("text-anchor", "middle")
         .style("font-size", "16px")
         .text("Quarter");
+
+    svg.append("text")
+        .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
+        .attr("transform", "translate("+ -(vMargin.left/2+5) +","+( boxMargin.top*2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
+        .style("font-size", "14px")
+        .text(unit);
 }
 
 
