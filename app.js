@@ -5,6 +5,8 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
+var SQLProtection = require('./routes/SQLProtection');
+
 var index = require('./routes/index');
 var sections = require('./routes/sections');
 var compare = require('./routes/compare');
@@ -35,6 +37,7 @@ app.use('/sections',sections);
 app.use('/compare',compare);
 app.use('/core',core);
 
+SQLProtection.createValidSelectionData();
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

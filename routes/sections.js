@@ -7,8 +7,19 @@ var pg = require('pg');
 
 var squel = require("squel");
 
+var SQLProtection = require("./SQLProtection");
+
 // finds all categories that match a section
 router.post('/s', function(req, res, next) {
+
+    //console.log("Here");
+    //console.log(SQLProtection.validSections.sections);
+    //
+    //if(!SQLProtection.validSections.sections.includes(req.body.selected)){
+    //    return;
+    //} else {
+    //    console.log("Valid SQL Query");
+    //}
 
     //TODO escape req.body.selected
     var queryString = squel.select()
