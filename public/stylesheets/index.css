@@ -91,6 +91,22 @@ a {
   stroke: #000;
 }
 
+.cap {
+  font-size: 24px;
+  color: steelblue;
+}
+.edb-cell {
+  color: lightcoral;
+}
+
+/*The top row of each table with EBD header and years*/
+.table-head {
+  font-size: 18px;
+  color: steelblue;
+  font-weight: bold;
+}
+
+
 .axis {
   font: 12px sans-serif;
   shape-rendering: crispEdges;

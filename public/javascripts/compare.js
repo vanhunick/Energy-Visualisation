@@ -261,7 +261,7 @@ function insertTable(tableRows,id){
     if(tableRows.length === 0)return; // No data so return
 
     // Add the title to the table
-    $("#"+id).append('<caption>' +tableRows[0].section + " " + tableRows[0].description + '</caption>');
+    $("#"+id).append('<caption class="cap">' +tableRows[0].section + " " + tableRows[0].description + '</caption>');
 
     // Find the min and max year from the data
     var min = tableRows.reduce(function(prev, curr) {
@@ -278,7 +278,7 @@ function insertTable(tableRows,id){
         years += "<th>" + i + "</th>";
     }
 
-    $("#"+id).append('<tr id="head-row" class="table-row"> <th>EDB</th>'+ years + '</tr>');
+    $("#"+id).append('<tr id="head-row" class="table-row table-head"> <th>EDB</th>'+ years + '</tr>');
 
     // An array of companies already processed
     var done = [];
