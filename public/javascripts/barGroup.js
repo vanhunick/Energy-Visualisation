@@ -1,10 +1,10 @@
-var margin = { top: 35, right: 50, bottom: 150, left: 60 },
-    width = 1500 - margin.left - margin.right,
+var margin = { top: 35, right: 20, bottom: 150, left: 30 },
+    width = 1600 - margin.left - margin.right,
     height = 800 - margin.top - margin.bottom;
 
 var x0 = d3.scaleBand()
     .rangeRound([0, width])
-    .paddingInner(0.1);
+    .paddingInner(0.05);
 
 var x1 = d3.scaleBand()
     .padding(0.05);
@@ -67,8 +67,15 @@ function createdGroupedBarGraph(data,keys,title, yLabel, divID){
         .attr("dy", "0.32em")
         .attr("fill", "#000")
         .attr("font-weight", "bold")
-        .attr("text-anchor", "start")
+        .attr("text-anchor", "start");
+
+    svg.append("text")
+        .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
+        .attr("transform", "translate("+ (margin.left/2-20) +","+( margin.top*2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
+        .style("font-size", "18px")
+        .attr("class", "unit-text")
         .text(yLabel);
+
 
     var legend = g.append("g")
         .attr("font-family", "sans-serif")
@@ -89,6 +96,7 @@ function createdGroupedBarGraph(data,keys,title, yLabel, divID){
         .attr("x", width - 64)
         .attr("y", 9.5)
         .attr("dy", "0.32em")
+        .attr("class", "g-text")
         .style("font-size", "14px")
         .text(function(d) { return d; });
 
@@ -97,7 +105,8 @@ function createdGroupedBarGraph(data,keys,title, yLabel, divID){
         .attr("x", (width / 2))
         .attr("y", 0 - (margin.top / 2))
         .attr("text-anchor", "middle")
-        .style("font-size", "16px")
+        .attr("class", "g-text")
+        .style("font-size", "24px")
         .style("font-weight", "bold")
         .text(title);
 }

@@ -26,6 +26,16 @@ $(document).ready( function() {
     $(".nav-link").removeClass('active');
     $("#benchmarks-link").addClass('active');
 
+    // Hide all the table divs
+    $('#full-table-a-div').hide();
+    $('#full-table-b-div').hide();
+    $('#full-table-c-div').hide();
+    $('#full-table-d-div').hide();
+    $('#full-table-ab-div').hide();
+    $('#full-table-cd-div').hide();
+    $('#vector-full-div').hide();
+
+
     // On click listener for company selector
     $('#company-select').on('change', function(event){
         selectedCompany = $(this).find("option:selected").text();
@@ -37,17 +47,19 @@ $(document).ready( function() {
 });
 
 // Uses the url to find what was searches and asks server for rows relating to that search
-function loadFromURL(selections){
-    loadInSections(true,selections); // First load in the section rows
+function loadFromURL(urlSelections){
+    loadInSections(true,urlSelections); // First load in the section rows
 
 
-    lastSearch = new Selection(selections[0],selections[1],selections[2],selections[3]); //TODO copy values
+
+
+    lastSearch = new Selection(urlSelections[0],urlSelections[1],urlSelections[2],urlSelections[3]); //TODO copy values
     // Send array of selected sections to server and the company
-    $.post("/compare/search",{company : selectedCompany, selections : JSON.stringify(selections)}, function(data){
-        setSelectionsFromURL(selections[0]); //TODO check for null to be more efficient
-        setSelectionsFromURL(selections[1]);
-        setSelectionsFromURL(selections[2]);
-        setSelectionsFromURL(selections[3]);
+    $.post("/compare/search",{company : selectedCompany, selections : JSON.stringify(urlSelections)}, function(data){
+        setSelectionsFromURL(urlSelections[0]); //TODO check for null to be more efficient
+        setSelectionsFromURL(urlSelections[1]);
+        setSelectionsFromURL(urlSelections[2]);
+        setSelectionsFromURL(urlSelections[3]);
 
         dataTables = filterRowsToTables(data.rows); // Filter the rows into their tables
         if(dataTables.tableA.length > 0){
@@ -115,6 +127,36 @@ function createTableTitles(tablesData){
     return new DataTableTitles(aTitle,bTitle,cTitle,dTitle,aUnit,bUnit,cUnit,dUnit);
 }
 
+function hideUnselectedDivs(){
+    if(aSelected){
+        $('#full-table-a-div').show();
+    }
+
+    if(bSelected){
+        $('#full-table-b-div').show();
+    }
+
+    if(cSelected){
+        $('#full-table-c-div').show();
+    }
+
+    if(dSelected){
+        $('#full-table-d-div').show();
+    }
+
+    if((aSelected && cSelected)){
+        $('#full-table-ab-div').show();
+    }
+
+    if((cSelected && dSelected)){
+        $('#full-table-cd-div').show();
+    }
+
+    if((aSelected && bSelected && cSelected && dSelected)){
+        $('#vector-full-div').show();
+    }
+}
+
 // Shows all tables bar graphs and box plots
 function showAll(){
     createTables(dataTables);
@@ -138,7 +180,12 @@ function showAll(){
     }
     title = xTitle + " Over " + yTitle;
 
-    createVectorGraph(createDataForVectorGraph(dataTables.tableA,dataTables.tableC),xUnit,yUnit,title); // TODO check if A/B / C/D
+
+
+
+    if(aSelected && bSelected){
+        createVectorGraph(createDataForVectorGraph(dataTables.tableA,dataTables.tableC),xUnit,yUnit,title); // TODO check if A/B / C/D
+    }
 }
 
 // Create the 4 box plots from the tables data object if they contain rows
@@ -594,6 +641,18 @@ function loadInSections(fromURL, userSelections){ // if from url false selection
         addSection(1);
         addSection(2);
         addSection(3);
+
+        hideUnselectedDivs();
+
+        if(fromURL){
+            for(var i = 0; i < userSelections.length; i++){
+                selections[i].description = userSelections[i].description;
+                selections[i].category = userSelections[i].category;
+                selections[i].section = userSelections[i].section;
+                selections[i].subCategory = userSelections[i].subCategory;
+            }
+        }
+
 
         // Sort the sections
         sortSections(data);

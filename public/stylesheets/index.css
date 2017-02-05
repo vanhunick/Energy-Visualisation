@@ -7,6 +7,12 @@ a {
   color: #00B7FF;
 }
 
+
+.full-table{
+  /*background: #FF1A1A;*/
+  background:#f2f2f2;
+  margin-top: 2%;
+}
 .row-selected {
   color: deepskyblue;
 }
@@ -20,6 +26,8 @@ a {
   vertical-align: top;
 }
 
+
+
 .compare-row {
   margin-bottom: 0.5%;
   margin-top: 0.5%;
@@ -29,13 +37,23 @@ a {
   margin-right: 0.2%;
 }
 
+.table-title {
+  color: black;
+}
+
 .cell {
   border: 1px solid lightgray;
   padding: 0px;
 }
 
 .table-row {
-  border: 1px solid lightgray;
+  border: 1px solid lightgrey;
+  color: black;
+  background-color: white;
+}
+
+.full {
+  display: none;
 }
 
 /*Box plot CSS*/
@@ -47,12 +65,25 @@ a {
 .box rect,
 .box circle {
   fill: steelblue;
-  stroke: #000;
+  stroke: #000; /* circle stroke*/
   stroke-width: 1px;
+}
+
+.box circle {
+  fill: #e74c3c;
 }
 
 .box .center {
   stroke-dasharray: 3,3;
+}
+
+.group-row {
+  margin-top: 2%;
+}
+
+.whisk-row {
+  margin-top: 2%;
+  padding-bottom: 2%;
 }
 
 .box .outlier {
@@ -62,39 +93,36 @@ a {
 
 .axis {
   font: 12px sans-serif;
+  shape-rendering: crispEdges;
 
 }
 
 .axis path,
 .axis line {
   fill: none;
-  stroke: #000;
+  stroke: black;
   shape-rendering: crispEdges;
 }
 
 .x.axis path {
   fill: none;
-  stroke: #000;
+  stroke: black;
   shape-rendering: crispEdges;
 }
 
-/*.data-table {*/
-  /*margin-left : 5%;*/
-  /*margin-right : 5%;*/
-/*}*/
 
-.table-nonfluid {
-  /*width: auto !important;*/
-
+.g-text {
+  stroke: none;
+  fill: black;
+  shape-rendering: crispEdges;
 
 }
 
-.dot {
-  /*fill: red;*/
+.unit-text {
+  fill: darkgrey;
+  shape-rendering: crispEdges;
 }
 
-
-/*red 820302*/
 
 /*Nav bar css*/
 /*https://work.smarchal.com/twbscolor/css/e74c3cc0392becf0f1ffbbbc0*/

@@ -4,10 +4,8 @@
 var labels = false; // show the text labels beside individual boxplots?
 
 var boxMargin = {top: 30, right: 100, bottom: 70, left: 100};
-var  boxWidth = 700 - margin.left - margin.right;
-var boxHeight = 600- margin.top - margin.bottom;
-
-
+var  boxWidth = 1000 - margin.left - margin.right;
+var boxHeight = 800  - margin.top  - margin.bottom;
 
 
 function createBoxPlot(dataObject, divID, title, unit){
@@ -61,7 +59,7 @@ function createBoxPlot(dataObject, divID, title, unit){
         .enter().append("circle")
         .attr("class", "dot")
         .attr("r", 3.5)
-        .attr("cx", function(d) { return x(d.year) + (boxMargin.left / 4) - 6; })
+        .attr("cx", function(d) { return x(d.year) + (boxMargin.left / 4) + 6; })
         .attr("cy", function(d) { return y(d.value); })
         .on("mouseover", function(d) {
 
@@ -77,7 +75,7 @@ function createBoxPlot(dataObject, divID, title, unit){
                 .attr("font-family", "sans-serif")
                 .attr("font-size", "14px")
                 .attr("font-weight", "bold")
-                .attr("fill", "steelblue")
+                .attr("fill", "orangered")
                 .text("" + d.edb);
 
         }).on("mouseout", function() {
@@ -90,21 +88,21 @@ function createBoxPlot(dataObject, divID, title, unit){
         .attr("x", (boxWidth / 2))
         .attr("y", 0 + (boxMargin.top / 2))
         .attr("text-anchor", "middle")
-        .style("font-size", "18px")
-        //.style("text-decoration", "underline")
+        .attr("class", "g-text")
+        .style("font-size", "24px")
         .text(title);
 
     // draw y axis
     svg.append("g")
         .attr("class", "y axis")
         .call(yAxis)
-        .append("text") // and text1
+        .append("text")
         .attr("transform", "rotate(-90)")
         .attr("y", 6)
         .attr("dy", ".71em")
         .style("text-anchor", "end")
-        .style("font-size", "16px")
-        .text("Revenue in €");
+        .style("font-size", "16px");
+        //.text("Revenue in €");
 
     // draw x axis
     svg.append("g")
@@ -122,7 +120,8 @@ function createBoxPlot(dataObject, divID, title, unit){
     svg.append("text")
         .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
         .attr("transform", "translate("+ -(vMargin.left/2+5) +","+( boxMargin.top*2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
-        .style("font-size", "14px")
+        .style("font-size", "18px")
+        .attr("class", "unit-text")
         .text(unit);
 }
 

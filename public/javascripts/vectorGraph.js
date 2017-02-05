@@ -3,13 +3,10 @@
  */
 
 var vMargin = {top: 30, right: 20, bottom: 30, left: 60},
-    vWidth = 960 - vMargin.left - vMargin.right,
-    vHeight = 500 - vMargin.top - vMargin.bottom;
+    vWidth = 1000 - vMargin.left - vMargin.right,
+    vHeight = 800 - vMargin.top - vMargin.bottom;
 
 function createVectorGraph(data,xLabel, yLabel, title){
-    console.log(xLabel);
-    console.log(yLabel);
-    console.log(title);
 
     var edbs = [];
     data.forEach(function (e) {
@@ -66,11 +63,13 @@ function createVectorGraph(data,xLabel, yLabel, title){
 
     svg.append("g")
         .attr("transform", "translate(0," + vHeight + ")")
+        .attr("stroke", "#black")
         .call(d3.axisBottom(x));
 
     // add the y Axis
     svg.append("g")
         .attr("class","yAxis")
+        .attr("fill", "black")
         .call(yAxis);
 
 
