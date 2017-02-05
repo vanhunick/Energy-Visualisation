@@ -27,13 +27,13 @@ $(document).ready( function() {
     $("#benchmarks-link").addClass('active');
 
     // Hide all the table divs
-    $('#full-table-a-div').hide();
-    $('#full-table-b-div').hide();
-    $('#full-table-c-div').hide();
-    $('#full-table-d-div').hide();
-    $('#full-table-ab-div').hide();
-    $('#full-table-cd-div').hide();
-    $('#vector-full-div').hide();
+    //$('#full-table-a-div').hide();
+    //$('#full-table-b-div').hide();
+    //$('#full-table-c-div').hide();
+    //$('#full-table-d-div').hide();
+    //$('#full-table-ab-div').hide();
+    //$('#full-table-cd-div').hide();
+    //$('#vector-full-div').hide();
 
 
     // On click listener for company selector
@@ -223,10 +223,10 @@ function createGroupedBardGraphs(tablesData, titles){
 
 // Receives rows from DB and converts to html tables
 function createTables(tablesData){
-    insertTable(tablesData.tableA,'#tableA');
-    insertTable(tablesData.tableB,'#tableB');
-    insertTable(tablesData.tableC,'#tableC');
-    insertTable(tablesData.tableD,'#tableD');
+    insertTable(tablesData.tableA,'tableA');
+    insertTable(tablesData.tableB,'tableB');
+    insertTable(tablesData.tableC,'tableC');
+    insertTable(tablesData.tableD,'tableD');
     insertTableOverTable(true,tablesData);
     insertTableOverTable(false,tablesData);
 }
@@ -247,7 +247,7 @@ function insertTableOverTable(ab,tablesData){
 
     }
 
-    insertTable(combined, ab ? "#tableAB" : "#tableCD");
+    insertTable(combined, ab ? "tableAB" : "tableCD");
 }
 
 
@@ -261,7 +261,7 @@ function insertTable(tableRows,id){
     if(tableRows.length === 0)return; // No data so return
 
     // Add the title to the table
-    $(id).append('<caption>' +tableRows[0].section + " " + tableRows[0].description + '</caption>');
+    $("#"+id).append('<caption>' +tableRows[0].section + " " + tableRows[0].description + '</caption>');
 
     // Find the min and max year from the data
     var min = tableRows.reduce(function(prev, curr) {
@@ -278,7 +278,7 @@ function insertTable(tableRows,id){
         years += "<th>" + i + "</th>";
     }
 
-    $(id).append('<tr id="head-row" class="table-row"> <th>EDB</th>'+ years + '</tr>');
+    $("#"+id).append('<tr id="head-row" class="table-row"> <th>EDB</th>'+ years + '</tr>');
 
     // An array of companies already processed
     var done = [];
@@ -313,7 +313,7 @@ function insertTable(tableRows,id){
                 }
             }
 
-            $(id).append(row + '</tr>');
+            $("#"+id).append(row + '</tr>');
             // Here we can check the unit type and highlight appropriately
             // Assing a on click function to each of the rows to generate the bar graph with the row specific data
             //$( "#row"+i+"").click(function(event) {
@@ -321,6 +321,31 @@ function insertTable(tableRows,id){
             //});
         }
     }
+
+    //First find out what unit type
+
+
+    var percent = false;
+    if(tableRows[0].units.includes("%")) { //TODO check if this is the right way to identify percentage
+        percent = true;
+    }
+
+    var maxCellValue = -Infinity;
+    cellValues.forEach(function(elem){
+        maxCellValue = +elem.value > maxCellValue ? +elem.value : maxCellValue;
+    });
+
+
+    // Apllie css to each cell
+    for(var i = 0; i < cellValues.length; i++){
+        var value = (percent ? value : ((+cellValues[i].value / maxCellValue)*100)); // If percentage metric just use valud
+
+        $(cellValues[i].id).css({
+                "background" : "-webkit-gradient(linear, left top, right top, color-stop(" + value +"%,steelblue), color-stop(" + value +"%,#FFF))",
+            }
+        );
+    }
+
 }
 
 // Returns if a row from the DB matches one of the specified rows by the user
