@@ -208,6 +208,26 @@ function createValidSelectionData(){
     distinctCompanies();
 }
 
+function validSection(stringToCheck){
+    return validSections.sections.indexOf(stringToCheck) > -1;
+}
+
+function validCategory(stringToCheck){
+    return validSections.categories.indexOf(stringToCheck) > -1;
+}
+
+function validSubCategory(stringToCheck){
+    return validSections.subCategories.indexOf(stringToCheck) > -1;
+}
+
+function validDescription(stringToCheck){
+    return validSections.descriptions.indexOf(stringToCheck) > -1;
+}
+
+function validCompany(stringToCheck){
+    return validSections.companies.indexOf(stringToCheck) > -1;
+}
+
 module.exports = {
     createValidSelectionData : function (){
         getValidSections();
@@ -215,8 +235,13 @@ module.exports = {
         getValidCategories();
         getValidDescriptions();
         distinctCompanies();
-    },validSections : validSections
-}
+    },
+    validSection : validSection,
+    validCategory : validCategory,
+    validSubCategory : validSubCategory,
+    validDescription : validDescription,
+    validCompany : validCompany
+};
 
 
 

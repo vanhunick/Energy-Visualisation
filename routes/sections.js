@@ -4,24 +4,17 @@
 var express = require('express');
 var router = express.Router();
 var pg = require('pg');
-
 var squel = require("squel");
-
 var SQLProtection = require("./SQLProtection");
 
 // finds all categories that match a section
 router.post('/s', function(req, res, next) {
 
-    //console.log("Here");
-    //console.log(SQLProtection.validSections.sections);
-    //
-    //if(!SQLProtection.validSections.sections.includes(req.body.selected)){
-    //    return;
-    //} else {
-    //    console.log("Valid SQL Query");
-    //}
+    if(!SQLProtection.validSection(req.body.selected)){
+        res.send({categories: []});
+        return;
+    }
 
-    //TODO escape req.body.selected
     var queryString = squel.select()
         .from("large_strata_energy")
         .field("category").distinct()
@@ -64,7 +57,17 @@ router.post('/s', function(req, res, next) {
 // Finds all sub categories
 router.post('/sc', function(req, res, next) {
 
-    //TODO escape req.body.category
+    if(!SQLProtection.validCategory(req.body.category)){
+        res.send({subCategories: []});
+        return;
+    }
+
+    if(!SQLProtection.validSection(req.body.section)){
+        res.send({subCategories: []});
+        return;
+    }
+
+
     var queryString = squel.select()
         .from("large_strata_energy")
         .field("sub_category").distinct()
@@ -110,13 +113,31 @@ router.post('/sc', function(req, res, next) {
 router.post('/desc', function(req, res, next) {
     console.log("Searching for descriptions");
 
-    //TODO escape req.body.category
+    // Check valid section
+    if(!SQLProtection.validSection(req.body.section)){
+        res.send({descriptions: []});
+        return;
+    }
+
+    // check valid category
+    if(!SQLProtection.validCategory(req.body.category)){
+        res.send({descriptions: []});
+        return;
+    }
+
+
     var queryString = squel.select()
         .from("large_strata_energy")
         .field("description").distinct();
 
-
     if(req.body.subCategory !== ''){
+
+        // Check valid subCategory
+        if(!SQLProtection.validSubCategory(req.body.subCategory)){
+            res.send({descriptions: []});
+            return;
+        }
+
         queryString = queryString.where("section = '"+ req.body.section + "'")
             .where("category = '"+ req.body.category+ "'")
             .where("sub_category = '"+ req.body.subCategory+ "'").toString(); // Adds subcategory clause
@@ -161,8 +182,6 @@ router.post('/desc', function(req, res, next) {
 
 router.get('/company', function(req, res) {
 
-    //TODO escape req.body.selected
-    //TODO maybe check if the company data exists for the section and category
     var queryString = squel.select()
         .from("large_strata_energy")
         .field("edb").distinct()
@@ -202,9 +221,6 @@ router.get('/company', function(req, res) {
 
 
 router.get('/sections', function(req, res) {
-
-    //TODO escape req.body.selected
-    //TODO maybe check if the company data exists for the section and category
     var queryString = squel.select()
         .from("large_strata_energy")
         .field("section").distinct()
@@ -243,8 +259,25 @@ router.get('/sections', function(req, res) {
 });
 
 router.post('/search', function(req, res, next) {
+    // Check valid section
+    if(!SQLProtection.validSection(req.body.section)){
+        res.send({rows: []});
+        return;
+    }
 
-    //TODO escape req.body.selected
+    // check valid category
+    if(!SQLProtection.validCategory(req.body.category)){
+        res.send({rows: []});
+        return;
+    }
+
+    // check valid category
+    if(!SQLProtection.validDescription(req.body.description)){
+        res.send({rows: []});
+        return;
+    }
+
+
     var queryString = squel.select()
         .from("large_strata_energy")
         .field("edb")
@@ -256,6 +289,12 @@ router.post('/search', function(req, res, next) {
         .field("value");
 
     if(req.body.subCategory !== ''){
+        // Check valid subCategory
+        if(!SQLProtection.validSubCategory(req.body.subCategory)){
+            res.send({descriptions: []});
+            return;
+        }
+
         queryString = queryString.where("section = '"+ req.body.section + "'")
             .where("category = '"+ req.body.category+ "'")
             .where("sub_category = '"+ req.body.subCategory+ "'"); // Adds subcategory clause
@@ -265,8 +304,6 @@ router.post('/search', function(req, res, next) {
     }
 
     queryString = queryString.where("description = '"+ req.body.description + "'").toString();
-    console.log(queryString);
-
 
     // Connect to the database
     pg.connect(global.databaseURI, function (err, client, done) {
