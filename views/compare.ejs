@@ -11,15 +11,16 @@
 
 <div class="container-fluid" style="margin-left: 5%; margin-right: 5%;">
     <h1>Compare Sections</h1>
-    <div class="row">
-    <div class="col-md-12">
-    <h4>Company</h4>
-    <select class="selectpicker" title="EDB" id="company-select">
-        <option>No data</option>
-    </select>
-    </div>
 
-</div>
+    <div class="row">
+        <div class="col-md-12">
+            <h4>Company</h4>
+            <select class="selectpicker" title="EDB" id="company-select">
+            <option>No data</option>
+            </select>
+        </div>
+
+    </div>
 
 <div id="compare-div" style="margin-top: 1%; margin-bottom: 3%"></div>
 
@@ -28,121 +29,155 @@
         <button type="button" class="btn btn-default" id="search-btn-compare">Search</button>
     </div>
 </div>
+    <div class="row text-center" style="margin-top: 2%">
+        <div class="col-md-12 text-center">
+            <div class="panel with-nav-tabs panel-default">
+                <div class="panel-heading">
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a href="#tab1default" data-toggle="tab">Selection 1</a></li>
+                        <li><a href="#tab2default" data-toggle="tab">Selection 2</a></li>
+                        <li><a href="#tab3default" data-toggle="tab">Selection 3</a></li>
+                        <li><a href="#tab4default" data-toggle="tab">Selection 4</a></li>
+                        <li><a href="#tab5default" data-toggle="tab">A over B</a></li>
+                        <li><a href="#tab6default" data-toggle="tab">C over D</a></li>
+                        <li><a href="#tab7default" data-toggle="tab">Vector Graph</a></li>
+                    </ul>
+                </div>
+                <div class="panel-body">
 
+                    <!--Tab content-->
+                    <div class="tab-content">
+                        <div class="tab-pane fade in active" id="tab1default">
+                            <!--Wrapped in a div for table A to easily hide it-->
+                            <div id="full-table-a-div" class="full-table">
+                                <div class="row">
+                                    <div class="col-md-3"></div>
+                                    <div class="col-md-6 text-center ">
+                                        <h2 class="table-title"><b>Selection A</b></h2>
+                                        <table class="table table-nonfluid" id="tableA"></table>
+                                    </div>
+                                    <div class="col-md-3"></div>
+                                </div>
 
-<!--Wrapped in a div for table A to easily hide it-->
-<div id="full-table-a-div" class="full-table full">
-    <div class="row">
-        <div class="col-md-3"></div>
-        <div class="col-md-6 text-center ">
-            <h2 class="table-title"><b>Selection A</b></h2>
-            <table class="table table-nonfluid" id="tableA"></table>
+                                <div class="row group-row" >
+                                    <div class="col-lg-12 text-center" id="grouped-bar-a" ></div>
+                                </div>
+
+                                <div class="row text-center whisk-row">
+                                    <div class="col-lg-12 text-center" id="boxplotA-div"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--Tab 2 Content-->
+                        <div class="tab-pane fade" id="tab2default">
+                            <!--Wrapped in a div for table B to easily hide it-->
+                            <div id="full-table-b-div" class="full-table full">
+                                <div class="row">
+                                    <div class="col-md-3"></div>
+                                    <div class="col-md-6 text-center">
+                                        <h2 class="table-title"><b>Selection B</b></h2>
+                                        <table class="table" id="tableB"></table>
+                                    </div>
+                                    <div class="col-md-3"></div>
+                                </div>
+                                <div class="row group-row">
+                                    <div class="col-lg-12 text-center" id="grouped-bar-b"></div>
+                                </div>
+
+                                <div class="row text-center whisk-row">
+                                    <div class="col-lg-12 text-center" id="boxplotB-div"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--Tab 3 content-->
+                        <div class="tab-pane fade" id="tab3default">
+                            <!--Wrapped in a div for table C to easily hide it-->
+                            <div id="full-table-c-div" class="full-table full">
+                                <div class="row">
+                                    <div class="col-md-3"></div>
+                                    <div class="col-md-6 text-center">
+                                        <h2 class="table-title"><b>Selection C</b></h2>
+                                        <table class="table" id="tableC"></table>
+                                    </div>
+                                    <div class="col-md-3"></div>
+                                </div>
+
+                                <div class="row group-row">
+                                    <div class="col-lg-12 text-center" id="grouped-bar-c"></div>
+                                </div>
+
+                                <div class="row text-center whisk-row">
+                                    <div class="col-lg-12 text-center" id="boxplotC-div"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="tab4default">
+                            <!--Wrapped in a div for table D to easily hide it-->
+                            <div id="full-table-d-div" class="full-table full">
+                                <div class="row">
+                                    <div class="col-md-3"></div>
+                                    <div class="col-md-6 text-center">
+                                        <h2 class="table-title"><b>Selection D</b></h2>
+                                        <table class="table" id="tableD"></table>
+                                    </div>
+                                    <div class="col-md-3"></div>
+                                </div>
+
+                                <div class="row group-row">
+                                    <div class="col-lg-12 text-center" id="grouped-bar-d"></div>
+                                </div>
+
+                                <div class="row whisk-row">
+                                    <div class="col-lg-12 text-center" id="boxplotD-div"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="tab5default">
+                            <!--Wrapped in a div for table A/B to easily hide it-->
+                            <div class="full-table full" id="full-table-ab-div">
+                                <div class="row">
+                                    <div class="col-md-3"></div>
+                                    <div class="col-md-6 text-center">
+                                        <h2 class="table-title"><b>Table selection  A over  selection B</b></h2>
+                                        <table class="table" id="tableAB"></table>
+                                    </div>
+                                    <div class="col-md-3"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="tab6default">
+                            <!--Wrapped in a div for table C/D to easily hide it-->
+                            <div id="full-table-cd-div" class="full-table full">
+                                <div class="row">
+                                    <div class="col-md-3"></div>
+                                    <div class="col-md-6 text-center">
+                                        <h2 class="table-title"><b>Table selection  C over selection D</b></h2>
+                                        <table class="table" id="tableCD"></table>
+                                    </div>
+                                    <div class="col-md-3"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="tab7default">
+                            <div id="vector-full-div" class="full-table full">
+                                <div class="row text-center" style="margin-top: 2%;">
+                                    <h2 class="table-title"><b>Vector graph (A over B) over (C over D)</b></h2>
+                                    <div class="col-lg-12 text-center" id="vector-graph-div" style="margin-bottom: 2%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="col-md-3"></div>
     </div>
 
-    <div class="row group-row" >
-        <div class="col-lg-12 text-center" id="grouped-bar-a" ></div>
-    </div>
-
-    <div class="row text-center whisk-row">
-        <div class="col-lg-12 text-center" id="boxplotA-div"></div>
-    </div>
-</div>
-
-<!--Wrapped in a div for table B to easily hide it-->
-<div id="full-table-b-div" class="full-table full">
-    <div class="row">
-        <div class="col-md-3"></div>
-        <div class="col-md-6 text-center">
-            <h2 class="table-title"><b>Selection B</b></h2>
-            <table class="table" id="tableB"></table>
-        </div>
-        <div class="col-md-3"></div>
-    </div>
-    <div class="row group-row">
-        <div class="col-lg-12 text-center" id="grouped-bar-b"></div>
-    </div>
-
-    <div class="row text-center whisk-row">
-        <div class="col-lg-12 text-center" id="boxplotB-div"></div>
-    </div>
-</div>
 
 
-<!--Wrapped in a div for table C to easily hide it-->
-<div id="full-table-c-div" class="full-table full">
-    <div class="row">
-        <div class="col-md-3"></div>
-        <div class="col-md-6 text-center">
-            <h2 class="table-title"><b>Selection C</b></h2>
-            <table class="table" id="tableC"></table>
-        </div>
-        <div class="col-md-3"></div>
-    </div>
-
-    <div class="row group-row">
-        <div class="col-lg-12 text-center" id="grouped-bar-c"></div>
-    </div>
-
-    <div class="row text-center whisk-row">
-        <div class="col-lg-12 text-center" id="boxplotC-div"></div>
-    </div>
-</div>
 
 
-<!--Wrapped in a div for table D to easily hide it-->
-<div id="full-table-d-div" class="full-table full">
-    <div class="row">
-        <div class="col-md-3"></div>
-        <div class="col-md-6 text-center">
-            <h2 class="table-title"><b>Selection D</b></h2>
-            <table class="table" id="tableD"></table>
-        </div>
-        <div class="col-md-3"></div>
-    </div>
-
-    <div class="row group-row">
-        <div class="col-lg-12 text-center" id="grouped-bar-d"></div>
-    </div>
-
-    <div class="row whisk-row">
-        <div class="col-lg-12 text-center" id="boxplotD-div"></div>
-    </div>
-</div>
-
-
-<!--Wrapped in a div for table A/B to easily hide it-->
-<div class="full-table full" id="full-table-ab-div">
-    <div class="row">
-        <div class="col-md-3"></div>
-        <div class="col-md-6 text-center">
-            <h2 class="table-title"><b>Table selection  A over  selection B</b></h2>
-            <table class="table" id="tableAB"></table>
-        </div>
-        <div class="col-md-3"></div>
-    </div>
-</div>
-
-
-<!--Wrapped in a div for table C/D to easily hide it-->
-<div id="full-table-cd-div" class="full-table full">
-    <div class="row">
-        <div class="col-md-3"></div>
-        <div class="col-md-6 text-center">
-            <h2 class="table-title"><b>Table selection  C over selection D</b></h2>
-            <table class="table" id="tableCD"></table>
-        </div>
-        <div class="col-md-3"></div>
-    </div>
-</div>
-
-<div id="vector-full-div" class="full-table full">
-    <div class="row text-center" style="margin-top: 2%;">
-        <h2 class="table-title"><b>Vector graph (A over B) over (C over D)</b></h2>
-        <div class="col-lg-12 text-center" id="vector-graph-div" style="margin-bottom: 2%"></div>
-    </div>
-</div>
 
 </div>
 

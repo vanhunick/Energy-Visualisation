@@ -50,9 +50,6 @@ $(document).ready( function() {
 function loadFromURL(urlSelections){
     loadInSections(true,urlSelections); // First load in the section rows
 
-
-
-
     lastSearch = new Selection(urlSelections[0],urlSelections[1],urlSelections[2],urlSelections[3]); //TODO copy values
     // Send array of selected sections to server and the company
     $.post("/compare/search",{company : selectedCompany, selections : JSON.stringify(urlSelections)}, function(data){

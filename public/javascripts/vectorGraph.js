@@ -85,6 +85,7 @@ function createVectorGraph(data,xLabel, yLabel, title){
 
             var xPosition = parseFloat(d3.select(this).attr("cx"));
             var yPosition = parseFloat(d3.select(this).attr("cy"));
+             yPosition = yPosition - 10;
 
             //Create the tooltip label
             svg.append("text")
@@ -95,7 +96,7 @@ function createVectorGraph(data,xLabel, yLabel, title){
                 .attr("font-family", "sans-serif")
                 .attr("font-size", "14px")
                 .attr("font-weight", "bold")
-                .attr("fill", "red")
+                .attr("fill", "black")
                 .text(""+ d.year);
 
         }).on("mouseout", function() {
