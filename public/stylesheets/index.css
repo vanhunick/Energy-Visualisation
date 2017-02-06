@@ -26,7 +26,18 @@ a {
   vertical-align: top;
 }
 
+.cpi-form {
+  width: 100%;
+}
 
+#compare-div {
+  margin-top: 1%;
+  margin-bottom: 1%;
+}
+
+#cpi-header {
+  margin-top: 0.5%;
+}
 
 .compare-row {
   margin-bottom: 0.5%;

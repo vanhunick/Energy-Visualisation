@@ -1,9 +1,9 @@
 var margin = { top: 35, right: 20, bottom: 150, left: 30 },
-    width = 1600 - margin.left - margin.right,
+    width = 1200 - margin.left - margin.right,
     height = 800 - margin.top - margin.bottom;
 
 var x0 = d3.scaleBand()
-    .rangeRound([0, width])
+    .rangeRound([0, width-45]) // -45 so rotated text stays on the screen
     .paddingInner(0.05);
 
 var x1 = d3.scaleBand()

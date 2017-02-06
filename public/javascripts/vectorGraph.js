@@ -6,7 +6,7 @@ var vMargin = {top: 30, right: 20, bottom: 30, left: 60},
     vWidth = 1000 - vMargin.left - vMargin.right,
     vHeight = 800 - vMargin.top - vMargin.bottom;
 
-function createVectorGraph(data,xLabel, yLabel, title){
+function createVectorGraph(data,xLabel, yLabel, title, divID){
 
     var edbs = [];
     data.forEach(function (e) {
@@ -44,7 +44,7 @@ function createVectorGraph(data,xLabel, yLabel, title){
     var xAvis = d3.axisBottom();
 
     // Create the svg and append to the div
-    var svg = d3.select("#vector-graph-div").append("svg")
+    var svg = d3.select(divID).append("svg")
         .attr("width", vWidth + vMargin.left + vMargin.right)
         .attr("height", vHeight + vMargin.top + vMargin.bottom)
         .append("g")

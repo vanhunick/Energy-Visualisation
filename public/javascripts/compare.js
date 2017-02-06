@@ -26,6 +26,8 @@ $(document).ready( function() {
     $(".nav-link").removeClass('active');
     $("#benchmarks-link").addClass('active');
 
+    cpiValidationSetup(); // Set up cpi validation rules
+
     // Hide all the table divs
     //$('#full-table-a-div').hide();
     //$('#full-table-b-div').hide();
@@ -143,6 +145,7 @@ function hideUnselectedDivs(){
 
     if((aSelected && cSelected)){
         $('#full-table-ab-div').show();
+        $('#vector-full-div-ab').show();
     }
 
     if((cSelected && dSelected)){
@@ -150,7 +153,7 @@ function hideUnselectedDivs(){
     }
 
     if((aSelected && bSelected && cSelected && dSelected)){
-        $('#vector-full-div').show();
+        $('#vector-full-div-abcd').show();
     }
 }
 
@@ -180,9 +183,19 @@ function showAll(){
 
 
 
-    if(aSelected && bSelected){
-        createVectorGraph(createDataForVectorGraph(dataTables.tableA,dataTables.tableC),xUnit,yUnit,title); // TODO check if A/B / C/D
+    if(aSelected && cSelected){
+        console.log("Inserting Single");
+        createVectorGraph(createDataForVectorGraph(dataTables.tableA,dataTables.tableC),xUnit,yUnit,title,"#vector-graph-div-ac"); // TODO check if A/B / C/D
     }
+
+    if(aSelected && bSelected && cSelected && dSelected) {
+        console.log("Inserting both");
+        var ab = insertTableOverTable(true, dataTables);
+        var cd = insertTableOverTable(false, dataTables);
+
+        createVectorGraph(createDataForVectorGraph(ab,cd),xUnit,yUnit,"","#vector-graph-div-abcd"); // TODO check titles and units
+    }
+
 }
 
 // Create the 4 box plots from the tables data object if they contain rows
@@ -199,6 +212,17 @@ function createBoxPlots(tablesData, titles){
     if(tablesData.tableD.length > 0){
         createBoxPlot(createDataForBoxPlot(tablesData.tableD), "#boxplotD-div", titles.dTitle, titles.dUnit);
     }
+
+    if(aSelected && bSelected){
+        var abData = insertTableOverTable(true,tablesData);
+        createBoxPlot(createDataForBoxPlot(abData), "#boxplotAB-div", titles.aTitle + " Over " + titles.bTitle, titles.aUnit);
+    }
+
+    if(cSelected && dSelected){
+        var cdData = insertTableOverTable(false,tablesData);
+        createBoxPlot(createDataForBoxPlot(cdData), "#boxplotCD-div", titles.cTitle + " Over " + titles.dTitle, titles.cUnit);
+    }
+
 }
 
 // Create the 4 grouped bar graphs from the tables data object if they contain rows
@@ -219,16 +243,40 @@ function createGroupedBardGraphs(tablesData, titles){
         var table4Data = createDataForGroupedGraph(tablesData.tableD);
         createdGroupedBarGraph(table4Data.data, table1Data.keys, titles.dTitle, titles.dUnit, "#grouped-bar-d");
     }
+
+    if(aSelected && bSelected){
+        var abData = insertTableOverTable(true,tablesData);
+        var tableABData = createDataForGroupedGraph(abData);
+        createdGroupedBarGraph(tableABData.data, tableABData.keys,titles.aTitle + " Over " + titles.bTitle , titles.aUnit, "#grouped-bar-ab");
+    }
+
+    if(cSelected && dSelected){
+        var cdData = insertTableOverTable(false,tablesData);
+        var tableCDData = createDataForGroupedGraph(cdData);
+        createdGroupedBarGraph(tableCDData.data, tableCDData.keys,titles.cTitle + " Over " + titles.dTitle , titles.aUnit, "#grouped-bar-cd");
+    }
+}
+
+function filterByCompanies(tablesData){
+
+    // Match company to table and filter row
+
+    return new DataTables();
 }
 
 // Receives rows from DB and converts to html tables
 function createTables(tablesData){
+
+
     insertTable(tablesData.tableA,'tableA');
     insertTable(tablesData.tableB,'tableB');
     insertTable(tablesData.tableC,'tableC');
     insertTable(tablesData.tableD,'tableD');
-    insertTableOverTable(true,tablesData);
-    insertTableOverTable(false,tablesData);
+    var abData = insertTableOverTable(true,tablesData);
+    var cdData = insertTableOverTable(false,tablesData);
+
+    insertTable(abData, "tableAB");
+    insertTable(cdData, "tableCD");
 }
 
 function insertTableOverTable(ab,tablesData){
@@ -246,8 +294,7 @@ function insertTableOverTable(ab,tablesData){
         }
 
     }
-
-    insertTable(combined, ab ? "tableAB" : "tableCD");
+    return combined;
 }
 
 
@@ -326,9 +373,9 @@ function insertTable(tableRows,id){
 
 
     var percent = false;
-    if(tableRows[0].units.includes("%")) { //TODO check if this is the right way to identify percentage
-        percent = true;
-    }
+    //if(tableRows[0].units.includes("%")) { //TODO check if this is the right way to identify percentage
+    //    percent = true;
+    //}
 
     var maxCellValue = -Infinity;
     cellValues.forEach(function(elem){
@@ -695,18 +742,17 @@ function loadInSections(fromURL, userSelections){ // if from url false selection
 
 // Adds a new row of filters for section category and sub category
 function addSection(numberSections){
+    var table = ['A','B','C','D'];
 
     // Add in a new row div
-    $('#compare-div').append('<div class="col-xs-3 compare-col" id="Ocol'+numberSections+'">');
+    $('#compare-div').append('<div class="row" id="titleRow'+numberSections+'"><div class="col-md-12"><h5>Make a selection for table '+table[numberSections]+'</h5> </div></div>');
 
-    $("#Ocol"+numberSections).append('<div class="row"><h5>Make a selection for table A</h5></div>');
+    $('#compare-div').append('<div class="row" id="row'+numberSections+'">');
 
-
-    // Add in a new col div
-    $("#Ocol"+numberSections).append('<div class="row" id="col'+numberSections+'">');
+    $("#row"+numberSections).append('<div class="col-md-12 compare-col" id="col'+numberSections+'">');
 
     // add section selector with the number section as the dynamic id
-    $("#col"+numberSections).append('<select data-width="120px" class="selectpicker select-compare"  title="Section" id="section-select'+numberSections+'"></select>');
+    $("#col"+numberSections).append('<select data-width="250px" class="selectpicker select-compare"  title="Section" id="section-select'+numberSections+'"></select>');
 
     // Push the information for the new row into the selections array
     selections.push({id : numberSections, section : "", category : "", subCategory : "", description : ""});
@@ -734,7 +780,7 @@ function addSection(numberSections){
     });
 
     // add category selector
-    $("#col"+numberSections).append('<select data-width="120px" class="selectpicker select-compare" title="Category" id="category-select'+numberSections+'"></select>');
+    $("#col"+numberSections).append('<select data-width="190px" class="selectpicker select-compare" title="Category" id="category-select'+numberSections+'"></select>');
     $('#category-select'+numberSections).on('change', function(event){
         var category = $(this).find("option:selected").text();
         var idNumb = event.target.id.charAt(event.target.id.length-1);
@@ -772,7 +818,7 @@ function addSection(numberSections){
     });
 
     // add sub category selector
-    $("#col"+numberSections).append('<select data-width="120px" class="selectpicker select-compare" title="Subsection" id="subsection-select'+numberSections+'"></select>');
+    $("#col"+numberSections).append('<select data-width="190px" class="selectpicker select-compare" title="Subsection" id="subsection-select'+numberSections+'"></select>');
     $('#subsection-select'+numberSections).on('change', function(event){
         var idNumb = event.target.id.charAt(event.target.id.length-1);
         var subCat = $(this).find("option:selected").text();
@@ -795,7 +841,7 @@ function addSection(numberSections){
     });
 
     // add description selector
-    $("#col"+numberSections).append('<select data-width="120px" class="selectpicker select-compare" title="Description" id="description-select'+numberSections+'"></select>');
+    $("#col"+numberSections).append('<select data-width="190px" class="selectpicker select-compare" title="Description" id="description-select'+numberSections+'"></select>');
     $('#description-select'+numberSections).on('change', function(event){
         var idNumb = event.target.id.charAt(event.target.id.length-1);
 
@@ -850,3 +896,58 @@ function DataTableTitles(aTitle,bTitle,cTitle,dTitle,aUnit,bUnit,cUnit,dUnit){
     this.dUnit = dUnit;
 }
 
+function cpiValidationSetup(){
+    $.validator.setDefaults({
+            errorClass : 'help-block',
+            highlight: function (element) {
+                $(element)
+                    .closest('.form-group')
+                    .addClass('has-error')
+            },
+            unhighlight :function (element) {
+                $(element)
+                    .closest('.form-group')
+                    .removeClass('has-error')
+            }
+        }
+    );
+
+    var cpiRules = {
+        required : true,
+        number : true,
+        min : 0,
+        max : 100
+    };
+
+    var messageSet = {
+        required : "Please enter a percentage",
+        number : "Please enter a valid number",
+        min : "Please enter a percentage greater than 0",
+        max : "Please enter a percentage less than 100"
+    }
+
+    $('#cpi-form').validate({
+        rules : {
+            Y2012 : cpiRules,
+            Y2013 : cpiRules,
+            Y2014 : cpiRules,
+            Y2015 : cpiRules,
+            Y2016 : cpiRules
+        },
+        messages : {
+            Y2012 : messageSet,
+            Y2013 : messageSet,
+            Y2014 : messageSet,
+            Y2015 : messageSet,
+            Y2016 : messageSet
+        }
+    });
+}
+
+function applyCPI(){
+    if($('#cpi-form').valid()){
+        console.log("Validated");
+    } else {
+        console.log("Not Validated");
+    }
+}

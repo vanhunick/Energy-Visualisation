@@ -3,6 +3,7 @@
 <head>
     <title>Energy</title>
     <% include ../views/templates/head %>
+    <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.15.0/jquery.validate.min.js"></script>
     <script src="/javascripts/compare.js"></script>
 </head>
 <body>
@@ -22,13 +23,57 @@
 
     </div>
 
-<div id="compare-div" style="margin-top: 1%; margin-bottom: 3%"></div>
+<div id="compare-div"></div>
 
-<div class="row" style="margin-top: 8%">
+<div class="row">
     <div class="col-md-12">
-        <button type="button" class="btn btn-default" id="search-btn-compare">Search</button>
+        <button type="button" class="btn btn-primary" id="search-btn-compare">Search</button>
     </div>
 </div>
+
+    <!--CPI Inputs-->
+    <div class="row" style="margin-top: 2%;">
+        <div class="col-sm-12">
+            <div class="form-group input-horizontal">
+                <h4><b>Set CPI:</b></h4>
+            </div>
+
+            <form id="cpi-form"  onsubmit="return applyCPI()" >
+
+                <div class="form-group input-horizontal">
+                    <label for="inputdefault">2012</label>
+                    <input name="Y2012" class="form-control cpi-form" id="" type="text" value="1.00">
+                </div>
+
+                <div class="form-group input-horizontal">
+                    <label for="inputdefault">2013</label>
+                    <input name="Y2013" class="form-control cpi-form" id="" type="text" value="1.00">
+                </div>
+                <div class="form-group input-horizontal">
+                    <label for="inputdefault">2014</label>
+                    <input name="Y2014" class="form-control cpi-form" id="" type="text" value="1.40">
+                </div>
+                <div class="form-group input-horizontal">
+                    <label for="inputdefault">2015</label>
+                    <input name="Y2015" class="form-control cpi-form" id="" type="text" value="0.5">
+                </div>
+                <div class="form-group input-horizontal">
+                    <label for="inputdefault">2016</label>
+                    <input  name="Y2016" class="form-control cpi-form" id="" type="text" value="1.00">
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!--CPI Button-->
+    <div class="row">
+        <div class="col-sm-12">
+            <button type ="button" class ="btn btn-primary" onclick="applyCPI()">Apply cpi</button>
+        </div>
+    </div>
+
+
+    <!--Tabs-->
     <div class="row text-center" style="margin-top: 2%">
         <div class="col-md-12 text-center">
             <div class="panel with-nav-tabs panel-default">
@@ -40,23 +85,27 @@
                         <li><a href="#tab4default" data-toggle="tab">Selection 4</a></li>
                         <li><a href="#tab5default" data-toggle="tab">A over B</a></li>
                         <li><a href="#tab6default" data-toggle="tab">C over D</a></li>
-                        <li><a href="#tab7default" data-toggle="tab">Vector Graph</a></li>
+                        <li><a href="#tab7default" data-toggle="tab">Vector Graph A/C</a></li>
+                        <li><a href="#tab8default" data-toggle="tab">Vector Graph A/B over C/D </a></li>
                     </ul>
                 </div>
-                <div class="panel-body">
 
+                <!--Tab Content-->
+                <div class="panel-body">
                     <!--Tab content-->
                     <div class="tab-content">
+
+                        <!--Table A content-->
                         <div class="tab-pane fade in active" id="tab1default">
                             <!--Wrapped in a div for table A to easily hide it-->
-                            <div id="full-table-a-div" class="full-table">
+                            <div id="full-table-a-div" class="full-table full">
                                 <div class="row">
-                                    <div class="col-md-3"></div>
-                                    <div class="col-md-6 text-center ">
+                                    <div class="col-md-2"></div>
+                                    <div class="col-md-8 text-center ">
                                         <h2 class="table-title"><b>Selection A</b></h2>
                                         <table class="table table-nonfluid" id="tableA"></table>
                                     </div>
-                                    <div class="col-md-3"></div>
+                                    <div class="col-md-2"></div>
                                 </div>
 
                                 <div class="row group-row" >
@@ -113,6 +162,8 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!--Table 4 Content-->
                         <div class="tab-pane fade" id="tab4default">
                             <!--Wrapped in a div for table D to easily hide it-->
                             <div id="full-table-d-div" class="full-table full">
@@ -134,6 +185,8 @@
                                 </div>
                             </div>
                         </div>
+
+
                         <div class="tab-pane fade" id="tab5default">
                             <!--Wrapped in a div for table A/B to easily hide it-->
                             <div class="full-table full" id="full-table-ab-div">
@@ -145,8 +198,17 @@
                                     </div>
                                     <div class="col-md-3"></div>
                                 </div>
+
+                                <div class="row group-row">
+                                    <div class="col-lg-12 text-center" id="grouped-bar-ab"></div>
+                                </div>
+
+                                <div class="row whisk-row">
+                                    <div class="col-lg-12 text-center" id="boxplotAB-div"></div>
+                                </div>
                             </div>
                         </div>
+
                         <div class="tab-pane fade" id="tab6default">
                             <!--Wrapped in a div for table C/D to easily hide it-->
                             <div id="full-table-cd-div" class="full-table full">
@@ -158,16 +220,35 @@
                                     </div>
                                     <div class="col-md-3"></div>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="tab-pane fade" id="tab7default">
-                            <div id="vector-full-div" class="full-table full">
-                                <div class="row text-center" style="margin-top: 2%;">
-                                    <h2 class="table-title"><b>Vector graph (A over B) over (C over D)</b></h2>
-                                    <div class="col-lg-12 text-center" id="vector-graph-div" style="margin-bottom: 2%"></div>
+
+                                <div class="row group-row">
+                                    <div class="col-lg-12 text-center" id="grouped-bar-cd"></div>
+                                </div>
+
+                                <div class="row whisk-row">
+                                    <div class="col-lg-12 text-center" id="boxplotCD-div"></div>
                                 </div>
                             </div>
                         </div>
+
+                        <div class="tab-pane fade" id="tab7default">
+                            <div id="vector-full-div-ab" class="full-table full">
+                                <div class="row text-center" style="margin-top: 2%;">
+                                    <h2 class="table-title"><b>Vector graph A over C</b></h2>
+                                    <div class="col-lg-12 text-center" id="vector-graph-div-ac" style="margin-bottom: 2%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="tab8default">
+                            <div id="vector-full-div-abcd" class="full-table full">
+                                <div class="row text-center" style="margin-top: 2%;">
+                                    <h2 class="table-title"><b>Vector graph (A over B) over (C over D)</b></h2>
+                                    <div class="col-lg-12 text-center" id="vector-graph-div-abcd" style="margin-bottom: 2%"></div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>
