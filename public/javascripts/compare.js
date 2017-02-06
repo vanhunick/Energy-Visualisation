@@ -128,6 +128,7 @@ function createTableTitles(tablesData){
 
 function hideUnselectedDivs(){
     if(aSelected){
+        //console.log("SHOWING AAA");
         $('#full-table-a-div').show();
     }
 
@@ -184,12 +185,10 @@ function showAll(){
 
 
     if(aSelected && cSelected){
-        console.log("Inserting Single");
         createVectorGraph(createDataForVectorGraph(dataTables.tableA,dataTables.tableC),xUnit,yUnit,title,"#vector-graph-div-ac"); // TODO check if A/B / C/D
     }
 
     if(aSelected && bSelected && cSelected && dSelected) {
-        console.log("Inserting both");
         var ab = insertTableOverTable(true, dataTables);
         var cd = insertTableOverTable(false, dataTables);
 
@@ -711,7 +710,6 @@ function loadInSections(fromURL, userSelections){ // if from url false selection
         addSection(2);
         addSection(3);
 
-        hideUnselectedDivs();
 
         if(fromURL){
             for(var i = 0; i < userSelections.length; i++){
@@ -737,6 +735,7 @@ function loadInSections(fromURL, userSelections){ // if from url false selection
             }
             $(".selectpicker").selectpicker('refresh');
         }
+        hideUnselectedDivs();
     });
 }
 

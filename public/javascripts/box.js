@@ -44,7 +44,6 @@
                     .domain(domain && domain.call(this, d, i) || [min, max])
                     .range([height, 0]);
 
-                console.log("H " + height);
 
                 // Retrieve the old x-scale, if this is an update.
                 var x0 = this.__chart__ || d3.scaleLinear()
@@ -55,7 +54,6 @@
                 // Stash the new scale.
                 this.__chart__ = x1;
 
-                console.log("S " + x0(10));
                 // Note: the box, median, and box tick elements are fixed in number,
                 // so we only have to handle enter and update. In contrast, the outliers
                 // and other elements are variable, so we need to exit them! Variable

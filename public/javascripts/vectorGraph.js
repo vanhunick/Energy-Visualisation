@@ -80,7 +80,7 @@ function createVectorGraph(data,xLabel, yLabel, title, divID){
         .attr("r", 3.5)
         .attr("cx", function(d) {return x(d.valueB); })
         .attr("cy", function(d) { return y(d.valueA); })
-        .attr("fill", function(d) { console.log("EEE " +d.edb); return color(d.edb); })
+        .attr("fill", function(d) { return color(d.edb); })
         .on("mouseover", function(d) {
 
             var xPosition = parseFloat(d3.select(this).attr("cx"));
