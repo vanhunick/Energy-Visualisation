@@ -73,9 +73,9 @@ function createBoxPlot(dataObject, divID, title, unit){
                 .attr("y", yPosition - 10)
                 .attr("text-anchor", "middle")
                 .attr("font-family", "sans-serif")
-                .attr("font-size", "14px")
+                .attr("font-size", "18px")
                 .attr("font-weight", "bold")
-                .attr("fill", "orangered")
+                .attr("fill", "#64B5F6")
                 .text("" + d.edb);
 
         }).on("mouseout", function() {

@@ -23,7 +23,7 @@ a {
 }
 
 .selection-title{
-  color: steelblue; 
+  color: steelblue;
 }
 
 .input-horizontal {
@@ -86,7 +86,8 @@ a {
 }
 
 .box circle {
-  fill: #e74c3c;
+  /*fill: #e74c3c;*/
+  fill : #FFFF66;
 }
 
 .box .center {
