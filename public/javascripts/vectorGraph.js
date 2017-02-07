@@ -94,9 +94,9 @@ function createVectorGraph(data,xLabel, yLabel, title, divID){
                 .attr("y", yPosition)
                 .attr("text-anchor", "middle")
                 .attr("font-family", "sans-serif")
-                .attr("font-size", "14px")
+                .attr("font-size", "18px")
                 .attr("font-weight", "bold")
-                .attr("fill", "black")
+                .attr("fill", "#64B5F6")
                 .text(""+ d.year);
 
         }).on("mouseout", function() {
@@ -118,7 +118,6 @@ function createVectorGraph(data,xLabel, yLabel, title, divID){
         .data(["end"])      // Different link/path types can be defined here
         .enter().append("svg:marker")    // This section adds in the arrows
         .attr("id", String)
-        .attr("class")
         .attr("viewBox", "0 -5 10 10")
         .attr("refX", 15)
         .attr("refY", -1.5)
