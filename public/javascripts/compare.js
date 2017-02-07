@@ -477,6 +477,9 @@ function search(){
         sc3 : selections[3].subCategory,
         d3 : selections[3].description
     };
+    console.log(selections[0]);
+
+
     params = serialise(rows);
     window.location.replace("compare?" + params);
 }
@@ -817,6 +820,8 @@ function addSection(numberSections){
         $('#category-select'+idNumb).html(''); // Empty temp options
         $('#subsection-select'+idNumb).html(''); // Empty temp options
         $('#description-select'+idNumb).html(''); // Empty temp options
+        selections[idNumb] = {id : numberSections, section : "", category : "", subCategory : "", description : ""};
+        validOptions[idNumb] = false;
 
         // Find all the categories associated with this section
         $.post("/sections/s",{selected : section }, function(data){
