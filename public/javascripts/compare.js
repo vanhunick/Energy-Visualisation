@@ -93,6 +93,7 @@ function loadFromURL(urlSelections){
         titles = createTableTitles(dataTables);
 
         showAll(); // Loads in tables bar graphs and box plots
+        hideUnselectedDivs();
     });
 }
 
@@ -167,7 +168,7 @@ function createTableTitles(tablesData){
 
 function hideUnselectedDivs(){
     if(aSelected){
-        //console.log("SHOWING AAA");
+        console.log("SHOWING AAA");
         $('#full-table-a-div').show();
     }
 
@@ -790,7 +791,7 @@ function loadInSections(fromURL, userSelections){ // if from url false selection
             }
             $(".selectpicker").selectpicker('refresh');
         }
-        hideUnselectedDivs();
+        // hideUnselectedDivs(); // TODO changed late at night double check in the morning
     });
 }
 
