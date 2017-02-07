@@ -7,7 +7,7 @@ var selections = [];
 
 // Holds a object that contains the rows of selections that were last searched
 var lastSearch = null;
-
+var validOptions = [false,false,false]; // Each boolean represents if a sub category should exist in the selection row
 var selectedCompany = "";
 
 // Hold if these tables have been selected
@@ -16,6 +16,8 @@ var bSelected = false;
 var cSelected = false;
 var dSelected = false;
 
+var minYear;
+var maxYear;
 
 // Holds the rows for each table separately
 var dataTables;
@@ -28,16 +30,6 @@ $(document).ready( function() {
 
     cpiValidationSetup(); // Set up cpi validation rules
 
-    // Hide all the table divs
-    //$('#full-table-a-div').hide();
-    //$('#full-table-b-div').hide();
-    //$('#full-table-c-div').hide();
-    //$('#full-table-d-div').hide();
-    //$('#full-table-ab-div').hide();
-    //$('#full-table-cd-div').hide();
-    //$('#vector-full-div').hide();
-
-
     // On click listener for company selector
     $('#company-select').on('change', function(event){
         selectedCompany = $(this).find("option:selected").text();
@@ -47,6 +39,27 @@ $(document).ready( function() {
         search();
     });
 });
+
+function validateSearchParams(){
+    var returnVal = true;
+
+    selections.forEach(function (elem, i) {
+        if(elem.subCategory === "" && validOptions[i]){
+            returnVal = false; // There is a possible sub category so it has to be chosen from
+        }
+
+        // Check if one of the selections is empty
+        if(elem.section === "" || elem.category === "" || elem.description === ""){
+            // Now check if one of the selections is not empty
+            if(elem.section !== "" || elem.category !== "" || elem.description !== ""){
+                $('#error-div').append('<h4 style="color : red;">Partial Row Selected</h4>');
+                returnVal = false; // A row cannot have one item selected and another empty
+            }
+        }
+    });
+    if(returnVal)$('#error-div').html('');
+    return returnVal;
+}
 
 // Uses the url to find what was searches and asks server for rows relating to that search
 function loadFromURL(urlSelections){
@@ -350,7 +363,7 @@ function insertTable(tableRows,id){
 
                     // Check it matches edb and year inserting into
                     if(tableRows[j].edb === tableRows[i].edb && tableRows[j].disc_yr === cur){
-                        row += "<th class='cell' id='t"+id+""+cellCount+"'>" + tableRows[j].value + "</th>";
+                        row += "<th class='cell "+cur+"' id='t"+id+""+cellCount+"'>" + tableRows[j].value + "</th>";
 
                         // Save the value and the id of the cell to display percentage
                         cellValues.push({ id : "#t"+id+""+cellCount, value : tableRows[j].value });
@@ -371,6 +384,14 @@ function insertTable(tableRows,id){
     //First find out what unit type
 
 
+
+
+
+    applyGradientCSS(cellValues);
+}
+
+
+function applyGradientCSS(cellValues){
     var percent = false;
     //if(tableRows[0].units.includes("%")) { //TODO check if this is the right way to identify percentage
     //    percent = true;
@@ -387,11 +408,10 @@ function insertTable(tableRows,id){
         var value = (percent ? value : ((+cellValues[i].value / maxCellValue)*100)); // If percentage metric just use valud
 
         $(cellValues[i].id).css({
-                "background" : "-webkit-gradient(linear, left top, right top, color-stop(" + value +"%,steelblue), color-stop(" + value +"%,#FFF))",
+                "background" : "-webkit-gradient(linear, left top, right top, color-stop(" + value +"%,#64B5F6), color-stop(" + value +"%,#FFF))",
             }
         );
     }
-
 }
 
 // Returns if a row from the DB matches one of the specified rows by the user
@@ -407,6 +427,8 @@ function matchDBRow(DBRow, selection){
 
 // Creates search parameters and creates url
 function search(){
+    if(!validateSearchParams())return;
+
     var rows = {
         i0 : selections[0].id,
         s0  : selections[0].section,
@@ -639,6 +661,8 @@ function setSelectionsFromURL(selection){
 
         if(data.subCategories.length > 0  &&  data.subCategories[0] !== null){
             $('#subsection-select'+selection.id).html(''); // Empty temp options
+
+            validOptions[selection.id] = true; // There are options for this row and sub category
         } else {
             return;
         }
@@ -789,6 +813,7 @@ function addSection(numberSections){
 
             if(data.subCategories.length > 0  &&  data.subCategories[0] !== null){
                 $('#subsection-select'+idNumb).html(''); // Empty temp options
+                validOptions[idNumb] = true; // There are options for this row and sub category
             } else { //TODO could split into individual functions
                 // Find all descriptions for the currently selected sub category
                 $.post("/sections/desc",{category : selections[idNumb].category,section : selections[idNumb].section, subCategory : ""}, function(data){
@@ -943,10 +968,64 @@ function cpiValidationSetup(){
     });
 }
 
+
+
+
 function applyCPI(){
     if($('#cpi-form').valid()){
-        console.log("Validated");
+        // CPI for 2012 - 2016
+        var cpiValues = [{year : 2012, value : +$('#Y2012').val()},{year : 2013, value : +$('#Y2013').val()},{year : 2014, value : +$('#Y2014').val()},{year : 2015, value : +$('#Y2015').val()},{year : 2016, value : +$('#Y2016').val()}];
+
+        var min = Infinity;
+        var max = -Infinity;
+        $('.cell', '#tableA').each(function(index){ //cell or th
+            var year = +$(this).attr("class").split(' ')[1];
+            min = year < min ? year : min;
+            max = year > max ? year : max;
+        });
+
+        $('.cell', '#tableB').each(function(index) { //cell or th
+            console.log("Table B");
+        });
+
+        applyCPIToTable('#tableA',min,max,cpiValues);
+
     } else {
         console.log("Not Validated");
     }
 }
+
+var noCPICells = [];
+
+// Applies cpi values to the table with div id table
+function applyCPIToTable(table, minYear, maxYear, cpiValues){
+    $('.cell', table).each(function(index){ // Back up the values from the cells
+        noCPICells.push({id : $(this).attr('id'), value : $(this).text()});
+    });
+
+    for(var cur = minYear; cur <=maxYear; cur++){ // Go through each possible year
+        $('.cell', table).each(function(index){ // Grab every cell
+            var year = +$(this).attr("class").split(' ')[1]; // Grab the year of the cell by checking the class
+
+            var valueOfCell = $(this).text();
+
+            for(var i = 0; i < cpiValues.length; i++){
+                if(cpiValues[i].year === cur){
+                    if(year >= cur){
+                        valueOfCell = valueOfCell * (1 + (cpiValues[i].value / 100));
+                    }
+                }
+            }
+            $(this).text(valueOfCell); // CPI Applied value
+        });
+    }
+    applyGradientCSS(noCPICells); // Highlights the cell based on the value compared to the max in the table
+}
+
+function revertCPI(){
+    noCPICells.forEach(function(e){
+        $('#'+e.id).text(e.value);
+    });
+    applyGradientCSS(noCPICells);
+}
+

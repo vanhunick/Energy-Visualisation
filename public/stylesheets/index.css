@@ -10,7 +10,7 @@ a {
 
 .full-table{
   /*background: #FF1A1A;*/
-  background:#f2f2f2;
+  background:white;
   /*margin-top: 2%;*/
 }
 .row-selected {
@@ -75,7 +75,7 @@ a {
 .box line,
 .box rect,
 .box circle {
-  fill: steelblue;
+  fill: #64B5F6;
   stroke: #000; /* circle stroke*/
   stroke-width: 1px;
 }
@@ -107,13 +107,13 @@ a {
   color: steelblue;
 }
 .edb-cell {
-  color: lightcoral;
+  color: black;
 }
 
 /*The top row of each table with EBD header and years*/
 .table-head {
   font-size: 18px;
-  color: steelblue;
+  color: black;
   font-weight: bold;
 }
 
