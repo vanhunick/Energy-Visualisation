@@ -1,6 +1,7 @@
 body {
   padding: 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  background: #F0F0F0;
 }
 
 a {
@@ -19,6 +20,10 @@ a {
 
 .bar {
   fill: steelblue;
+}
+
+.selection-title{
+  color: steelblue; 
 }
 
 .input-horizontal {

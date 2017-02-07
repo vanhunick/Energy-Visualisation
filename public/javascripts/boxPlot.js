@@ -59,7 +59,7 @@ function createBoxPlot(dataObject, divID, title, unit){
         .enter().append("circle")
         .attr("class", "dot")
         .attr("r", 3.5)
-        .attr("cx", function(d) { return x(d.year) + (boxMargin.left / 4) + 6; })
+        .attr("cx", function(d) { return x(d.year) + whiskBoxWidth/2; })
         .attr("cy", function(d) { return y(d.value); })
         .on("mouseover", function(d) {
 
@@ -102,7 +102,6 @@ function createBoxPlot(dataObject, divID, title, unit){
         .attr("dy", ".71em")
         .style("text-anchor", "end")
         .style("font-size", "16px");
-        //.text("Revenue in €");
 
     // draw x axis
     svg.append("g")
@@ -119,7 +118,7 @@ function createBoxPlot(dataObject, divID, title, unit){
 
     svg.append("text")
         .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-        .attr("transform", "translate("+ -(vMargin.left/2+5) +","+( boxMargin.top*2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
+        .attr("transform", "translate("+ -(vMargin.left+15) +","+( boxMargin.top*2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
         .style("font-size", "18px")
         .attr("class", "unit-text")
         .text(unit);

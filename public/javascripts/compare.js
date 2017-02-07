@@ -99,9 +99,35 @@ function loadFromURL(urlSelections){
 // Takes all rows and filers into corresponding tables
 function filterRowsToTables(rows){
     var aRows = rows.filter(function(e){return matchDBRow(e,lastSearch.aTable);});
+
     var bRows = rows.filter(function(e){return matchDBRow(e,lastSearch.bTable);});
     var cRows = rows.filter(function(e){return matchDBRow(e,lastSearch.cTable);});
     var dRows = rows.filter(function(e){return matchDBRow(e,lastSearch.dTable);});
+
+    aRows.forEach(function(e){
+        if(e.value === null){
+            e.value = 0;
+        }
+    });
+
+    bRows.forEach(function(e){
+        if(e.value === null){
+            e.value = 0;
+        }
+    });
+
+    cRows.forEach(function(e){
+        if(e.value === null){
+            e.value = 0;
+        }
+    });
+
+    dRows.forEach(function(e){
+        if(e.value === null){
+            e.value = 0;
+        }
+    });
+
 
     return new DataTables(aRows,bRows,cRows,dRows);
 }
@@ -245,15 +271,15 @@ function createGroupedBardGraphs(tablesData, titles){
     }
     if(tablesData.tableB.length > 0){
         var table2Data = createDataForGroupedGraph(tablesData.tableB);
-        createdGroupedBarGraph(table2Data.data, table1Data.keys, titles.bTitle, titles.bUnit, "#grouped-bar-b");
+        createdGroupedBarGraph(table2Data.data, table2Data.keys, titles.bTitle, titles.bUnit, "#grouped-bar-b");
     }
     if(tablesData.tableC.length > 0){
         var table3Data = createDataForGroupedGraph(tablesData.tableC);
-        createdGroupedBarGraph(table3Data.data, table1Data.keys,titles.cTitle, titles.cUnit, "#grouped-bar-c");
+        createdGroupedBarGraph(table3Data.data, table3Data.keys,titles.cTitle, titles.cUnit, "#grouped-bar-c");
     }
     if(tablesData.tableD.length > 0){
         var table4Data = createDataForGroupedGraph(tablesData.tableD);
-        createdGroupedBarGraph(table4Data.data, table1Data.keys, titles.dTitle, titles.dUnit, "#grouped-bar-d");
+        createdGroupedBarGraph(table4Data.data, table4Data.keys, titles.dTitle, titles.dUnit, "#grouped-bar-d");
     }
 
     if(aSelected && bSelected){
@@ -512,7 +538,9 @@ function createDataForVectorGraph(table1Rows,table2Rows) {
                         return d.disc_yr === edbRowsAt[j].disc_yr
                     });
 
-
+                    if(!(yearRowsAt.length == yearRowsBt.length )){
+                        return [];
+                    }
 
                     for (var k = 0; k < yearRowsAt.length; k++) {
                         edbYearArray.push({
@@ -768,7 +796,7 @@ function addSection(numberSections){
     var table = ['A','B','C','D'];
 
     // Add in a new row div
-    $('#compare-div').append('<div class="row" id="titleRow'+numberSections+'"><div class="col-md-12"><h5>Make a selection for table '+table[numberSections]+'</h5> </div></div>');
+    $('#compare-div').append('<div class="row" id="titleRow'+numberSections+'"><div class="col-md-12"><h5  class="selection-title">Make a selection for table '+table[numberSections]+'</h5> </div></div>');
 
     $('#compare-div').append('<div class="row" id="row'+numberSections+'">');
 
@@ -784,6 +812,11 @@ function addSection(numberSections){
     $("#section-select"+numberSections).on('change', function(event){
         var section = $(this).find("option:selected").text(); // Grab the selection
         var idNumb = event.target.id.charAt(event.target.id.length-1); // Grab the last character of the id that generated the event to work out correct id
+
+        // First empty out all options for sub selections
+        $('#category-select'+idNumb).html(''); // Empty temp options
+        $('#subsection-select'+idNumb).html(''); // Empty temp options
+        $('#description-select'+idNumb).html(''); // Empty temp options
 
         // Find all the categories associated with this section
         $.post("/sections/s",{selected : section }, function(data){
@@ -807,6 +840,7 @@ function addSection(numberSections){
     $('#category-select'+numberSections).on('change', function(event){
         var category = $(this).find("option:selected").text();
         var idNumb = event.target.id.charAt(event.target.id.length-1);
+        $('#description-select'+idNumb).html(''); // Empty temp options
 
         // Find all sub categories for the currently selected category
         $.post("/sections/sc",{section : selections[idNumb].section, category : category}, function(data){

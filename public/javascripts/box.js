@@ -1,9 +1,14 @@
+// Required to line up scatter plot dots
+var whiskBoxWidth = 1;
+
 (function() {
 
 // Inspired by http://informationandvisualization.de/blog/box-plot
     d3.box = function() {
-        var width = 1,
-            height = 1,
+
+
+
+        var height = 1,
             duration = 0,
             domain = null,
             value = Number,
@@ -66,9 +71,9 @@
                 //vertical line
                 center.enter().insert("line", "rect")
                     .attr("class", "center")
-                    .attr("x1", width / 2)
+                    .attr("x1", whiskBoxWidth / 2)
                     .attr("y1", function(d) { return x0(d[0]); })
-                    .attr("x2", width / 2)
+                    .attr("x2", whiskBoxWidth / 2)
                     .attr("y2", function(d) { return x0(d[1]); })
                     .style("opacity", 1e-6)
                     .transition()
@@ -98,7 +103,7 @@
                     .attr("class", "box")
                     .attr("x", 0)
                     .attr("y", function(d) {return x0(d[2]); })
-                    .attr("width", width)
+                    .attr("width", whiskBoxWidth)
                     .attr("height", function(d) { return x0(d[0]) - x0(d[2]); })
                     .transition()
                     .duration(duration)
@@ -119,7 +124,7 @@
                     .attr("class", "median")
                     .attr("x1", 0)
                     .attr("y1", x0)
-                    .attr("x2", width)
+                    .attr("x2", whiskBoxWidth)
                     .attr("y2", x0)
                     .transition()
                     .duration(duration)
@@ -140,7 +145,7 @@
                     .attr("class", "whisker")
                     .attr("x1", 0)
                     .attr("y1", x0)
-                    .attr("x2", 0 + width)
+                    .attr("x2", 0 + whiskBoxWidth)
                     .attr("y2", x0)
                     .style("opacity", 1e-6)
                     .transition()
@@ -169,7 +174,7 @@
                 outlier.enter().insert("circle", "text")
                     .attr("class", "outlier")
                     .attr("r", 5)
-                    .attr("cx", width / 2)
+                    .attr("cx", whiskBoxWidth / 2)
                     .attr("cy", function(i) { return x0(d[i]); })
                     .style("opacity", 1e-6)
                     .transition()
@@ -199,7 +204,7 @@
                         .attr("class", "box")
                         .attr("dy", ".3em")
                         .attr("dx", function(d, i) { return i & 1 ? 6 : -6 })
-                        .attr("x", function(d, i) { return i & 1 ?  + width : 0 })
+                        .attr("x", function(d, i) { return i & 1 ?  + whiskBoxWidth : 0 })
                         .attr("y", x0)
                         .attr("text-anchor", function(d, i) { return i & 1 ? "start" : "end"; })
                         .text(format)
@@ -223,7 +228,7 @@
                         .attr("class", "whisker")
                         .attr("dy", ".3em")
                         .attr("dx", 6)
-                        .attr("x", width)
+                        .attr("x", whiskBoxWidth)
                         .attr("y", x0)
                         .text(format)
                         .style("opacity", 1e-6)
@@ -248,8 +253,8 @@
         }
 
         box.width = function(x) {
-            if (!arguments.length) return width;
-            width = x;
+            if (!arguments.length) return whiskBoxWidth;
+            whiskBoxWidth = x;
             return box;
         };
 
