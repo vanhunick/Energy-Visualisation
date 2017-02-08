@@ -92,8 +92,8 @@ function loadFromURL(urlSelections){
 
         titles = createTableTitles(dataTables);
 
-        showAll(); // Loads in tables bar graphs and box plots
-        hideUnselectedDivs();
+        showAllTwo(dataTables,titles); // Loads in tables bar graphs and box plots
+        showSelectedDivs();
     });
 }
 
@@ -128,8 +128,6 @@ function filterRowsToTables(rows){
             e.value = 0;
         }
     });
-
-
     return new DataTables(aRows,bRows,cRows,dRows);
 }
 
@@ -166,7 +164,7 @@ function createTableTitles(tablesData){
     return new DataTableTitles(aTitle,bTitle,cTitle,dTitle,aUnit,bUnit,cUnit,dUnit);
 }
 
-function hideUnselectedDivs(){
+function showSelectedDivs(){
     if(aSelected){
         console.log("SHOWING AAA");
         $('#full-table-a-div').show();
@@ -198,127 +196,82 @@ function hideUnselectedDivs(){
     }
 }
 
-// Shows all tables bar graphs and box plots
-function showAll(){
-    createTables(dataTables);
-    createBoxPlots(dataTables,titles);
-    createGroupedBardGraphs(dataTables, titles);
+// Tables data contains 4 arrays with rows for each table
+function showAllTwo(tablesData, titles){
+    // For each selection we need to check if it has been selected
 
-    // If all selected line graph is A/B / C/D
-    var xTitle = "";
-    var yTitle = "";
-    var xUnit = "";
-    var yUnit = "";
-    if(aSelected && bSelected && cSelected && dSelected){
-        xTitle = titles.aTitle + " Over " + titles.bTitle;
-        yTitle = titles.cTitle + " Over " + titles.dTitle;
-        xUnit = titles.aUnit + " / " + titles.bUnit;
-    } else {
-        xTitle = titles.aTitle;
-        xUnit = titles.aUnit;
-        yTitle = titles.cTitle;
-        yUnit = titles.cUnit;
-    }
-    title = xTitle + " Over " + yTitle;
+    // Check selection A
+    if(aSelected){
+        // Insert table A
+        insertTable(tablesData.tableA,'tableA');
 
-
-    if(aSelected && bSelected){
-        console.log("Creating AB vector graph");
-        createVectorGraph(createDataForVectorGraph(dataTables.tableA,dataTables.tableB),xUnit,yUnit,titles.tableA + " Over " + titles.tableB,"#vector-graph-div-ab"); // TODO check if A/B / C/D
-    }
-
-    if(cSelected && dSelected){
-        createVectorGraph(createDataForVectorGraph(dataTables.tableC,dataTables.tableD),xUnit,yUnit,titles.tableC + " Over " + titles.tableD,"#vector-graph-div-cd"); // TODO check if A/B / C/D
-    }
-
-    if(aSelected && bSelected && cSelected && dSelected) {
-        var ab = insertTableOverTable(true, dataTables);
-        var cd = insertTableOverTable(false, dataTables);
-
-        createVectorGraph(createDataForVectorGraph(ab,cd),xUnit,yUnit,"","#vector-graph-div-abcd"); // TODO check titles and units
-    }
-
-}
-
-// Create the 4 box plots from the tables data object if they contain rows
-function createBoxPlots(tablesData, titles){
-    if(tablesData.tableA.length > 0){
+        // Create and Insert the box plot for table A
         createBoxPlot(createDataForBoxPlot(tablesData.tableA), "#boxplotA-div", titles.aTitle, titles.aUnit);
-    }
-    if(tablesData.tableB.length > 0){
-        createBoxPlot(createDataForBoxPlot(tablesData.tableB), "#boxplotB-div", titles.bTitle, titles.bUnit);
-    }
-    if(tablesData.tableC.length > 0){
-        createBoxPlot(createDataForBoxPlot(tablesData.tableC), "#boxplotC-div", titles.cTitle, titles.cUnit);
-    }
-    if(tablesData.tableD.length > 0){
-        createBoxPlot(createDataForBoxPlot(tablesData.tableD), "#boxplotD-div", titles.dTitle, titles.dUnit);
-    }
 
-    if(aSelected && bSelected){
-        var abData = insertTableOverTable(true,tablesData);
-        createBoxPlot(createDataForBoxPlot(abData), "#boxplotAB-div", titles.aTitle + " Over " + titles.bTitle, titles.aUnit);
-    }
-
-    if(cSelected && dSelected){
-        var cdData = insertTableOverTable(false,tablesData);
-        createBoxPlot(createDataForBoxPlot(cdData), "#boxplotCD-div", titles.cTitle + " Over " + titles.dTitle, titles.cUnit);
-    }
-
-}
-
-// Create the 4 grouped bar graphs from the tables data object if they contain rows
-function createGroupedBardGraphs(tablesData, titles){
-    if(tablesData.tableA.length > 0){
+        // Create and insert the grouped graph
         var table1Data = createDataForGroupedGraph(tablesData.tableA);
         createdGroupedBarGraph(table1Data.data, table1Data.keys,titles.aTitle,titles.aUnit,"#grouped-bar-a");
     }
-    if(tablesData.tableB.length > 0){
+
+    // Check selection B
+    if(bSelected){
+        insertTable(tablesData.tableB,'tableB');
+        createBoxPlot(createDataForBoxPlot(tablesData.tableB), "#boxplotB-div", titles.bTitle, titles.bUnit);
+
         var table2Data = createDataForGroupedGraph(tablesData.tableB);
         createdGroupedBarGraph(table2Data.data, table2Data.keys, titles.bTitle, titles.bUnit, "#grouped-bar-b");
     }
-    if(tablesData.tableC.length > 0){
+
+    // Check selection C
+    if(cSelected){
+        insertTable(tablesData.tableC,'tableC');
+        createBoxPlot(createDataForBoxPlot(tablesData.tableC), "#boxplotC-div", titles.cTitle, titles.cUnit);
+
         var table3Data = createDataForGroupedGraph(tablesData.tableC);
         createdGroupedBarGraph(table3Data.data, table3Data.keys,titles.cTitle, titles.cUnit, "#grouped-bar-c");
     }
-    if(tablesData.tableD.length > 0){
+
+    // Check selection D
+    if(dSelected){
+        insertTable(tablesData.tableD,'tableD');
+        createBoxPlot(createDataForBoxPlot(tablesData.tableD), "#boxplotD-div", titles.dTitle, titles.dUnit);
+
         var table4Data = createDataForGroupedGraph(tablesData.tableD);
         createdGroupedBarGraph(table4Data.data, table4Data.keys, titles.dTitle, titles.dUnit, "#grouped-bar-d");
     }
 
+    // Check selection A and B
     if(aSelected && bSelected){
         var abData = insertTableOverTable(true,tablesData);
+        insertTable(abData, "tableAB");
+        createBoxPlot(createDataForBoxPlot(abData), "#boxplotAB-div", titles.aTitle + " Over " + titles.bTitle, titles.aUnit);
+
         var tableABData = createDataForGroupedGraph(abData);
         createdGroupedBarGraph(tableABData.data, tableABData.keys,titles.aTitle + " Over " + titles.bTitle , titles.aUnit, "#grouped-bar-ab");
+
+        createVectorGraph(createDataForVectorGraph(dataTables.tableA,dataTables.tableB),titles.aUnit,titles.bUnit,titles.tableA + " Over " + titles.tableB,"#vector-graph-div-ab"); // TODO check if A/B / C/D
     }
 
+    // Check selection C and D
     if(cSelected && dSelected){
         var cdData = insertTableOverTable(false,tablesData);
+        insertTable(cdData, "tableCD");
+        createBoxPlot(createDataForBoxPlot(cdData), "#boxplotCD-div", titles.cTitle + " Over " + titles.dTitle, titles.cUnit);
+
         var tableCDData = createDataForGroupedGraph(cdData);
         createdGroupedBarGraph(tableCDData.data, tableCDData.keys,titles.cTitle + " Over " + titles.dTitle , titles.aUnit, "#grouped-bar-cd");
+
+        //TODO maybe change units
+        createVectorGraph(createDataForVectorGraph(dataTables.tableC,dataTables.tableD),titles.cUnit,titles.dUnit,titles.tableC + " Over " + titles.tableD,"#vector-graph-div-cd");
     }
-}
 
-function filterByCompanies(tablesData){
+    // Check selection A, B, C, and D
+    if(aSelected && bSelected && cSelected && dSelected){
+        var ab = insertTableOverTable(true, dataTables);
+        var cd = insertTableOverTable(false, dataTables);
 
-    // Match company to table and filter row
-
-    return new DataTables();
-}
-
-// Receives rows from DB and converts to html tables
-function createTables(tablesData){
-
-
-    insertTable(tablesData.tableA,'tableA');
-    insertTable(tablesData.tableB,'tableB');
-    insertTable(tablesData.tableC,'tableC');
-    insertTable(tablesData.tableD,'tableD');
-    var abData = insertTableOverTable(true,tablesData);
-    var cdData = insertTableOverTable(false,tablesData);
-
-    insertTable(abData, "tableAB");
-    insertTable(cdData, "tableCD");
+        createVectorGraph(createDataForVectorGraph(ab,cd),titles.aUnit,titles.bUnit,"","#vector-graph-div-abcd");
+    }
 }
 
 function insertTableOverTable(ab,tablesData){
@@ -339,7 +292,6 @@ function insertTableOverTable(ab,tablesData){
                 break; // can exit the loop
             }
         }
-
     }
     return combined;
 }
@@ -378,7 +330,6 @@ function insertTable(tableRows,id){
     var done = [];
     var cellCount = 0;
     var cellValues = [];
-
     var observerd = true;
 
     // Create the rows of data
@@ -415,13 +366,6 @@ function insertTable(tableRows,id){
             //});
         }
     }
-
-    //First find out what unit type
-
-
-
-
-
     applyGradientCSS(cellValues);
 }
 
@@ -433,12 +377,10 @@ function applyGradientCSS(cellValues){
     //}
     // or proportion
 
-
     var maxCellValue = -Infinity;
     cellValues.forEach(function(elem){
         maxCellValue = +elem.value > maxCellValue ? +elem.value : maxCellValue;
     });
-
 
     // Apllie css to each cell
     for(var i = 0; i < cellValues.length; i++){
@@ -490,7 +432,6 @@ function search(){
     };
     console.log(selections[0]);
 
-
     params = serialise(rows);
     window.location.replace("compare?" + params);
 }
@@ -510,11 +451,8 @@ function serialise(obj) {
 function createDataForVectorGraph(table1Rows,table2Rows) {
     var at = table1Rows;
     var bt = table2Rows;
-
     var edbDone = []; // The edbs that have been processed
-
     var vecData = []; // The final entry in the form { EDB, [ { year1, valueA, valueB }, {year2, valueA, valueB }]}
-
 
     // Go through every row
     for (var i = 0; i < at.length; i++) {
@@ -532,9 +470,7 @@ function createDataForVectorGraph(table1Rows,table2Rows) {
 
             edbDone.push(at[i].edb); // Add year to done so it is not repeated
 
-
             var yearsDone = []; // Processed years
-
             var edbYearArray = [];
 
             // Iterate through rows in edb
@@ -588,17 +524,13 @@ function createDataForBoxPlot(tableRows){
 
     var data = []; // Each entry will be an array where array[0] = year and array[1] = values for that year
     var sValues = []; // Data for the scatter plot on top of box plot
-
     var min = Infinity;
     var max = -Infinity;
 
     for(var i = 0; i < years.length; i++){
         var entry = [];
-
         entry[0] = ""+years[i][0].obs_yr; // Name of the box plot convert year to string
-
         var year = ""+years[i][0].obs_yr;
-
         var values = [];
 
         for(var j = 0; j < years[i].length; j++){
@@ -623,7 +555,6 @@ function createDataForBoxPlot(tableRows){
 // Creates the data for the bar graphs from the rows used in D3
 function createDataForGroupedGraph(rows){
     var data = [];
-    // includes
     var edbDone = [];
 
     // Find the min and max year from the data
@@ -654,7 +585,6 @@ function createDataForGroupedGraph(rows){
     }
 
     var keys = [];
-
     for(var i = min; i <= max; i++){
         keys.push(""+i);
     }
@@ -662,27 +592,12 @@ function createDataForGroupedGraph(rows){
 }
 
 
-function setSections(callback){
-    $.get("/sections/sections", function(data){
-        sortSections(data);
-
-        // Go through each row and add the sections in
-        for(var i = 0; i < selections.length; i++){
-            for(var j = 0; j < data.sections.length; j++){
-                $("#section-select"+selections[i].id+"").append('<option>' + data.sections[j] + '</option>');
-            }
-            $(".selectpicker").selectpicker('refresh');
-        }
-    });
-}
-
 function setSelectionsFromURL(selection){
     // Find all the categories associated with this section
     $.post("/sections/s",{selected : selection.section }, function(data){
         if(data.categories.length > 0  &&  data.categories[0] !== null){
             $('#category-select'+selection.id).html(''); // Empty temp options
         }
-
         // Add the options to the drop down
         for(var i = 0; i < data.categories.length; i++){
             if(data.categories[i] === selection.category){
@@ -692,11 +607,9 @@ function setSelectionsFromURL(selection){
             }
 
         }
-
         // Refresh all drop downs
         $(".selectpicker").selectpicker('refresh');
     });
-
 
     // Find all sub categories for the currently selected category
     $.post("/sections/sc",{section : selection.section, category : selection.category}, function(data){
@@ -727,7 +640,6 @@ function setSelectionsFromURL(selection){
         } else {
             return;
         }
-
         // Add sub section options
         for(var i = 0; i < data.descriptions.length; i++){
             if(data.descriptions[i] === selection.description){
@@ -740,7 +652,7 @@ function setSelectionsFromURL(selection){
     });
 }
 
-
+// Sort the sections
 function sortSections(data){
     data.sections.sort(function(a,b){
         // First check simple case of number difference
@@ -754,7 +666,6 @@ function sortSections(data){
         while(!isNaN(b.charAt(i))){
             i++
         }
-
         var numberB = b.substring(0,i);
 
         if(numberA !== numberB) {
@@ -770,12 +681,10 @@ function loadInSections(fromURL, userSelections){ // if from url false selection
     /// Query for all sections
     $.get("/sections/sections", function(data){
         // Create the four filters rows
-
         addSection(0);
         addSection(1);
         addSection(2);
         addSection(3);
-
 
         if(fromURL){
             for(var i = 0; i < userSelections.length; i++){
@@ -785,7 +694,6 @@ function loadInSections(fromURL, userSelections){ // if from url false selection
                 selections[i].subCategory = userSelections[i].subCategory;
             }
         }
-
 
         // Sort the sections
         sortSections(data);
@@ -801,7 +709,7 @@ function loadInSections(fromURL, userSelections){ // if from url false selection
             }
             $(".selectpicker").selectpicker('refresh');
         }
-        // hideUnselectedDivs(); // TODO changed late at night double check in the morning
+        // showSelectedDivs(); // TODO changed late at night double check in the morning
     });
 }
 
@@ -839,12 +747,10 @@ function addSection(numberSections){
             if(data.categories.length > 0  &&  data.categories[0] !== null){
                 $('#category-select'+idNumb).html(''); // Empty temp options
             }
-
             // Add the options to the drop down
             for(var i = 0; i < data.categories.length; i++){
                 $('#category-select'+idNumb).append('<option>' + data.categories[i] + '</option>');
             }
-
             // Refresh all drop downs
             $(".selectpicker").selectpicker('refresh');
         });
@@ -860,7 +766,6 @@ function addSection(numberSections){
 
         // Find all sub categories for the currently selected category
         $.post("/sections/sc",{section : selections[idNumb].section, category : category}, function(data){
-
             if(data.subCategories.length > 0  &&  data.subCategories[0] !== null){
                 $('#subsection-select'+idNumb).html(''); // Empty temp options
                 validOptions[idNumb] = true; // There are options for this row and sub category
@@ -872,7 +777,6 @@ function addSection(numberSections){
                     } else {
                         return;
                     }
-
                     // Add sub section options
                     for(var i = 0; i < data.descriptions.length; i++){
                         $('#description-select'+idNumb).append('<option>' + data.descriptions[i] + '</option>');
@@ -881,7 +785,6 @@ function addSection(numberSections){
                 });
                 return;
             }
-
             // Add sub section options
             for(var i = 0; i < data.subCategories.length; i++){
                 $('#subsection-select'+idNumb).append('<option>' + data.subCategories[i] + '</option>');
@@ -918,11 +821,9 @@ function addSection(numberSections){
     $("#col"+numberSections).append('<select data-width="190px" class="selectpicker select-compare" title="Description" id="description-select'+numberSections+'"></select>');
     $('#description-select'+numberSections).on('change', function(event){
         var idNumb = event.target.id.charAt(event.target.id.length-1);
-
         var data = $(this).find("option:selected").text();
         addToSelection(idNumb,"description", data);
     });
-    //numberSections++; // Increment the int used for id's
 }
 
 // Adds a section, category, sub category, or descriptions to a particular row in selections
@@ -970,18 +871,15 @@ function DataTableTitles(aTitle,bTitle,cTitle,dTitle,aUnit,bUnit,cUnit,dUnit){
     this.dUnit = dUnit;
 }
 
+// Set up rules for validating the CPI fields
 function cpiValidationSetup(){
     $.validator.setDefaults({
             errorClass : 'help-block',
             highlight: function (element) {
-                $(element)
-                    .closest('.form-group')
-                    .addClass('has-error')
+                $(element).closest('.form-group').addClass('has-error')
             },
             unhighlight :function (element) {
-                $(element)
-                    .closest('.form-group')
-                    .removeClass('has-error')
+                $(element).closest('.form-group').removeClass('has-error')
             }
         }
     );
@@ -998,7 +896,7 @@ function cpiValidationSetup(){
         number : "Please enter a valid number",
         min : "Please enter a percentage greater than 0",
         max : "Please enter a percentage less than 100"
-    }
+    };
 
     $('#cpi-form').validate({
         rules : {
@@ -1025,9 +923,9 @@ function applyCPI(){
     if($('#cpi-form').valid()){
         // CPI for 2012 - 2016
         var cpiValues = [{year : 2012, value : +$('#Y2012').val()},{year : 2013, value : +$('#Y2013').val()},{year : 2014, value : +$('#Y2014').val()},{year : 2015, value : +$('#Y2015').val()},{year : 2016, value : +$('#Y2016').val()}];
-
         var min = Infinity;
         var max = -Infinity;
+
         $('.cell', '#tableA').each(function(index){ //cell or th
             var year = +$(this).attr("class").split(' ')[1];
             min = year < min ? year : min;
@@ -1037,19 +935,19 @@ function applyCPI(){
         $('.cell', '#tableB').each(function(index) { //cell or th
             console.log("Table B");
         });
-
         applyCPIToTable('#tableA',min,max,cpiValues);
-
-    } else {
-        console.log("Not Validated");
     }
 }
 
-var noCPICells = [];
+var noCPICells = []; // Hold the original cpi values
 
 // Applies cpi values to the table with div id table
 function applyCPIToTable(table, minYear, maxYear, cpiValues){
-    $('.cell', table).each(function(index){ // Backup the values from the cells
+    if(noCPICells.length > 0){
+        console.log("Reverting");
+        revertCPI(); // Reverts cpi before instead of saving values with cpi already applied
+    }
+    $('.cell', table).each(function(){ // Backup the values from the cells
         noCPICells.push({id : $(this).attr('id'), value : $(this).text()});
     });
 
