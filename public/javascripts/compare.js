@@ -423,6 +423,8 @@ function applyGradientCSS(cellValues){
     //if(tableRows[0].units.includes("%")) { //TODO check if this is the right way to identify percentage
     //    percent = true;
     //}
+    // or proportion
+
 
     var maxCellValue = -Infinity;
     cellValues.forEach(function(elem){
@@ -797,7 +799,7 @@ function loadInSections(fromURL, userSelections){ // if from url false selection
 
 // Adds a new row of filters for section category and sub category
 function addSection(numberSections){
-    var table = ['A','B','C','D'];
+    var table = ['A','B','C','D','E'];
 
     // Add in a new row div
     $('#compare-div').append('<div class="row" id="titleRow'+numberSections+'"><div class="col-md-12"><h5  class="selection-title">Make a selection for table '+table[numberSections]+'</h5> </div></div>');
@@ -1039,7 +1041,7 @@ var noCPICells = [];
 
 // Applies cpi values to the table with div id table
 function applyCPIToTable(table, minYear, maxYear, cpiValues){
-    $('.cell', table).each(function(index){ // Back up the values from the cells
+    $('.cell', table).each(function(index){ // Backup the values from the cells
         noCPICells.push({id : $(this).attr('id'), value : $(this).text()});
     });
 
@@ -1051,7 +1053,7 @@ function applyCPIToTable(table, minYear, maxYear, cpiValues){
 
             for(var i = 0; i < cpiValues.length; i++){
                 if(cpiValues[i].year === cur){
-                    if(year >= cur){
+                    if(year <= cur){
                         valueOfCell = valueOfCell * (1 + (cpiValues[i].value / 100));
                     }
                 }
