@@ -16,9 +16,6 @@ var bSelected = false;
 var cSelected = false;
 var dSelected = false;
 
-var minYear;
-var maxYear;
-
 // Holds the rows for each table separately
 var dataTables;
 var titles;
@@ -28,18 +25,17 @@ $(document).ready( function() {
     $(".nav-link").removeClass('active');
     $("#benchmarks-link").addClass('active');
 
-    cpiValidationSetup(); // Set up cpi validation rules
-
     // On click listener for company selector
     $('#company-select').on('change', function(event){
         selectedCompany = $(this).find("option:selected").text();
     });
-
-    $('#search-btn-compare').click(function(){
+    $('#search-btn-compare').click(function(){ // Listener to search button
         search();
     });
+    cpiValidationSetup(); // Set up cpi validation rules
 });
 
+// Checks that if there is a value in a selection one must be selected per row
 function validateSearchParams(){
     var returnVal = true;
 
@@ -93,7 +89,6 @@ function loadFromURL(urlSelections){
         titles = createTableTitles(dataTables);
 
         showAllTwo(dataTables,titles); // Loads in tables bar graphs and box plots
-        showSelectedDivs();
     });
 }
 
@@ -164,38 +159,6 @@ function createTableTitles(tablesData){
     return new DataTableTitles(aTitle,bTitle,cTitle,dTitle,aUnit,bUnit,cUnit,dUnit);
 }
 
-function showSelectedDivs(){
-    if(aSelected){
-        console.log("SHOWING AAA");
-        $('#full-table-a-div').show();
-    }
-
-    if(bSelected){
-        $('#full-table-b-div').show();
-    }
-
-    if(cSelected){
-        $('#full-table-c-div').show();
-    }
-
-    if(dSelected){
-        $('#full-table-d-div').show();
-    }
-
-    if((aSelected && bSelected)){
-        $('#full-table-ab-div').show();
-        //$('#vector-full-div-ab').show();
-    }
-
-    if((cSelected && dSelected)){
-        $('#full-table-cd-div').show();
-    }
-
-    if((aSelected && bSelected && cSelected && dSelected)){
-        $('#vector-full-div-abcd').show();
-    }
-}
-
 // Tables data contains 4 arrays with rows for each table
 function showAllTwo(tablesData, titles){
     // For each selection we need to check if it has been selected
@@ -211,6 +174,7 @@ function showAllTwo(tablesData, titles){
         // Create and insert the grouped graph
         var table1Data = createDataForGroupedGraph(tablesData.tableA);
         createdGroupedBarGraph(table1Data.data, table1Data.keys,titles.aTitle,titles.aUnit,"#grouped-bar-a");
+        $('#full-table-a-div').show(); //Show the div
     }
 
     // Check selection B
@@ -220,6 +184,7 @@ function showAllTwo(tablesData, titles){
 
         var table2Data = createDataForGroupedGraph(tablesData.tableB);
         createdGroupedBarGraph(table2Data.data, table2Data.keys, titles.bTitle, titles.bUnit, "#grouped-bar-b");
+        $('#full-table-b-div').show();
     }
 
     // Check selection C
@@ -229,6 +194,7 @@ function showAllTwo(tablesData, titles){
 
         var table3Data = createDataForGroupedGraph(tablesData.tableC);
         createdGroupedBarGraph(table3Data.data, table3Data.keys,titles.cTitle, titles.cUnit, "#grouped-bar-c");
+        $('#full-table-c-div').show();
     }
 
     // Check selection D
@@ -238,6 +204,7 @@ function showAllTwo(tablesData, titles){
 
         var table4Data = createDataForGroupedGraph(tablesData.tableD);
         createdGroupedBarGraph(table4Data.data, table4Data.keys, titles.dTitle, titles.dUnit, "#grouped-bar-d");
+        $('#full-table-d-div').show();
     }
 
     // Check selection A and B
@@ -248,8 +215,8 @@ function showAllTwo(tablesData, titles){
 
         var tableABData = createDataForGroupedGraph(abData);
         createdGroupedBarGraph(tableABData.data, tableABData.keys,titles.aTitle + " Over " + titles.bTitle , titles.aUnit, "#grouped-bar-ab");
-
         createVectorGraph(createDataForVectorGraph(dataTables.tableA,dataTables.tableB),titles.aUnit,titles.bUnit,titles.tableA + " Over " + titles.tableB,"#vector-graph-div-ab"); // TODO check if A/B / C/D
+        $('#full-table-ab-div').show();
     }
 
     // Check selection C and D
@@ -261,8 +228,8 @@ function showAllTwo(tablesData, titles){
         var tableCDData = createDataForGroupedGraph(cdData);
         createdGroupedBarGraph(tableCDData.data, tableCDData.keys,titles.cTitle + " Over " + titles.dTitle , titles.aUnit, "#grouped-bar-cd");
 
-        //TODO maybe change units
         createVectorGraph(createDataForVectorGraph(dataTables.tableC,dataTables.tableD),titles.cUnit,titles.dUnit,titles.tableC + " Over " + titles.tableD,"#vector-graph-div-cd");
+        $('#full-table-cd-div').show();
     }
 
     // Check selection A, B, C, and D
@@ -271,6 +238,7 @@ function showAllTwo(tablesData, titles){
         var cd = insertTableOverTable(false, dataTables);
 
         createVectorGraph(createDataForVectorGraph(ab,cd),titles.aUnit,titles.bUnit,"","#vector-graph-div-abcd");
+        $('#vector-full-div-abcd').show();
     }
 }
 
