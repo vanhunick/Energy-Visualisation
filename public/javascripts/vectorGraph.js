@@ -110,7 +110,7 @@ function createVectorGraph(data,xLabel, yLabel, title, divID){
     for(var i =0; i < data.length; i++){
         for(var j = 0; j < data[i].years.length-1; j++){ // -1 because we add
             lines.push( {end :  data[i].years[j].year  === 2016 || data[i].years[j+1].year === 2016,edb : data[i].edb, x : data[i].years[j].valueB, y : data[i].years[j].valueA , x1 : data[i].years[j+1].valueB , y1 : data[i].years[j+1].valueA});
-        }
+        } //TODO change 2016 to actual value
     }
 
     // Build arrow

@@ -184,9 +184,9 @@ function hideUnselectedDivs(){
         $('#full-table-d-div').show();
     }
 
-    if((aSelected && cSelected)){
+    if((aSelected && bSelected)){
         $('#full-table-ab-div').show();
-        $('#vector-full-div-ab').show();
+        //$('#vector-full-div-ab').show();
     }
 
     if((cSelected && dSelected)){
@@ -222,10 +222,13 @@ function showAll(){
     title = xTitle + " Over " + yTitle;
 
 
+    if(aSelected && bSelected){
+        console.log("Creating AB vector graph");
+        createVectorGraph(createDataForVectorGraph(dataTables.tableA,dataTables.tableB),xUnit,yUnit,titles.tableA + " Over " + titles.tableB,"#vector-graph-div-ab"); // TODO check if A/B / C/D
+    }
 
-
-    if(aSelected && cSelected){
-        createVectorGraph(createDataForVectorGraph(dataTables.tableA,dataTables.tableC),xUnit,yUnit,title,"#vector-graph-div-ac"); // TODO check if A/B / C/D
+    if(cSelected && dSelected){
+        createVectorGraph(createDataForVectorGraph(dataTables.tableC,dataTables.tableD),xUnit,yUnit,titles.tableC + " Over " + titles.tableD,"#vector-graph-div-cd"); // TODO check if A/B / C/D
     }
 
     if(aSelected && bSelected && cSelected && dSelected) {
@@ -327,7 +330,12 @@ function insertTableOverTable(ab,tablesData){
     for(var i = 0; i < at.length; i++){
         for(var j = 0; j < bt.length; j++){
             if(at[i].edb === bt[j].edb && at[i].obs_yr === bt[j].obs_yr && at[i].disc_yr === bt[j].disc_yr){
-                combined.push({ disc_yr : bt[j].disc_yr ,edb : bt[j].edb, "obs_yr" : bt[j].obs_yr, value : at[i].value / bt[j].value});// Divide the values
+                combined.push({ disc_yr : bt[j].disc_yr ,
+                                edb : bt[j].edb,
+                                "obs_yr" : bt[j].obs_yr,
+                                value : at[i].value / bt[j].value, // Divide the value
+                                section : bt[j].section + "" + bt[j].description + " over ", // Bit of a hack as description is inserted after section, this way both titles are added to table
+                                description : at[i].section + " " + at[i].description});
                 break; // can exit the loop
             }
         }
@@ -347,7 +355,7 @@ function insertTable(tableRows,id){
     if(tableRows.length === 0)return; // No data so return
 
     // Add the title to the table
-    $("#"+id).append('<caption class="cap">' +tableRows[0].section + " " + tableRows[0].description + '</caption>');
+    $("#"+id).append('<caption class="cap">' +tableRows[0].section + " " + tableRows[0].description + '</caption>'); // TODO wont work with ab cd
 
     // Find the min and max year from the data
     var min = tableRows.reduce(function(prev, curr) {
