@@ -167,7 +167,13 @@ function showAllTwo(tablesData, titles){
     if(aSelected){
         // Insert table A
         var titleA = tablesData.tableA[0].section + ", " + tablesData.tableA[0].category;
-        var subTitleA = tablesData.tableA[0].sub_category + ", " + tablesData.tableA[0].description;
+        var subTitleA = "";
+        if(tablesData.tableA[0].sub_category === null){
+            subTitleA = tablesData.tableA[0].description;
+        } else {
+           subTitleA = tablesData.tableA[0].sub_category + ", " + tablesData.tableA[0].description;
+        }
+
         $('#title-a').append('<h2 class="title">'+titleA+'</h2>')
                      .append('<h4 class="subTitle">'+subTitleA+'</h4>');
 
@@ -191,7 +197,14 @@ function showAllTwo(tablesData, titles){
     // Check selection B
     if(bSelected){
         var titleB = tablesData.tableB[0].section + ", " + tablesData.tableB[0].category;
-        var subTitleB = tablesData.tableB[0].sub_category + ", " + tablesData.tableB[0].description;
+        var subTitleB = "";
+        if(tablesData.tableB[0].sub_category === null){
+            subTitleB =tablesData.tableB[0].description;
+        } else {
+            subTitleB = tablesData.tableB[0].sub_category + ", " + tablesData.tableB[0].description;
+        }
+
+
         $('#title-b').append('<h2 class="title">'+titleB+'</h2>')
                      .append('<h4 class="subTitle">'+subTitleB+'</h4>');
 
@@ -214,7 +227,13 @@ function showAllTwo(tablesData, titles){
     // Check selection C
     if(cSelected){
         var titleC = tablesData.tableC[0].section + ", " + tablesData.tableC[0].category;
-        var subTitleC = tablesData.tableC[0].sub_category + ", " + tablesData.tableC[0].description;
+        var subTitleC = "";
+        if(tablesData.tableC[0].sub_category === null){
+            subTitleC =tablesData.tableC[0].description;
+        } else {
+            subTitleC = tablesData.tableC[0].sub_category + ", " + tablesData.tableC[0].description;
+        }
+
         $('#title-c').append('<h2 class="title">'+titleC+'</h2>')
             .append('<h4 class="subTitle">'+subTitleC+'</h4>');
 
@@ -235,7 +254,13 @@ function showAllTwo(tablesData, titles){
     // Check selection D
     if(dSelected){
         var titleD = tablesData.tableD[0].section + ", " + tablesData.tableD[0].category;
-        var subTitleD = tablesData.tableD[0].sub_category + ", " + tablesData.tableD[0].description;
+        var subTitleD = "";
+        if(tablesData.tableD[0].sub_category === null){
+            subTitleD =tablesData.tableD[0].description;
+        } else {
+            subTitleD = tablesData.tableD[0].sub_category + ", " + tablesData.tableD[0].description;
+        }
+
         $('#title-d').append('<h2 class="title">'+titleD+'</h2>')
             .append('<h4 class="subTitle">'+subTitleD+'</h4>');
 
@@ -321,7 +346,10 @@ function insertTableOverTable(ab,tablesData){
                                 "obs_yr" : bt[j].obs_yr,
                                 value : at[i].value / (bt[j].value === '0' ? 1 : bt[j].value), // Divide the value if va if dividing by 0 make it 1
                                 section : bt[j].section + "" + bt[j].description + " over ", // Bit of a hack as description is inserted after section, this way both titles are added to table
-                                description : at[i].section + " " + at[i].description});
+                                description : at[i].section + " " + at[i].description,
+                                unitA : at[i].units,
+                                unitB : bt[j].units
+                });
                 break; // can exit the loop
             }
         }
@@ -952,37 +980,53 @@ function cpiValidationSetup(){
 
 
 
-function applyCPI(){
+function applyCPI(units){
     if($('#cpi-form').valid()){
+        if(noCPICells.length > 0){
+            console.log("Reverting");
+            revertCPI(); // Reverts cpi before instead of saving values with cpi already applied
+        }
         // CPI for 2012 - 2016
         var cpiValues = [{year : 2012, value : +$('#Y2012').val()},{year : 2013, value : +$('#Y2013').val()},{year : 2014, value : +$('#Y2014').val()},{year : 2015, value : +$('#Y2015').val()},{year : 2016, value : +$('#Y2016').val()}];
-        var min = Infinity;
-        var max = -Infinity;
 
-        $('.cell', '#tableA').each(function(index){ //cell or th
-            var year = +$(this).attr("class").split(' ')[1];
-            min = year < min ? year : min;
-            max = year > max ? year : max;
-        });
 
-        $('.cell', '#tableB').each(function(index) { //cell or th
-            console.log("Table B");
-        });
-        applyCPIToTable('#tableA',min,max,cpiValues);
+        if(aSelected && titles.aUnit.includes('$')){
+            console.log("Apply to A");
+            applyCPIToTable('#tableA',cpiValues);
+        }
+
+        if(bSelected && titles.bUnit.includes('$')){
+            applyCPIToTable('#tableB',cpiValues);
+        }
+
+        if(cSelected && titles.cUnit.includes('$')){
+            applyCPIToTable('#tableC',cpiValues);
+        }
+
+        if(dSelected && titles.dUnit.includes('$')){
+            applyCPIToTable('#tableD',cpiValues);
+        }
     }
 }
 
 var noCPICells = []; // Hold the original cpi values
 
 // Applies cpi values to the table with div id table
-function applyCPIToTable(table, minYear, maxYear, cpiValues){
-    if(noCPICells.length > 0){
-        console.log("Reverting");
-        revertCPI(); // Reverts cpi before instead of saving values with cpi already applied
-    }
+function applyCPIToTable(table, cpiValues){
+
     $('.cell', table).each(function(){ // Backup the values from the cells
         noCPICells.push({id : $(this).attr('id'), value : $(this).text()});
     });
+
+    var minYear = Infinity;
+    var maxYear = -Infinity;
+
+    $('.cell', table).each(function(){ //cell or th
+        var year = +$(this).attr("class").split(' ')[1];
+        minYear = year < minYear ? year : minYear;
+        maxYear = year > maxYear ? year : maxYear;
+    });
+
 
     for(var cur = minYear; cur <=maxYear; cur++){ // Go through each possible year
         $('.cell', table).each(function(index){ // Grab every cell
