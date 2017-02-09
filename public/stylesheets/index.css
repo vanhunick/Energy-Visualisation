@@ -18,7 +18,19 @@ a {
 
 }
 
+.combined-title {
+  color : steelblue;
+}
 
+.over {
+  color: black;
+  font-weight: bold;
+}
+
+.graph-title {
+  margin-left: 15%;
+  margin-right: 15%;
+}
 
 /*Container that holds all content on the compare page*/
 #compare-container {

@@ -101,17 +101,6 @@ function createdGroupedBarGraph(data,keys,title, yLabel, divID){
         .attr("class", "g-text")
         .style("font-size", "14px")
         .text(function(d) { return d; });
-
-    // Add a title
-
-
-    //svg.append("text")
-    //    .attr("x", (width / 2))
-    //    .attr("y", 0 - (margin.top / 2))
-    //    .attr("text-anchor", "middle")
-    //    .attr("class", "g-text")
-    //    .style("font-size", "24px")
-    //    .text(title);
 }
 
 

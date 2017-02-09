@@ -254,38 +254,41 @@ function showAllTwo(tablesData, titles){
 
     // Check selection A and B
     if(aSelected && bSelected){
-        $('#title-ab').append('<h3 class="title">'+titleA+'</h3>')
-            .append('<h5 class="subTitle">'+subTitleA+'</h5>')
-            .append('<h5>Over</h5>')
-            .append('<h3 class="title">'+titleB+'</h3>')
-            .append('<h5 class="subTitle">'+subTitleB+'</h5>');
+        $('#title-ab').append('<h3 class="combined-title">'+subTitleA+' <span class="over">over</span>,'+subTitleB+'</h3>');
 
 
         var abData = insertTableOverTable(true,tablesData);
         insertTable(abData, "tableAB");
 
-        $('#title-ab-box-a').append('<h3 class="title">'+titleA+'</h3>')
-            .append('<h5 class="subTitle">'+subTitleA+'</h5>');
+        $('#title-ab-box').append('<h3 class="combined-title">'+subTitleA+' <span class="over">over</span>,'+subTitleB+'</h3>');
 
-        $('#title-ab-box-b').append('<h3 class="title">'+titleB+'</h3>')
-            .append('<h5 class="subTitle">'+subTitleB+'</h5>');
         createBoxPlot(createDataForBoxPlot(abData), "#boxplotAB-div", titles.aTitle + " Over " + titles.bTitle, titles.aUnit);
 
+        $('#title-ab-bar').append('<h3 class="combined-title">'+subTitleA+' <span class="over">over</span>,'+subTitleB+'</h3>');
         var tableABData = createDataForGroupedGraph(abData);
         createdGroupedBarGraph(tableABData.data, tableABData.keys,titles.aTitle + " Over " + titles.bTitle , titles.aUnit, "#grouped-bar-ab");
+
+
+        $('#title-ab-vector').append('<h3 class="combined-title">'+subTitleA+' <span class="over">over</span>,'+subTitleB+'</h3>');
         createVectorGraph(createDataForVectorGraph(dataTables.tableA,dataTables.tableB),titles.aUnit,titles.bUnit,titles.tableA + " Over " + titles.tableB,"#vector-graph-div-ab"); // TODO check if A/B / C/D
         $('#full-table-ab-div').show();
     }
 
     // Check selection C and D
     if(cSelected && dSelected){
+        $('#title-cd').append('<h3 class="combined-title">'+subTitleC+' <span class="over">over</span>,'+subTitleD+'</h3>');
+
         var cdData = insertTableOverTable(false,tablesData);
         insertTable(cdData, "tableCD");
+
+        $('#title-cd-box').append('<h3 class="combined-title">'+subTitleC+' <span class="over">over</span>,'+subTitleD+'</h3>');
         createBoxPlot(createDataForBoxPlot(cdData), "#boxplotCD-div", titles.cTitle + " Over " + titles.dTitle, titles.cUnit);
 
+        $('#title-cd-bar').append('<h3 class="combined-title">'+subTitleC+' <span class="over">over</span>,'+subTitleD+'</h3>');
         var tableCDData = createDataForGroupedGraph(cdData);
         createdGroupedBarGraph(tableCDData.data, tableCDData.keys,titles.cTitle + " Over " + titles.dTitle , titles.aUnit, "#grouped-bar-cd");
 
+        $('#title-cd-vector').append('<h3 class="combined-title">'+subTitleC+' <span class="over">over</span>,'+subTitleD+'</h3>');
         createVectorGraph(createDataForVectorGraph(dataTables.tableC,dataTables.tableD),titles.cUnit,titles.dUnit,titles.tableC + " Over " + titles.tableD,"#vector-graph-div-cd");
         $('#full-table-cd-div').show();
     }
@@ -295,7 +298,11 @@ function showAllTwo(tablesData, titles){
         var ab = insertTableOverTable(true, dataTables);
         var cd = insertTableOverTable(false, dataTables);
 
-        createVectorGraph(createDataForVectorGraph(ab,cd),titles.aUnit,titles.bUnit,"","#vector-graph-div-abcd");
+        $('#title-abcd-vec').append('<h4 class="combined-title">'+subTitleA+' / '+subTitleB+'</h4>')
+                            .append('<h4>Over</h4>')
+                            .append('<h4 class="combined-title">'+subTitleC+' / '+subTitleD+'</h4>');
+
+        createVectorGraph(createDataForVectorGraph(ab,cd),titles.aUnit + " / " + titles.bUnit,titles.cUnit + " / " + titles.dUnit,"","#vector-graph-div-abcd");
         $('#vector-full-div-abcd').show();
     }
 }

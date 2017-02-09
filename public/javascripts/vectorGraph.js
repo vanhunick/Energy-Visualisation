@@ -2,7 +2,7 @@
  * Created by Nicky on 3/02/2017.
  */
 
-var vMargin = {top: 30, right: 20, bottom: 30, left: 60},
+var vMargin = {top: 30, right: 20, bottom: 180, left: 70},
     vWidth = 1000 - vMargin.left - vMargin.right,
     vHeight = 800 - vMargin.top - vMargin.bottom;
 
@@ -143,29 +143,74 @@ function createVectorGraph(data,xLabel, yLabel, title, divID){
             }
         });
 
-
-
-
-    // Add in title
-    svg.append("text")
-        .attr("x", (vWidth / 2))
-        .attr("y", 0 - (vMargin.top / 2))
-        .attr("id","vector-title")
-        .attr("text-anchor", "middle")
-        .style("font-size", "14px")
-        .text(title);
-
     // Add X label
     svg.append("text")
         .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-        .attr("transform", "translate("+ -vMargin.left/2 +","+( vHeight/2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
-        .style("font-size", "14px")
+        .attr("transform", "translate("+ -(vMargin.left/2 +15) +","+( vMargin.top*2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
+        .style("font-size", "18px")
+        .attr("font-family", "sans-serif")
+        .attr("class", "unit-text")
         .text(yLabel);
 
     // Add Y label
     svg.append("text")
         .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-        .attr("transform", "translate("+ vWidth/2 +","+( vHeight+ vMargin.bottom /2 + 15) + ")")  // text is drawn off the screen top left, move down and out and rotate
-        .style("font-size", "14px")
+        .attr("transform", "translate("+ vWidth/2 +","+( vHeight+35) + ")")  // text is drawn off the screen top left, move down and out and rotate
+        .style("font-size", "18px")
+        .attr("font-family", "sans-serif")
+        .attr("class", "unit-text")
         .text(xLabel);
+
+    var xCur = 0;
+
+    var legend = svg.append("g")
+        .attr("font-family", "sans-serif")
+        .attr("font-size", 10)
+        .attr("text-anchor", "end")
+        .selectAll("g")
+        .data(edbs)
+        .enter().append("g")
+        .attr("transform", function(d, i) {
+
+            var y = Math.floor(i / 5) * 20;
+            i++;
+            var x = i * 160;
+
+            if(i > 5 ){
+                x = (i - 5) * 160;
+            }
+
+            if(i > 10 ){
+                x = (i - 10) * 160;
+            }
+
+            if(i > 15 ){
+                x = (i - 15) * 160;
+            }
+
+            if(i > 20 ){
+                x = (i - 20) * 160;
+            }
+
+            if(i > 25 ){
+                x = (i - 25) * 160;
+            }
+            x = x -160 + vMargin.left;
+
+            return "translate("+ x +"," + (y +vHeight +vMargin.bottom/3 ) + ")";
+        });
+
+    legend.append("rect")
+        .attr("x", vMargin.left + 45)
+        .attr("width", 19)
+        .attr("height", 19)
+        .attr("fill", color);
+
+    legend.append("text")
+        .attr("x", vMargin.left + 40)
+        .attr("y", 9.5)
+        .attr("dy", "0.32em")
+        .attr("class", "g-text")
+        .style("font-size", "14px")
+        .text(function(d) { return d; });
 }

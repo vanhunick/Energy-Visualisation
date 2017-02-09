@@ -176,7 +176,7 @@
                             </div>
                         </div>
 
-                        <!--Table 4 Content-->
+                        <!--Table D Content-->
                         <div class="tab-pane fade" id="tab4default">
                             <!--Wrapped in a div for table D to easily hide it-->
                             <div id="full-table-d-div" class="full-table full">
@@ -217,20 +217,17 @@
                                 </div>
 
                                 <div class="row group-row">
-                                    <div id="title-ab-bar" class="text-center"></div>
+                                    <div id="title-ab-bar" class="row text-center graph-title"></div>
                                     <div class="col-lg-12 text-center" id="grouped-bar-ab"></div>
                                 </div>
 
                                 <div class="row whisk-row">
-                                    <div class="col-sm-5 text-right" id="title-ab-box-a"></div>
-                                    <div class="col-sm-1 text-center" ><h4>Over</h4></div>
-                                    <div class="col-sm-5 text-left" id="title-ab-box-b"></div>
-                                    <!--<div id="title-ab-box" class="text-center"></div>-->
+                                    <div class="row text-center  graph-title" id="title-ab-box"></div>
                                     <div class="col-lg-12 text-center" id="boxplotAB-div"></div>
                                 </div>
 
                                 <div class="row text-center" >
-                                    <h2 class="table-title"><b>Vector graph A over B</b></h2>
+                                    <div class="row text-center  graph-title" id="title-ab-vector"></div>
                                     <div class="col-lg-12 text-center" id="vector-graph-div-ab" style="margin-bottom: 2%"></div>
                                 </div>
                             </div>
@@ -242,7 +239,7 @@
                                 <div class="row">
                                     <div class="col-md-2"></div>
                                     <div class="col-md-8 text-center">
-                                        <h2 class="table-title"><b>Table selection  C over selection D</b></h2>
+                                        <h2 class="table-title "><b>Table selection  C over selection D</b></h2>
                                         <div id="title-cd" class="text-left"></div>
                                         <table class="table" id="tableCD"></table>
                                     </div>
@@ -250,18 +247,18 @@
                                 </div>
 
                                 <div class="row group-row">
-                                    <div id="title-cd-bar" class="text-center"></div>
+                                    <div id="title-cd-bar" class="text-center  graph-title"></div>
                                     <div class="col-lg-12 text-center" id="grouped-bar-cd"></div>
                                 </div>
 
                                 <div class="row whisk-row">
 
-                                    <div id="title-cd-box" class="text-center"></div>
+                                    <div id="title-cd-box" class="text-center  graph-title"></div>
                                     <div class="col-lg-12 text-center" id="boxplotCD-div"></div>
                                 </div>
 
                                 <div class="row text-center" >
-                                    <h2 class="table-title"><b>Vector graph C over D</b></h2>
+                                    <div class="row text-center  graph-title" id="title-cd-vector"></div>
                                     <div class="col-lg-12 text-center" id="vector-graph-div-cd" style="margin-bottom: 2%"></div>
                                 </div>
                             </div>
@@ -270,7 +267,9 @@
                         <div class="tab-pane fade" id="tab7default">
                             <div id="vector-full-div-abcd" class="full-table full">
                                 <div class="row text-center" >
-                                    <h2 class="table-title"><b>Vector graph (A over B) over (C over D)</b></h2>
+                                    <!--<h2 class="table-title"><b>Vector graph (A over B) over (C over D)</b></h2>-->
+                                    <div id="title-abcd-vec" class="text-center graph-title"></div>
+
                                     <div class="col-lg-12 text-center" id="vector-graph-div-abcd" style="margin-bottom: 2%"></div>
                                 </div>
                             </div>
