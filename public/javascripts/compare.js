@@ -319,7 +319,7 @@ function insertTableOverTable(ab,tablesData){
                 combined.push({ disc_yr : bt[j].disc_yr ,
                                 edb : bt[j].edb,
                                 "obs_yr" : bt[j].obs_yr,
-                                value : at[i].value / bt[j].value, // Divide the value
+                                value : at[i].value / (bt[j].value === '0' ? 1 : bt[j].value), // Divide the value if va if dividing by 0 make it 1
                                 section : bt[j].section + "" + bt[j].description + " over ", // Bit of a hack as description is inserted after section, this way both titles are added to table
                                 description : at[i].section + " " + at[i].description});
                 break; // can exit the loop
