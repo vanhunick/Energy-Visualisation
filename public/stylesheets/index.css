@@ -8,6 +8,24 @@ a {
   color: #00B7FF;
 }
 
+/*The selection for a table Section and category*/
+.title {
+  color: steelblue;
+}
+
+/*The selection for a table Sub category and description*/
+.subTitle {
+
+}
+
+
+
+/*Container that holds all content on the compare page*/
+#compare-container {
+  margin-left: 5%;
+  margin-right: 5%;
+}
+
 
 .full-table{
   /*background: #FF1A1A;*/
@@ -152,7 +170,7 @@ a {
 }
 
 .unit-text {
-  fill: darkgrey;
+  fill: steelblue;
   shape-rendering: crispEdges;
 }
 

@@ -1,9 +1,10 @@
-var margin = { top: 35, right: 20, bottom: 150, left: 50 },
+
+var margin = { top: 35, right: 85, bottom: 150, left: 50 }, // Right needs to be big to fit the edb text diagonally
     width = 1200 - margin.left - margin.right,
     height = 800 - margin.top - margin.bottom;
 
 var x0 = d3.scaleBand()
-    .rangeRound([0, width-45]) // -45 so rotated text stays on the screen
+    .rangeRound([0, width])
     .paddingInner(0.05);
 
 var x1 = d3.scaleBand()
@@ -12,8 +13,6 @@ var x1 = d3.scaleBand()
 var y = d3.scaleLinear()
     .rangeRound([height, 0]);
 
-// Purple
-//var z = d3.scaleOrdinal().range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
 
 // Blue
 var z = d3.scaleOrdinal()
@@ -104,13 +103,15 @@ function createdGroupedBarGraph(data,keys,title, yLabel, divID){
         .text(function(d) { return d; });
 
     // Add a title
-    svg.append("text")
-        .attr("x", (width / 2))
-        .attr("y", 0 - (margin.top / 2))
-        .attr("text-anchor", "middle")
-        .attr("class", "g-text")
-        .style("font-size", "24px")
-        .text(title);
+
+
+    //svg.append("text")
+    //    .attr("x", (width / 2))
+    //    .attr("y", 0 - (margin.top / 2))
+    //    .attr("text-anchor", "middle")
+    //    .attr("class", "g-text")
+    //    .style("font-size", "24px")
+    //    .text(title);
 }
 
 

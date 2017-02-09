@@ -10,7 +10,7 @@
 
 <% include ../views/templates/nav %>
 
-<div class="container-fluid" style="margin-left: 5%; margin-right: 5%;">
+<div class="container-fluid" id="compare-container" >
     <h1>Core Metrics</h1>
 
     <div class="row">
@@ -22,16 +22,18 @@
         </div>
     </div>
 
-<div id="compare-div"></div>
+    <!--Div that hold the rows of selections-->
+    <div id="compare-div"></div>
 
-<div class="row">
-    <div class="col-md-12" id="search-div">
-        <button type="button" class="btn btn-primary" id="search-btn-compare">Search</button>
-    </div>
+    <!--Holds the search buttons for selections and a div for errors-->
     <div class="row">
-        <div class="col-md-12" id="error-div"></div>
+        <div class="col-md-12" id="search-div">
+            <button type="button" class="btn btn-primary" id="search-btn-compare">Search</button>
+        </div>
+        <div class="row">
+            <div class="col-md-12" id="error-div"></div>
+        </div>
     </div>
-</div>
 
     <!--CPI Inputs-->
     <div class="row" style="margin-top: 2%;">
@@ -105,22 +107,25 @@
                                     <div class="col-md-2"></div>
                                     <div class="col-md-8 text-center ">
                                         <h2 class="table-title"><b>Selection A</b></h2>
+                                        <div id="title-a" class="text-left"></div>
                                         <table class="table table-nonfluid" id="tableA"></table>
                                     </div>
                                     <div class="col-md-2"></div>
                                 </div>
 
                                 <div class="row group-row" >
+                                    <div id="title-a-bar" class="text-center"></div>
                                     <div class="col-lg-12 text-center" id="grouped-bar-a" ></div>
                                 </div>
 
                                 <div class="row text-center whisk-row">
+                                    <div id="title-a-box" class="text-center"></div>
                                     <div class="col-lg-12 text-center" id="boxplotA-div"></div>
                                 </div>
                             </div>
                         </div>
 
-                        <!--Tab 2 Content-->
+                        <!--Table B Content-->
                         <div class="tab-pane fade" id="tab2default">
                             <!--Wrapped in a div for table B to easily hide it-->
                             <div id="full-table-b-div" class="full-table full">
@@ -128,21 +133,24 @@
                                     <div class="col-md-2"></div>
                                     <div class="col-md-8 text-center">
                                         <h2 class="table-title"><b>Selection B</b></h2>
+                                        <div id="title-b" class="text-left"></div>
                                         <table class="table" id="tableB"></table>
                                     </div>
                                     <div class="col-md-2"></div>
                                 </div>
                                 <div class="row group-row">
+                                    <div id="title-b-bar" class="text-center"></div>
                                     <div class="col-lg-12 text-center" id="grouped-bar-b"></div>
                                 </div>
 
                                 <div class="row text-center whisk-row">
+                                    <div id="title-b-box" class="text-center"></div>
                                     <div class="col-lg-12 text-center" id="boxplotB-div"></div>
                                 </div>
                             </div>
                         </div>
 
-                        <!--Tab 3 content-->
+                        <!--Table C content-->
                         <div class="tab-pane fade" id="tab3default">
                             <!--Wrapped in a div for table C to easily hide it-->
                             <div id="full-table-c-div" class="full-table full">
@@ -150,16 +158,19 @@
                                     <div class="col-md-2"></div>
                                     <div class="col-md-8 text-center">
                                         <h2 class="table-title"><b>Selection C</b></h2>
+                                        <div id="title-c" class="text-left"></div>
                                         <table class="table" id="tableC"></table>
                                     </div>
                                     <div class="col-md-2"></div>
                                 </div>
 
                                 <div class="row group-row">
+                                    <div id="title-c-bar" class="text-center"></div>
                                     <div class="col-lg-12 text-center" id="grouped-bar-c"></div>
                                 </div>
 
                                 <div class="row text-center whisk-row">
+                                    <div id="title-c-box" class="text-center"></div>
                                     <div class="col-lg-12 text-center" id="boxplotC-div"></div>
                                 </div>
                             </div>
@@ -173,22 +184,25 @@
                                     <div class="col-md-2"></div>
                                     <div class="col-md-8 text-center">
                                         <h2 class="table-title"><b>Selection D</b></h2>
+                                        <div id="title-d" class="text-left"></div>
                                         <table class="table" id="tableD"></table>
                                     </div>
                                     <div class="col-md-2"></div>
                                 </div>
 
                                 <div class="row group-row">
+                                    <div id="title-d-bar" class="text-center"></div>
                                     <div class="col-lg-12 text-center" id="grouped-bar-d"></div>
                                 </div>
 
                                 <div class="row whisk-row">
+                                    <div id="title-d-box" class="text-center"></div>
                                     <div class="col-lg-12 text-center" id="boxplotD-div"></div>
                                 </div>
                             </div>
                         </div>
 
-
+                        <!--Table AB content-->
                         <div class="tab-pane fade" id="tab5default">
                             <!--Wrapped in a div for table A/B to easily hide it-->
                             <div class="full-table full" id="full-table-ab-div">
@@ -196,16 +210,22 @@
                                     <div class="col-md-2"></div>
                                     <div class="col-md-8 text-center">
                                         <h2 class="table-title"><b>Table selection  A over  selection B</b></h2>
+                                        <div id="title-ab" class="text-left"></div>
                                         <table class="table" id="tableAB"></table>
                                     </div>
                                     <div class="col-md-2"></div>
                                 </div>
 
                                 <div class="row group-row">
+                                    <div id="title-ab-bar" class="text-center"></div>
                                     <div class="col-lg-12 text-center" id="grouped-bar-ab"></div>
                                 </div>
 
                                 <div class="row whisk-row">
+                                    <div class="col-sm-5 text-right" id="title-ab-box-a"></div>
+                                    <div class="col-sm-1 text-center" ><h4>Over</h4></div>
+                                    <div class="col-sm-5 text-left" id="title-ab-box-b"></div>
+                                    <!--<div id="title-ab-box" class="text-center"></div>-->
                                     <div class="col-lg-12 text-center" id="boxplotAB-div"></div>
                                 </div>
 
@@ -223,16 +243,20 @@
                                     <div class="col-md-2"></div>
                                     <div class="col-md-8 text-center">
                                         <h2 class="table-title"><b>Table selection  C over selection D</b></h2>
+                                        <div id="title-cd" class="text-left"></div>
                                         <table class="table" id="tableCD"></table>
                                     </div>
                                     <div class="col-md-2"></div>
                                 </div>
 
                                 <div class="row group-row">
+                                    <div id="title-cd-bar" class="text-center"></div>
                                     <div class="col-lg-12 text-center" id="grouped-bar-cd"></div>
                                 </div>
 
                                 <div class="row whisk-row">
+
+                                    <div id="title-cd-box" class="text-center"></div>
                                     <div class="col-lg-12 text-center" id="boxplotCD-div"></div>
                                 </div>
 

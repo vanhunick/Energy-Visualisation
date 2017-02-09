@@ -6,8 +6,6 @@ var whiskBoxWidth = 1;
 // Inspired by http://informationandvisualization.de/blog/box-plot
     d3.box = function() {
 
-
-
         var height = 1,
             duration = 0,
             domain = null,

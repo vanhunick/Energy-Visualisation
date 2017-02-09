@@ -166,12 +166,23 @@ function showAllTwo(tablesData, titles){
     // Check selection A
     if(aSelected){
         // Insert table A
+        var titleA = tablesData.tableA[0].section + ", " + tablesData.tableA[0].category;
+        var subTitleA = tablesData.tableA[0].sub_category + ", " + tablesData.tableA[0].description;
+        $('#title-a').append('<h2 class="title">'+titleA+'</h2>')
+                     .append('<h4 class="subTitle">'+subTitleA+'</h4>');
+
         insertTable(tablesData.tableA,'tableA');
 
         // Create and Insert the box plot for table A
+        $('#title-a-box').append('<h2 class="title">'+titleA+'</h2>')
+                         .append('<h4 class="subTitle">'+subTitleA+'</h4>');
+
         createBoxPlot(createDataForBoxPlot(tablesData.tableA), "#boxplotA-div", titles.aTitle, titles.aUnit);
 
         // Create and insert the grouped graph
+        $('#title-a-bar').append('<h2 class="title">'+titleA+'</h2>')
+                         .append('<h4 class="subTitle">'+subTitleA+'</h4>');
+
         var table1Data = createDataForGroupedGraph(tablesData.tableA);
         createdGroupedBarGraph(table1Data.data, table1Data.keys,titles.aTitle,titles.aUnit,"#grouped-bar-a");
         $('#full-table-a-div').show(); //Show the div
@@ -179,8 +190,21 @@ function showAllTwo(tablesData, titles){
 
     // Check selection B
     if(bSelected){
+        var titleB = tablesData.tableB[0].section + ", " + tablesData.tableB[0].category;
+        var subTitleB = tablesData.tableB[0].sub_category + ", " + tablesData.tableB[0].description;
+        $('#title-b').append('<h2 class="title">'+titleB+'</h2>')
+                     .append('<h4 class="subTitle">'+subTitleB+'</h4>');
+
         insertTable(tablesData.tableB,'tableB');
+
+        $('#title-b-box').append('<h2 class="title">'+titleB+'</h2>')
+                         .append('<h4 class="subTitle">'+subTitleB+'</h4>');
+
+
         createBoxPlot(createDataForBoxPlot(tablesData.tableB), "#boxplotB-div", titles.bTitle, titles.bUnit);
+
+        $('#title-b-bar').append('<h2 class="title">'+titleB+'</h2>')
+            .append('<h4 class="subTitle">'+subTitleB+'</h4>');
 
         var table2Data = createDataForGroupedGraph(tablesData.tableB);
         createdGroupedBarGraph(table2Data.data, table2Data.keys, titles.bTitle, titles.bUnit, "#grouped-bar-b");
@@ -189,9 +213,20 @@ function showAllTwo(tablesData, titles){
 
     // Check selection C
     if(cSelected){
+        var titleC = tablesData.tableC[0].section + ", " + tablesData.tableC[0].category;
+        var subTitleC = tablesData.tableC[0].sub_category + ", " + tablesData.tableC[0].description;
+        $('#title-c').append('<h2 class="title">'+titleC+'</h2>')
+            .append('<h4 class="subTitle">'+subTitleC+'</h4>');
+
         insertTable(tablesData.tableC,'tableC');
+
+        $('#title-c-box').append('<h2 class="title">'+titleC+'</h2>')
+            .append('<h4 class="subTitle">'+subTitleC+'</h4>');
         createBoxPlot(createDataForBoxPlot(tablesData.tableC), "#boxplotC-div", titles.cTitle, titles.cUnit);
 
+
+        $('#title-c-bar').append('<h2 class="title">'+titleC+'</h2>')
+            .append('<h4 class="subTitle">'+subTitleC+'</h4>');
         var table3Data = createDataForGroupedGraph(tablesData.tableC);
         createdGroupedBarGraph(table3Data.data, table3Data.keys,titles.cTitle, titles.cUnit, "#grouped-bar-c");
         $('#full-table-c-div').show();
@@ -199,9 +234,19 @@ function showAllTwo(tablesData, titles){
 
     // Check selection D
     if(dSelected){
+        var titleD = tablesData.tableD[0].section + ", " + tablesData.tableD[0].category;
+        var subTitleD = tablesData.tableD[0].sub_category + ", " + tablesData.tableD[0].description;
+        $('#title-d').append('<h2 class="title">'+titleD+'</h2>')
+            .append('<h4 class="subTitle">'+subTitleD+'</h4>');
+
         insertTable(tablesData.tableD,'tableD');
+
+        $('#title-d-box').append('<h2 class="title">'+titleD+'</h2>')
+            .append('<h4 class="subTitle">'+subTitleD+'</h4>');
         createBoxPlot(createDataForBoxPlot(tablesData.tableD), "#boxplotD-div", titles.dTitle, titles.dUnit);
 
+        $('#title-d-bar').append('<h2 class="title">'+titleD+'</h2>')
+            .append('<h4 class="subTitle">'+subTitleD+'</h4>');
         var table4Data = createDataForGroupedGraph(tablesData.tableD);
         createdGroupedBarGraph(table4Data.data, table4Data.keys, titles.dTitle, titles.dUnit, "#grouped-bar-d");
         $('#full-table-d-div').show();
@@ -209,8 +254,21 @@ function showAllTwo(tablesData, titles){
 
     // Check selection A and B
     if(aSelected && bSelected){
+        $('#title-ab').append('<h3 class="title">'+titleA+'</h3>')
+            .append('<h5 class="subTitle">'+subTitleA+'</h5>')
+            .append('<h5>Over</h5>')
+            .append('<h3 class="title">'+titleB+'</h3>')
+            .append('<h5 class="subTitle">'+subTitleB+'</h5>');
+
+
         var abData = insertTableOverTable(true,tablesData);
         insertTable(abData, "tableAB");
+
+        $('#title-ab-box-a').append('<h3 class="title">'+titleA+'</h3>')
+            .append('<h5 class="subTitle">'+subTitleA+'</h5>');
+
+        $('#title-ab-box-b').append('<h3 class="title">'+titleB+'</h3>')
+            .append('<h5 class="subTitle">'+subTitleB+'</h5>');
         createBoxPlot(createDataForBoxPlot(abData), "#boxplotAB-div", titles.aTitle + " Over " + titles.bTitle, titles.aUnit);
 
         var tableABData = createDataForGroupedGraph(abData);
@@ -275,7 +333,7 @@ function insertTable(tableRows,id){
     if(tableRows.length === 0)return; // No data so return
 
     // Add the title to the table
-    $("#"+id).append('<caption class="cap">' +tableRows[0].section + " " + tableRows[0].description + '</caption>'); // TODO wont work with ab cd
+    //$("#"+id).append('<caption class="cap">' +tableRows[0].section + " " + tableRows[0].description + '</caption>'); // TODO wont work with ab cd
 
     // Find the min and max year from the data
     var min = tableRows.reduce(function(prev, curr) {

@@ -3,9 +3,9 @@
  */
 var labels = false; // show the text labels beside individual boxplots?
 
-var boxMargin = {top: 30, right: 100, bottom: 70, left: 100};
-var  boxWidth = 1000 - margin.left - margin.right;
-var boxHeight = 800  - margin.top  - margin.bottom;
+var boxMargin = {top: 30, right: 50, bottom: 100, left: 100};
+var  boxWidth = 1000 - boxMargin.left - boxMargin.right;
+var boxHeight = 800  - boxMargin.top  - boxMargin.bottom;
 
 
 function createBoxPlot(dataObject, divID, title, unit){
@@ -15,10 +15,15 @@ function createBoxPlot(dataObject, divID, title, unit){
 
     var scatterData = dataObject.scatterData;
 
+    // the y-axis
+    var y = d3.scaleLinear()
+        .domain([min, max]).nice()
+        .range([boxHeight + boxMargin.top, 0 + boxMargin.top]);
+
     var chart = d3.box()
         .whiskers(iqr(1.5))
         .height(boxHeight)
-        .domain([min, max])
+        .domain(y.domain())
         .showLabels(labels);
 
     var svg = d3.select(divID).append("svg")
@@ -36,10 +41,7 @@ function createBoxPlot(dataObject, divID, title, unit){
 
     var xAxis = d3.axisBottom(x); // V4
 
-    // the y-axis
-    var y = d3.scaleLinear()
-        .domain([min, max])
-        .range([boxHeight + boxMargin.top, 0 + boxMargin.top]);
+
 
     var yAxis = d3.axisLeft(y); //V4
         //.scale(y)
@@ -75,7 +77,7 @@ function createBoxPlot(dataObject, divID, title, unit){
                 .attr("font-family", "sans-serif")
                 .attr("font-size", "18px")
                 .attr("font-weight", "bold")
-                .attr("fill", "#64B5F6")
+                .attr("fill", "black")
                 .text("" + d.edb);
 
         }).on("mouseout", function() {
@@ -83,14 +85,6 @@ function createBoxPlot(dataObject, divID, title, unit){
         d3.select("#tooltip").remove();
     });
 
-    // add a title
-    svg.append("text")
-        .attr("x", (boxWidth / 2))
-        .attr("y", 0 + (boxMargin.top / 2))
-        .attr("text-anchor", "middle")
-        .attr("class", "g-text")
-        .style("font-size", "24px")
-        .text(title);
 
     // draw y axis
     svg.append("g")
@@ -106,7 +100,7 @@ function createBoxPlot(dataObject, divID, title, unit){
     // draw x axis
     svg.append("g")
         .attr("class", "x axis")
-        .attr("transform", "translate(0," + (boxHeight  + boxMargin.top + 10) + ")")
+        .attr("transform", "translate(0," + (boxHeight + boxMargin.top  + 10) + ")")
         .call(xAxis)
         .append("text")             // text label for the x axis
         .attr("x", (boxWidth / 2) )
@@ -116,12 +110,21 @@ function createBoxPlot(dataObject, divID, title, unit){
         .style("font-size", "16px")
         .text("Quarter");
 
+    // Add the y axis unit
     svg.append("text")
         .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-        .attr("transform", "translate("+ -(vMargin.left+15) +","+( boxMargin.top*2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
+        .attr("transform", "translate("+ -(boxMargin.left/2) +","+( boxMargin.top*2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
         .style("font-size", "18px")
         .attr("class", "unit-text")
         .text(unit);
+
+    // Add year as the x-axis label
+    svg.append("text")
+        .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
+        .attr("transform", "translate("+ +(boxWidth/2) +","+( boxMargin.top + 40 + boxHeight)+")")  // text is drawn off the screen top left, move down and out and rotate
+        .style("font-size", "18px")
+        .attr("class", "unit-text")
+        .text("Year");
 }
 
 
