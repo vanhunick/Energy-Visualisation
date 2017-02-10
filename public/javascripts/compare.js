@@ -18,6 +18,8 @@ var dSelected = false;
 
 // Holds the rows for each table separately
 var dataTables;
+
+var copyOfDataTables;
 var titles;
 
 $(document).ready( function() {
@@ -57,6 +59,42 @@ function validateSearchParams(){
     return returnVal;
 }
 
+function copyDataTables(dataTables){
+    var tableAData = [];
+    var tableBData = [];
+    var tableCData = [];
+    var tableDData = [];
+
+    var a = dataTables.tableA;
+    for(var i = 0; i < a.length; i++){
+        tableAData.push({category :a[i].category, description : a[i].description,disc_yr: a[i].disc_yr,edb: a[i].edb,
+        fcast_yr: a[i].fcast_yr,network:a[i].network,note:a[i].note,obs_yr:a[i].obs_yr,p_key: a[i].p_key,sch_ref:a[i].sch_ref,
+        schedule:a[i].schedule,section:a[i].section,sub_category: a[i].sub_category,units:a[i].units,value:a[i].value})
+    }
+
+    var b = dataTables.tableB;
+    for(var i = 0; i < dataTables.tableB.length; i++){
+        tableBData.push({category :b[i].category, description : b[i].description,disc_yr: b[i].disc_yr,edb: b[i].edb,
+            fcast_yr: b[i].fcast_yr,network:b[i].network,note:b[i].note,obs_yr:b[i].obs_yr,p_key: b[i].p_key,sch_ref:b[i].sch_ref,
+            schedule:b[i].schedule,section:b[i].section,sub_category: b[i].sub_category,units:b[i].units,value:b[i].value})
+    }
+
+    var c = dataTables.tableC;
+    for(var i = 0; i < dataTables.tableC.length; i++){
+        tableCData.push({category :c[i].category, description : c[i].description,disc_yr: c[i].disc_yr,edb: c[i].edb,
+            fcast_yr: c[i].fcast_yr,network:c[i].network,note:c[i].note,obs_yr:c[i].obs_yr,p_key: c[i].p_key,sch_ref:c[i].sch_ref,
+            schedule:c[i].schedule,section:c[i].section,sub_category: c[i].sub_category,units:c[i].units,value:c[i].value})
+    }
+
+    var d = dataTables.tableD;
+    for(var i = 0; i < dataTables.tableD.length; i++){
+        tableDData.push({category :d[i].category, description : d[i].description,disc_yr: d[i].disc_yr,edb: d[i].edb,
+            fcast_yr: d[i].fcast_yr,network:d[i].network,note:d[i].note,obs_yr:d[i].obs_yr,p_key: d[i].p_key,sch_ref:d[i].sch_ref,
+            schedule:d[i].schedule,section:d[i].section,sub_category: d[i].sub_category,units:d[i].units,value:d[i].value})
+    }
+    return new DataTables(tableAData,tableBData,tableCData,tableDData);
+}
+
 // Uses the url to find what was searches and asks server for rows relating to that search
 function loadFromURL(urlSelections){
     loadInSections(true,urlSelections); // First load in the section rows
@@ -70,6 +108,11 @@ function loadFromURL(urlSelections){
         setSelectionsFromURL(urlSelections[3]);
 
         dataTables = filterRowsToTables(data.rows); // Filter the rows into their tables
+
+        // Create a copy of data tables
+        copyOfDataTables = copyDataTables(dataTables);
+
+
         if(dataTables.tableA.length > 0){
             aSelected = true;
         }
@@ -86,9 +129,9 @@ function loadFromURL(urlSelections){
             dSelected = true;
         }
 
-        titles = createTableTitles(dataTables);
+        titles = createTableTitles(copyOfDataTables); // Pass the copy through
 
-        showAllTwo(dataTables,titles); // Loads in tables bar graphs and box plots
+        showAll(copyOfDataTables,titles); // Loads in tables bar graphs and box plots
     });
 }
 
@@ -160,7 +203,7 @@ function createTableTitles(tablesData){
 }
 
 // Tables data contains 4 arrays with rows for each table
-function showAllTwo(tablesData, titles){
+function showAll(tablesData, titles){
     // For each selection we need to check if it has been selected
 
     // Check selection A
@@ -608,8 +651,14 @@ function createDataForBoxPlot(tableRows){
             sValues.push({year : year ,edb : edb, value : curValue});
         }
         entry[1] = values;
+
+
         data.push(entry);
     }
+    data.sort(function(a,b){
+        return a[0] - b[0];
+    });
+
     return {min : min, max : max, data : data, scatterData : sValues};
 }
 
@@ -983,37 +1032,75 @@ function cpiValidationSetup(){
 function applyCPI(units){
     if($('#cpi-form').valid()){
         if(noCPICells.length > 0){
-            console.log("Reverting");
             revertCPI(); // Reverts cpi before instead of saving values with cpi already applied
+            copyOfDataTables = copyDataTables(dataTables); // Use the original data and create a copy of it
         }
         // CPI for 2012 - 2016
         var cpiValues = [{year : 2012, value : +$('#Y2012').val()},{year : 2013, value : +$('#Y2013').val()},{year : 2014, value : +$('#Y2014').val()},{year : 2015, value : +$('#Y2015').val()},{year : 2016, value : +$('#Y2016').val()}];
 
 
         if(aSelected && titles.aUnit.includes('$')){
-            console.log("Apply to A");
             applyCPIToTable('#tableA',cpiValues);
+            applyCPIToTableRows(copyOfDataTables.tableA, cpiValues);
+
+            createBoxPlot(createDataForBoxPlot(copyOfDataTables.tableA), "#boxplotA-div", titles.aTitle, titles.aUnit);
+
+            var table1Data = createDataForGroupedGraph(copyOfDataTables.tableA);
+            createdGroupedBarGraph(table1Data.data, table1Data.keys,titles.aTitle,titles.aUnit,"#grouped-bar-a");
         }
 
         if(bSelected && titles.bUnit.includes('$')){
             applyCPIToTable('#tableB',cpiValues);
+            applyCPIToTableRows(copyOfDataTables.tableB, cpiValues);
         }
 
         if(cSelected && titles.cUnit.includes('$')){
             applyCPIToTable('#tableC',cpiValues);
+            applyCPIToTableRows(copyOfDataTables.tableC, cpiValues);
         }
 
         if(dSelected && titles.dUnit.includes('$')){
             applyCPIToTable('#tableD',cpiValues);
+            applyCPIToTableRows(copyOfDataTables.tableD, cpiValues);
         }
     }
+}
+
+
+// Applies the CPI to rows of data
+function applyCPIToTableRows(rows, cpiValues){
+    // Find the min and max year from the data
+    var minYear = rows.reduce(function(prev, curr) {
+        return prev.disc_yr < curr.disc_yr ? prev : curr;
+    }).obs_yr;
+
+    var maxYear = rows.reduce(function(prev, curr) {
+        return prev.disc_yr > curr.disc_yr ? prev : curr;
+    }).obs_yr;
+
+    for(var cur = minYear; cur <=maxYear; cur++){ // Go through each possible year
+        rows.forEach(function(elem, index){ // Grab every Row
+            var year = rows[index].obs_yr; // Grab the year of the cell by checking the class
+
+            var valueOfCell = rows[index].value;
+
+            for(var i = 0; i < cpiValues.length; i++){
+                if(cpiValues[i].year === cur){
+                    if(year <= cur){
+                        valueOfCell = valueOfCell * (1 + (cpiValues[i].value / 100));
+                    }
+                }
+            }
+            rows[index].value = valueOfCell; // CPI Applied value
+        });
+    }
+
 }
 
 var noCPICells = []; // Hold the original cpi values
 
 // Applies cpi values to the table with div id table
 function applyCPIToTable(table, cpiValues){
-
     $('.cell', table).each(function(){ // Backup the values from the cells
         noCPICells.push({id : $(this).attr('id'), value : $(this).text()});
     });
