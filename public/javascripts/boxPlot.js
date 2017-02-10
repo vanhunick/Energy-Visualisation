@@ -8,88 +8,169 @@ var  boxWidth = 1000 - boxMargin.left - boxMargin.right;
 var boxHeight = 800  - boxMargin.top  - boxMargin.bottom;
 
 
+// Encapsulate all properties of graph
+var plots = [];
+
+function BoxPlotData(x,y,xAxis,yAxis,svg,chart,created, id){
+    this.x = x;
+    this.y = y;
+    this.xAxis = xAxis;
+    this.yAxis = yAxis;
+    this.svg = svg;
+    this.chart = chart;
+    this.created = created;
+    this.id = id
+}
+
+
 function createBoxPlot(dataObject, divID, title, unit){
+    var boxPlotObjects = null;
     var data = dataObject.data;
     var min = dataObject.min;
     var max = dataObject.max;
-
     var scatterData = dataObject.scatterData;
 
+    // Find the plot that needs to be updated or created
+    plots.forEach(function (plot) {
+        if(plot.id === divID){
+            boxPlotObjects = plot;
+        }
+    });
+
+    // The graph has not been created yet
+    if(boxPlotObjects === null){
+        var x = d3.scaleBand().rangeRound([0, boxWidth]).padding(0.7,0.3);
+        boxPlotObjects = new BoxPlotData( x,null,null,null,null,null,false,divID);
+        plots.push(boxPlotObjects);
+    }
+
     // the y-axis
-    var y = d3.scaleLinear()
+    boxPlotObjects.y = d3.scaleLinear()
         .domain([min, max]).nice()
         .range([boxHeight + boxMargin.top, 0 + boxMargin.top]);
 
-    var chart = d3.box()
-        .whiskers(iqr(1.5))
-        .height(boxHeight)
-        .domain(y.domain())
-        .showLabels(labels);
 
-    var svg = d3.select(divID).append("svg")
-        .attr("width", boxWidth + boxMargin.left + boxMargin.right)
-        .attr("height", boxHeight + boxMargin.top + boxMargin.bottom)
-        .attr("class", "box")
-        .append("g")
-        .attr("transform", "translate(" + boxMargin.left + "," + boxMargin.top + ")");
-
-    var x = d3.scaleBand()
-        .rangeRound([0, boxWidth])
-        .padding(0.7,0.3);
-
-    x.domain( data.map(function(d) {return d[0] } ) );
-
-    var xAxis = d3.axisBottom(x); // V4
+    if(!boxPlotObjects.created){
+        boxPlotObjects.chart = d3.box()
+            .whiskers(iqr(1.5))
+            .height(boxHeight)
+            .domain(boxPlotObjects.y.domain())
+            .showLabels(labels);
+    }
 
 
 
-    var yAxis = d3.axisLeft(y); //V4
-        //.scale(y)
-        //.orient("left");
+    if(!boxPlotObjects.created){
+        boxPlotObjects.svg = d3.select(divID).append("svg")
+            .attr("width", boxWidth + boxMargin.left + boxMargin.right)
+            .attr("height", boxHeight + boxMargin.top + boxMargin.bottom)
+            .attr("class", "box")
+            .append("g")
+            .attr("transform", "translate(" + boxMargin.left + "," + boxMargin.top + ")");
+    }
+
+    boxPlotObjects.x.domain( data.map(function(d) {return d[0] } ) );
+
+
+    if(boxPlotObjects.created){
+        boxPlotObjects.svg.select(".xAis").call(boxPlotObjects.xAxis);
+        boxPlotObjects.svg.select(".yAis").call(boxPlotObjects.yAxis);
+    } else {
+        boxPlotObjects.xAxis = d3.axisBottom(boxPlotObjects.x);
+        boxPlotObjects.yAxis = d3.axisLeft(boxPlotObjects.y);
+    }
+
+    if(boxPlotObjects.created){
+        boxPlotObjects.svg.selectAll(".box")
+            .data(data)
+            .append("g")
+            .attr("transform", function(d) { return "translate(" +  boxPlotObjects.x(d[0])  + "," + boxMargin.top + ")"; } )
+            .call(boxPlotObjects.chart.width(boxPlotObjects.x.bandwidth())); //V4 Updated
+    } else {
+        boxPlotObjects.svg.selectAll(".box")
+            .data(data)
+            .enter().append("g")
+            .attr("transform", function(d) { return "translate(" +  boxPlotObjects.x(d[0])  + "," + boxMargin.top + ")"; } )
+            .call(boxPlotObjects.chart.width(boxPlotObjects.x.bandwidth())); //V4 Updated
+    }
 
     // draw the boxplots
-    svg.selectAll(".box")
+    boxPlotObjects.svg.selectAll(".box")
         .data(data)
         .enter().append("g")
-        .attr("transform", function(d) { return "translate(" +  x(d[0])  + "," + boxMargin.top + ")"; } )
-        .call(chart.width(x.bandwidth())); //V4 Updated
+        .attr("transform", function(d) { return "translate(" +  boxPlotObjects.x(d[0])  + "," + boxMargin.top + ")"; } )
+        .call(boxPlotObjects.chart.width(boxPlotObjects.x.bandwidth())); //V4 Updated
 
+
+
+
+
+    if(boxPlotObjects.created){
+        boxPlotObjects.svg.selectAll(".dot")
+            .data(scatterData)
+            .attr("r", 3.5)
+            .attr("cx", function(d) { return boxPlotObjects.x(d.year) + whiskBoxWidth/2; })
+            .attr("cy", function(d) { return boxPlotObjects.y(d.value); })
+            .on("mouseover", function(d) {
+
+                var xPosition = parseFloat(d3.select(this).attr("cx"));
+                var yPosition = parseFloat(d3.select(this).attr("cy") + 10);
+
+                //Create the tooltip label
+                boxPlotObjects.svg.append("text")
+                    .attr("id", "tooltip")
+                    .attr("x", xPosition)
+                    .attr("y", yPosition - 10)
+                    .attr("text-anchor", "middle")
+                    .attr("font-family", "sans-serif")
+                    .attr("font-size", "18px")
+                    .attr("font-weight", "bold")
+                    .attr("fill", "black")
+                    .text("" + d.edb);
+
+            }).on("mouseout", function() {
+            //Remove the tooltip
+            d3.select("#tooltip").remove();
+        });
+    } else {
+        boxPlotObjects.svg.selectAll(".dot")
+            .data(scatterData)
+            .enter().append("circle")
+            .attr("class", "dot")
+            .attr("r", 3.5)
+            .attr("cx", function(d) { return boxPlotObjects.x(d.year) + whiskBoxWidth/2; })
+            .attr("cy", function(d) { return boxPlotObjects.y(d.value); })
+            .on("mouseover", function(d) {
+
+                var xPosition = parseFloat(d3.select(this).attr("cx"));
+                var yPosition = parseFloat(d3.select(this).attr("cy") + 10);
+
+                //Create the tooltip label
+                boxPlotObjects.svg.append("text")
+                    .attr("id", "tooltip")
+                    .attr("x", xPosition)
+                    .attr("y", yPosition - 20)
+                    .attr("text-anchor", "middle")
+                    .attr("font-family", "sans-serif")
+                    .attr("font-size", "18px")
+                    .attr("font-weight", "bold")
+                    .attr("fill", "black")
+                    .text("" + d.edb);
+
+            }).on("mouseout", function() {
+            //Remove the tooltip
+            d3.select("#tooltip").remove();
+        });
+    }
 
     // Create the scatter plot over top
-    svg.selectAll(".dot")
-        .data(scatterData)
-        .enter().append("circle")
-        .attr("class", "dot")
-        .attr("r", 3.5)
-        .attr("cx", function(d) { return x(d.year) + whiskBoxWidth/2; })
-        .attr("cy", function(d) { return y(d.value); })
-        .on("mouseover", function(d) {
 
-            var xPosition = parseFloat(d3.select(this).attr("cx"));
-            var yPosition = parseFloat(d3.select(this).attr("cy") + 10);
-
-            //Create the tooltip label
-            svg.append("text")
-                .attr("id", "tooltip")
-                .attr("x", xPosition)
-                .attr("y", yPosition - 10)
-                .attr("text-anchor", "middle")
-                .attr("font-family", "sans-serif")
-                .attr("font-size", "18px")
-                .attr("font-weight", "bold")
-                .attr("fill", "black")
-                .text("" + d.edb);
-
-        }).on("mouseout", function() {
-        //Remove the tooltip
-        d3.select("#tooltip").remove();
-    });
 
 
     // draw y axis
-    svg.append("g")
+    boxPlotObjects.svg.append("g")
         .attr("class", "y axis")
-        .call(yAxis)
+        .call(boxPlotObjects.yAxis)
         .append("text")
         .attr("transform", "rotate(-90)")
         .attr("y", 6)
@@ -98,10 +179,10 @@ function createBoxPlot(dataObject, divID, title, unit){
         .style("font-size", "16px");
 
     // draw x axis
-    svg.append("g")
+    boxPlotObjects.svg.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + (boxHeight + boxMargin.top  + 10) + ")")
-        .call(xAxis)
+        .call(boxPlotObjects.xAxis)
         .append("text")             // text label for the x axis
         .attr("x", (boxWidth / 2) )
         .attr("y",  10 )
@@ -111,7 +192,7 @@ function createBoxPlot(dataObject, divID, title, unit){
         .text("Quarter");
 
     // Add the y axis unit
-    svg.append("text")
+    boxPlotObjects.svg.append("text")
         .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
         .attr("transform", "translate("+ -(boxMargin.left/2) +","+( boxMargin.top*2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
         .style("font-size", "18px")
@@ -119,12 +200,14 @@ function createBoxPlot(dataObject, divID, title, unit){
         .text(unit);
 
     // Add year as the x-axis label
-    svg.append("text")
+    boxPlotObjects.svg.append("text")
         .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
         .attr("transform", "translate("+ +(boxWidth/2) +","+( boxMargin.top + 40 + boxHeight)+")")  // text is drawn off the screen top left, move down and out and rotate
         .style("font-size", "18px")
         .attr("class", "unit-text")
         .text("Year");
+
+    boxPlotObjects.created = true;
 }
 
 
