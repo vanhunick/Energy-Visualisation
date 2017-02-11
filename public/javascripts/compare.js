@@ -18,9 +18,13 @@ var dSelected = false;
 
 // Holds the rows for each table separately
 var dataTables;
-
 var copyOfDataTables;
-var titles;
+
+var selectionDataArray;
+var selectionTablesArray;
+var combinedSelectionDataArray;
+
+
 
 $(document).ready( function() {
     // Highlight the selected link
@@ -92,9 +96,9 @@ function loadFromURL(urlSelections){
         dataTables = filterRowsToTables(data.rows); // Filter the rows into their tables
         copyOfDataTables = copyDataTables(dataTables); // Create a copy of data tables
 
-        var selectionDataArray = [];
-        var selectionTablesArray = [];
-        var combinedSelectionDataArray = [];
+        selectionDataArray = [];
+        selectionTablesArray = [];
+        combinedSelectionDataArray = [];
 
         // Contains if a table contains values
         var selectedRows = [copyOfDataTables.tableA.length > 0,copyOfDataTables.tableB.length > 0,copyOfDataTables.tableC.length > 0,copyOfDataTables.tableD.length > 0];
@@ -123,7 +127,7 @@ function loadFromURL(urlSelections){
         }
 
         showTables(selectionTablesArray); // Show the tables
-        showAllRegularGraphs(selectionDataArray); // Show all but combined and vector graphs
+        showAllRegularGraphs(selectionDataArray, true); // Show all but combined and vector graphs
         showAllCombinedGraphs(combinedSelectionDataArray); // Show the combined and vector graphs
     });
 }
@@ -166,21 +170,24 @@ function filterRowsToTables(rows){
 
 
 // Shows graphs for A,B,C,D
-function showAllRegularGraphs(selectionData){
+function showAllRegularGraphs(selectionData, addTitles){
     selectionData.forEach(function (selection) {
 
         // Create and insert the grouped bar graph
-        $('#title-'+selection.id+'-bar').append('<h2 class="title">'+selection.title+'</h2>')
-            .append('<h4 class="subTitle">'+selection.subTitle+'</h4>');
+        if(addTitles){
+            $('#title-'+selection.id+'-bar').append('<h2 class="title">'+selection.title+'</h2>')
+                .append('<h4 class="subTitle">'+selection.subTitle+'</h4>');
+        }
 
         var table1Data = createDataForGroupedGraph(selection.rows);
         createdGroupedBarGraph(table1Data.data, table1Data.keys,selection.unit,"#grouped-bar-"+selection.id);
 
         // Create and insert Box and whisker graph
-        $('#title-'+selection.id+'-box').append('<h2 class="title">'+selection.title+'</h2>')
-            .append('<h4 class="subTitle">'+selection.subTitle+'</h4>');
+        if(addTitles){
+            $('#title-'+selection.id+'-box').append('<h2 class="title">'+selection.title+'</h2>')
+                .append('<h4 class="subTitle">'+selection.subTitle+'</h4>');
+        }
 
-        console.log("#boxplot"+selection.id+"-div");
         createBoxPlot(createDataForBoxPlot(selection.rows), "#boxplot"+selection.id+"-div", selection.aUnit);
         $('#full-table-'+selection.id+'-div').show();
     });
@@ -806,30 +813,37 @@ function applyCPI(units){
         var cpiValues = [{year : 2012, value : +$('#Y2012').val()},{year : 2013, value : +$('#Y2013').val()},{year : 2014, value : +$('#Y2014').val()},{year : 2015, value : +$('#Y2015').val()},{year : 2016, value : +$('#Y2016').val()}];
 
 
-        if(aSelected && titles.aUnit.includes('$')){
-            applyCPIToTable('#tableA',cpiValues);
-            applyCPIToTableRows(copyOfDataTables.tableA, cpiValues);
+        // Applies CPI to all selected tables
+        selectionTablesArray.forEach(function (table) {
+            applyCPIToTable('#table'+table.id,cpiValues);
+        });
 
-            createBoxPlot(createDataForBoxPlot(copyOfDataTables.tableA), "#boxplotA-div", titles.aTitle, titles.aUnit);
 
-            var table1Data = createDataForGroupedGraph(copyOfDataTables.tableA);
-            createdGroupedBarGraph(table1Data.data, table1Data.keys,titles.aTitle,titles.aUnit,"#grouped-bar-a");
-        }
+        // Go through each table and check if is should have cpi applied if so modify the rows
+        selectionDataArray.forEach(function (table) {
+            if(table.unit.includes('$')){
+                applyCPIToTableRows(table.rows, cpiValues);
+            }
+        });
 
-        if(bSelected && titles.bUnit.includes('$')){
-            applyCPIToTable('#tableB',cpiValues);
-            applyCPIToTableRows(copyOfDataTables.tableB, cpiValues);
-        }
-
-        if(cSelected && titles.cUnit.includes('$')){
-            applyCPIToTable('#tableC',cpiValues);
-            applyCPIToTableRows(copyOfDataTables.tableC, cpiValues);
-        }
-
-        if(dSelected && titles.dUnit.includes('$')){
-            applyCPIToTable('#tableD',cpiValues);
-            applyCPIToTableRows(copyOfDataTables.tableD, cpiValues);
-        }
+        showAllRegularGraphs(selectionDataArray, false);
+        //
+        //
+        //
+        //if(bSelected && titles.bUnit.includes('$')){
+        //    applyCPIToTable('#tableB',cpiValues);
+        //    applyCPIToTableRows(copyOfDataTables.tableB, cpiValues);
+        //}
+        //
+        //if(cSelected && titles.cUnit.includes('$')){
+        //    applyCPIToTable('#tableC',cpiValues);
+        //    applyCPIToTableRows(copyOfDataTables.tableC, cpiValues);
+        //}
+        //
+        //if(dSelected && titles.dUnit.includes('$')){
+        //    applyCPIToTable('#tableD',cpiValues);
+        //    applyCPIToTableRows(copyOfDataTables.tableD, cpiValues);
+        //}
     }
 }
 
