@@ -269,14 +269,29 @@ function insertTable(tableRows,id){
     // Add the title to the table
     //$("#"+id).append('<caption class="cap">' +tableRows[0].section + " " + tableRows[0].description + '</caption>'); // TODO wont work with ab cd
 
-    // Find the min and max year from the data
     var min = tableRows.reduce(function(prev, curr) {
-        return prev.disc_yr < curr.disc_yr ? prev : curr;
+        return prev.obs_yr < curr.obs_yr ? prev : curr;
     }).obs_yr;
 
     var max = tableRows.reduce(function(prev, curr) {
-        return prev.disc_yr > curr.disc_yr ? prev : curr;
+        return prev.obs_yr > curr.obs_yr ? prev : curr;
     }).obs_yr; //TODO this line might need to be disc_yr
+
+    console.log(min + " " + max);
+
+    // Find the min and max year from the data
+    //min = tableRows.reduce(function(prev, curr) {
+    //    return prev.disc_yr < curr.disc_yr ? prev : curr;
+    //}).obs_yr;
+    //
+    //max = tableRows.reduce(function(prev, curr) {
+    //    return prev.disc_yr > curr.disc_yr ? prev : curr;
+    //}).obs_yr; //TODO this line might need to be disc_yr
+    //
+    //
+
+
+    console.log(min + " " + max);
 
     // Create cells for each of the years to use as header
     var years = "";
@@ -288,6 +303,9 @@ function insertTable(tableRows,id){
 
     // An array of companies already processed
     var done = [];
+    // Year done for edb
+    var yearDone = [];
+
     var cellCount = 0;
     var cellValues = [];
     var observerd = true;
@@ -306,9 +324,11 @@ function insertTable(tableRows,id){
             for(var cur = min; cur <=max; cur++){
                 // Iterate through all rows finding ones with the current edb
                 for(var j = 0; j < tableRows.length; j++){
+                    //if(!yearDone.includes())
 
                     // Check it matches edb and year inserting into
-                    if(tableRows[j].edb === tableRows[i].edb && tableRows[j].disc_yr === cur){
+                    if(tableRows[j].edb === tableRows[i].edb && tableRows[j].obs_yr === cur && (!yearDone.includes(tableRows[j].obs_yr))){
+                        yearDone.push(tableRows[j].obs_yr);
                         row += "<th class='cell "+cur+"' id='t"+id+""+cellCount+"'>" + tableRows[j].value + "</th>";
 
                         // Save the value and the id of the cell to display percentage
@@ -316,6 +336,7 @@ function insertTable(tableRows,id){
                         cellCount++;
                     }
                 }
+                yearDone = [];
             }
 
             $("#"+id).append(row + '</tr>');
