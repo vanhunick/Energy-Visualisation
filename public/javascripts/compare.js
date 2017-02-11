@@ -173,6 +173,21 @@ function filterRowsToTables(rows){
 function showAllRegularGraphs(selectionData, addTitles){
     selectionData.forEach(function (selection) {
 
+        var negative;
+        selection.rows.forEach(function (elem) {
+            if(elem.value < 0){
+                negative = true;
+                return;
+            }
+        })
+
+        if(negative){
+            console.log("Returning");
+            $('#title-'+selection.id+'-bar').append('<h3 class="title" style="color:red;">Cannot create bar graph with negative numbers</h3>'); // Display error
+            $('#full-table-'+selection.id+'-div').show();
+            return;
+        }
+
         // Create and insert the grouped bar graph
         if(addTitles){
             $('#title-'+selection.id+'-bar').append('<h2 class="title">'+selection.title+'</h2>')
