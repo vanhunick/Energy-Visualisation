@@ -269,6 +269,17 @@ function insertTable(tableRows,id){
     // Add the title to the table
     //$("#"+id).append('<caption class="cap">' +tableRows[0].section + " " + tableRows[0].description + '</caption>'); // TODO wont work with ab cd
 
+    var availableObsYears = [];
+
+    tableRows.forEach(function (elem) {
+        if(!availableObsYears.includes(elem.obs_yr))availableObsYears.push(elem.obs_yr);
+    });
+    availableObsYears.sort(function (a, b) {
+        return +a - +b;
+    });
+
+    console.log(availableObsYears);
+
     var min = tableRows.reduce(function(prev, curr) {
         return prev.obs_yr < curr.obs_yr ? prev : curr;
     }).obs_yr;
@@ -295,9 +306,13 @@ function insertTable(tableRows,id){
 
     // Create cells for each of the years to use as header
     var years = "";
-    for(var i = min; i <= max; i++){
-        years += "<th>" + i + "</th>";
-    }
+    //for(var i = min; i <= max; i++){
+    //    years += "<th>" + i + "</th>";
+    //}
+
+    availableObsYears.forEach(function (year) {
+       years += "<th>" + year + "</th>";
+    });
 
     $("#"+id).append('<tr id="head-row" class="table-row table-head"> <th>EDB</th>'+ years + '</tr>');
 
@@ -321,15 +336,15 @@ function insertTable(tableRows,id){
             row += "<th class='edb-cell'>" + tableRows[i].edb + "</th>";
 
 
-            for(var cur = min; cur <=max; cur++){
+            for(var k = 0; k < availableObsYears.length; k++){
                 // Iterate through all rows finding ones with the current edb
                 for(var j = 0; j < tableRows.length; j++){
                     //if(!yearDone.includes())
 
                     // Check it matches edb and year inserting into
-                    if(tableRows[j].edb === tableRows[i].edb && tableRows[j].obs_yr === cur && (!yearDone.includes(tableRows[j].obs_yr))){
+                    if(tableRows[j].edb === tableRows[i].edb && tableRows[j].obs_yr === availableObsYears[k] && (!yearDone.includes(tableRows[j].obs_yr))){
                         yearDone.push(tableRows[j].obs_yr);
-                        row += "<th class='cell "+cur+"' id='t"+id+""+cellCount+"'>" + tableRows[j].value + "</th>";
+                        row += "<th class='cell "+availableObsYears[k]+"' id='t"+id+""+cellCount+"'>" + tableRows[j].value + "</th>";
 
                         // Save the value and the id of the cell to display percentage
                         cellValues.push({ id : "#t"+id+""+cellCount, value : tableRows[j].value });
