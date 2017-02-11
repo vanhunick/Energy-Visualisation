@@ -296,8 +296,15 @@
 <script src="/javascripts/vectorGraph.js"></script>
 
 <script>
-    if('<%- selections %>' !== ""){
-        var s =   JSON.parse('<%- selections %>');
+    // TODO FIND PROPER SOLUTION TO REMOVING AND ADDING BACK IN " ' "
+    var p = <%- JSON.stringify(selections) %>;
+    var s = JSON.parse(p);
+    <!--var s =  <%= selections %>;-->
+    console.log(s);
+
+    //'<%- selections %>'
+    if(s  !== ""){
+        <!--var s =   JSON.parse('<%- selections %>');-->
         if(s.length > 0){
             loadFromURL(s);
         }

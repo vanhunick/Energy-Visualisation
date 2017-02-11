@@ -88,7 +88,7 @@ function loadFromURL(urlSelections){
     lastSearch = new Selection(urlSelections[0],urlSelections[1],urlSelections[2],urlSelections[3]); //TODO copy values
     // Send array of selected sections to server and the company
     $.post("/compare/search",{company : selectedCompany, selections : JSON.stringify(urlSelections)}, function(data){
-        setSelectionsFromURL(urlSelections[0]); //TODO check for null to be more efficient
+        setSelectionsFromURL(urlSelections[0]);
         setSelectionsFromURL(urlSelections[1]);
         setSelectionsFromURL(urlSelections[2]);
         setSelectionsFromURL(urlSelections[3]);
@@ -311,16 +311,12 @@ function insertTable(tableRows,id){
             //});
         }
     }
-    applyGradientCSS(cellValues);
+    var percent = tableRows[0].units.includes('%') || tableRows[0].units.includes('portion');
+    applyGradientCSS(cellValues, percent);
 }
 
 
-function applyGradientCSS(cellValues){
-    var percent = false;
-    //if(tableRows[0].units.includes("%")) { //TODO check if this is the right way to identify percentage
-    //    percent = true;
-    //}
-    // or proportion
+function applyGradientCSS(cellValues, percent){
 
     var maxCellValue = -Infinity;
     cellValues.forEach(function(elem){

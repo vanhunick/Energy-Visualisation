@@ -53,7 +53,14 @@ function search(req, res){
     selections.push(row2);
     selections.push(row3);
 
-    res.render('compare', {selections : JSON.stringify(selections)}); // Send the search results and render index
+    res.render('compare', {selections : JSON.stringify(selections).replace(/\\n/g, "\\n")
+        .replace(/\\'/g, "\\'")
+        .replace(/\\"/g, '\\"')
+        .replace(/\\&/g, "\\&")
+        .replace(/\\r/g, "\\r")
+        .replace(/\\t/g, "\\t")
+        .replace(/\\b/g, "\\b")
+        .replace(/\\f/g, "\\f")}); // Send the search results and render index
 
     return;
 
