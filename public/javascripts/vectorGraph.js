@@ -23,7 +23,7 @@ function updateVectorGraph(vecData, lines){
 
 }
 
-function createVectorGraph(data,xLabel, yLabel, title, divID){
+function createVectorGraph(data,xLabel, yLabel, divID){
 
     var vectorGraph = null;
 

@@ -61,6 +61,7 @@ function createBoxPlot(dataObject, divID, title, unit){
 
 
     if(!boxPlotObjects.created){
+        console.log(divID);
         boxPlotObjects.svg = d3.select(divID).append("svg")
             .attr("width", boxWidth + boxMargin.left + boxMargin.right)
             .attr("height", boxHeight + boxMargin.top + boxMargin.bottom)

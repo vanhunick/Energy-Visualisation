@@ -22,7 +22,7 @@ function GroupedBarData(x0, x1,y,yAxis,svg,id){
 var z = d3.scaleOrdinal()
     .range(["#BBDEFB", "#64B5F6", "#1976D2", "#1565C0", "#0D47A1", "#d0743c", "#ff8c00"]);
 
-function createdGroupedBarGraph(data,keys,title, yLabel, divID){
+function createdGroupedBarGraph(data,keys,yLabel, divID){
     var curBarGraph = null;
 
     barGraphs.forEach(function (elem) {
