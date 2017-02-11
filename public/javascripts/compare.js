@@ -128,7 +128,7 @@ function loadFromURL(urlSelections){
 
         showTables(selectionTablesArray); // Show the tables
         showAllRegularGraphs(selectionDataArray, true); // Show all but combined and vector graphs
-        showAllCombinedGraphs(combinedSelectionDataArray); // Show the combined and vector graphs
+        showAllCombinedGraphs(combinedSelectionDataArray, true); // Show the combined and vector graphs
     });
 }
 
@@ -194,18 +194,24 @@ function showAllRegularGraphs(selectionData, addTitles){
 }
 
 // Shows graphs for A/B, C/D
-function showAllCombinedGraphs(selectionData){
+function showAllCombinedGraphs(selectionData, showTitle){
     selectionData.forEach(function(selection){
         // Insert Bar graph
-        $('#title-'+selection.id+'-bar').append('<h3 class="combined-title">'+selection.title1+' <span class="over">over</span>,'+selection.title2+'</h3>');
+        if(showTitle){
+            $('#title-'+selection.id+'-bar').append('<h3 class="combined-title">'+selection.title1+' <span class="over">over</span>,'+selection.title2+'</h3>');
+        }
         var tableABData = createDataForGroupedGraph(selection.rows);
         createdGroupedBarGraph(tableABData.data, tableABData.keys, selection.unit1 + " / " + selection.unit2, "#grouped-bar-"+selection.id);
 
         // Create and insert combined box plot
-        $('#title-'+selection.id+'-box').append('<h3 class="combined-title">'+selection.title1+' <span class="over">over</span>,'+selection.title2+'</h3>');
+        if(showTitle){
+            $('#title-'+selection.id+'-box').append('<h3 class="combined-title">'+selection.title1+' <span class="over">over</span>,'+selection.title2+'</h3>');
+        }
         createBoxPlot(createDataForBoxPlot(selection.rows), "#boxplot"+selection.id+"-div", selection.unit1 + " / " + selection.unit2);
 
-        $('#title-'+selection.id+'-vector').append('<h3 class="combined-title">'+selection.title1+' <span class="over">over</span>,'+selection.title2+'</h3>');
+        if(showTitle){
+            $('#title-'+selection.id+'-vector').append('<h3 class="combined-title">'+selection.title1+' <span class="over">over</span>,'+selection.title2+'</h3>');
+        }
         createVectorGraph(createDataForVectorGraph(selection.table1Rows,selection.table2Rows),selection.unit1,selection.unit2,"#vector-graph-div-"+selection.id);
         $('#full-table-'+selection.id+'-div').show();
     });
@@ -827,6 +833,23 @@ function applyCPI(units){
         });
 
         showAllRegularGraphs(selectionDataArray, false);
+
+        //TODO check it works
+        if(aSelected && bSelected){
+            var abRows = combineTables(aRows,bRows);
+            combinedSelectionDataArray[0].rows = abRows;
+
+
+        }
+
+        if(cSelected && dSelected){
+            var cdRows = combineTables(dataTables.aRows,dataTables.bRows);
+            combinedSelectionDataArray[1].rows = cdRows;
+        }
+
+        showAllCombinedGraphs(combinedSelectionDataArray, false);
+
+
         //
         //
         //
