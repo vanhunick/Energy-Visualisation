@@ -750,7 +750,6 @@ function addSection(numberSections){
                     }
                     // Add sub section options
                     for(var i = 0; i < data.subCategories.length; i++){
-                        //if(data.categories[i] === null)continue;
                         $('#subsection-select'+idNumb).append('<option>' + data.subCategories[i] + '</option>');
                     }
                     $(".selectpicker").selectpicker('refresh');
@@ -760,6 +759,7 @@ function addSection(numberSections){
 
             // Add the options to the drop down
             for(var i = 0; i < data.categories.length; i++){
+                if(data.categories[i] === null)continue;
                 $('#category-select'+idNumb).append('<option>' + data.categories[i] + '</option>');
             }
             // Refresh all drop downs
