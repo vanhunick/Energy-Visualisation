@@ -95,6 +95,7 @@ function createVectorGraph(data,xLabel, yLabel, divID){
 
 
     vectorGraph.svg.append("g")
+        .attr("class","xAxis")
         .attr("transform", "translate(0," + vHeight + ")")
         .attr("stroke", "#black")
         .call(vectorGraph.xAxis.scale(vectorGraph.x));
