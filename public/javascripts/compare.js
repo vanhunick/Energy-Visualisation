@@ -266,9 +266,6 @@ function insertTable(tableRows,id){
     });
     if(tableRows.length === 0)return; // No data so return
 
-    // Add the title to the table
-    //$("#"+id).append('<caption class="cap">' +tableRows[0].section + " " + tableRows[0].description + '</caption>'); // TODO wont work with ab cd
-
     var availableObsYears = [];
 
     tableRows.forEach(function (elem) {
@@ -531,6 +528,16 @@ function createDataForBoxPlot(tableRows){
 
 // Creates the data for the bar graphs from the rows used in D3
 function createDataForGroupedGraph(rows){
+    var availableObsYears = [];
+
+    rows.forEach(function (elem) {
+        if(!availableObsYears.includes(elem.obs_yr))availableObsYears.push(elem.obs_yr);
+    });
+    availableObsYears.sort(function (a, b) {
+        return +a - +b;
+    });
+
+
     var data = [];
     var edbDone = [];
 
@@ -561,10 +568,10 @@ function createDataForGroupedGraph(rows){
         }
     }
 
-    var keys = [];
-    for(var i = min; i <= max; i++){
-        keys.push(""+i);
-    }
+    var keys = availableObsYears;
+    //for(var i = 0; i <= max; i++){
+    //    keys.push(""+availableObsYears[i]);
+    //}
     return {data : data, keys : keys};
 }
 
