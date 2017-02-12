@@ -4,6 +4,8 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var postgres = require('pg');
+
 
 var SQLProtection = require('./routes/SQLProtection');
 
@@ -12,10 +14,16 @@ var sections = require('./routes/sections');
 var compare = require('./routes/compare');
 var core = require('./routes/core');
 
+var auth = require('http-auth');
+var basic = auth.basic({
+    realm: "Private Area",
+    file: __dirname + "/htpasswd",
+});
 
-var postgres = require('pg');
 
 var app = express();
+
+app.use(auth.connect(basic));
 
 global.databaseURI = "postgres://Admin:admin@localhost:5432/Energy";
 
@@ -43,7 +51,7 @@ SQLProtection.createValidSelectionData();
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
   err.status = 404;
-  res.render('404');
+
   next(err);
 });
 
@@ -55,7 +63,11 @@ app.use(function(err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
-  res.render('error');
+  if(err.status === 404){
+    res.render('404');
+  } else {
+      res.render('error');
+  }
 });
 
 module.exports = app;
