@@ -50,7 +50,7 @@ function validateSearchParams(){
             returnVal = false; // There is a possible sub category so it has to be chosen from
         }
 
-        if(!(elem.category === "" && elem.section !== "" && elem.subCategory!== "" && elem.description !== "")){ // Special case where  category is null
+        //if(!(elem.category === "" && elem.section !== "" && elem.subCategory!== "" && elem.description !== "")){ // Special case where  category is null
             // Check if one of the selections is empty
             if(elem.section === "" || elem.category === "" || elem.description === ""){
                 // Now check if one of the selections is not empty
@@ -59,7 +59,7 @@ function validateSearchParams(){
                     returnVal = false; // A row cannot have one item selected and another empty
                 }
             }
-        }
+        //}
     });
     if(returnVal)$('#error-div').html('');
     return returnVal;
@@ -90,7 +90,6 @@ function loadFromURL(urlSelections){
     lastSearch = new Selection(urlSelections[0],urlSelections[1],urlSelections[2],urlSelections[3]); //TODO copy values
     // Send array of selected sections to server and the company
     $.post("/compare/search",{company : selectedCompany, selections : JSON.stringify(urlSelections)}, function(data){
-        console.log(data);
         setSelectionsFromURL(urlSelections[0]);
         setSelectionsFromURL(urlSelections[1]);
         setSelectionsFromURL(urlSelections[2]);
@@ -135,6 +134,11 @@ function loadFromURL(urlSelections){
     });
 }
 
+
+function showCombinedVector(){
+
+}
+
 function showTables(selectionTablesArray){
     selectionTablesArray.forEach(function (tableData) {
         $('#title-'+tableData.id).append('<h2 class="title">'+tableData.title+'</h2>')
@@ -159,12 +163,10 @@ function filterRowsToTables(rows){
 
     // Create combined tables if possible
     if(aRows.length > 0 && bRows.length > 0){
-        console.log("A");
         var abRows = combineTables(aRows,bRows);
     }
 
-    if(cRows.length > 0 && dRows > 0){
-        console.log("B");
+    if(cRows.length > 0 && dRows.length > 0){
         var cdRows = combineTables(cRows,dRows);
     }
     return new DataTables(aRows,bRows,cRows,dRows, abRows, cdRows);
@@ -185,7 +187,6 @@ function showAllRegularGraphs(selectionData, addTitles){
         })
 
         if(negative){
-            console.log("Returning");
             $('#title-'+selection.id+'-bar').append('<h3 class="title" style="color:red;">Cannot create bar graph with negative numbers</h3>'); // Display error
             $('#full-table-'+selection.id+'-div').show();
             return;
@@ -233,6 +234,15 @@ function showAllCombinedGraphs(selectionData, showTitle){
         createVectorGraph(createDataForVectorGraph(selection.table1Rows,selection.table2Rows),selection.unit1,selection.unit2,"#vector-graph-div-"+selection.id);
         $('#full-table-'+selection.id+'-div').show();
     });
+
+    if(selectionData.length === 2){
+        $('#title-abcd-vec').append('<h4 class="combined-title">'+selectionData[0].title1+' / '+selectionData[0].title2+'</h4>')
+            .append('<h4>Over</h4>')
+            .append('<h4 class="combined-title">'+selectionData[1].title1+' / '+selectionData[1].title2+'</h4>');
+
+        createVectorGraph(createDataForVectorGraph(selectionData[0].rows,selectionData[1].rows),selectionData[0].unit1 + " / " + selectionData[1].unit1,selectionData[0].unit2 + " / " + selectionData[1].unit2,"#vector-graph-div-abcd");
+        $('#vector-full-div-abcd').show();
+    }
 }
 
 // Combine two tables and return the results
@@ -278,8 +288,6 @@ function insertTable(tableRows,id){
         return +a - +b;
     });
 
-    console.log(availableObsYears);
-
     var min = tableRows.reduce(function(prev, curr) {
         return prev.obs_yr < curr.obs_yr ? prev : curr;
     }).obs_yr;
@@ -288,7 +296,6 @@ function insertTable(tableRows,id){
         return prev.obs_yr > curr.obs_yr ? prev : curr;
     }).obs_yr; //TODO this line might need to be disc_yr
 
-    console.log(min + " " + max);
 
     // Find the min and max year from the data
     //min = tableRows.reduce(function(prev, curr) {
@@ -301,8 +308,6 @@ function insertTable(tableRows,id){
     //
     //
 
-
-    console.log(min + " " + max);
 
     // Create cells for each of the years to use as header
     var years = "";
@@ -362,7 +367,13 @@ function insertTable(tableRows,id){
             //});
         }
     }
-    var percent = tableRows[0].units.includes('%') || tableRows[0].units.includes('portion');
+
+    var percent = true;
+    if(id === "tableab" || "tablcd"){
+        percent = false;
+    } else {
+        percent = tableRows[0].units.includes('%') || tableRows[0].units.includes('portion');
+    }
     applyGradientCSS(cellValues, percent);
 }
 
@@ -545,13 +556,13 @@ function createDataForGroupedGraph(rows){
     var edbDone = [];
 
     // Find the min and max year from the data
-    var min = rows.reduce(function(prev, curr) {
-        return prev.disc_yr < curr.disc_yr ? prev : curr;
-    }).obs_yr;
-
-    var max = rows.reduce(function(prev, curr) {
-        return prev.disc_yr > curr.disc_yr ? prev : curr;
-    }).obs_yr;
+    //var min = rows.reduce(function(prev, curr) {
+    //    return prev.disc_yr < curr.disc_yr ? prev : curr;
+    //}).obs_yr;
+    //
+    //var max = rows.reduce(function(prev, curr) {
+    //    return prev.disc_yr > curr.disc_yr ? prev : curr;
+    //}).obs_yr;
 
     for(var i = 0; i < rows.length; i++){
         if(!edbDone.includes(rows[i].edb)){
@@ -724,37 +735,37 @@ function addSection(numberSections){
             } else { // The one special case where category is null
 
             }
-            if(data.categories.length > 0  &&  data.categories[0] === null){ // Special case where category is null
-                console.log("Finding suvb");
-                // Find all sub categories for the currently selected category
-                $.post("/sections/sc",{section : selections[idNumb].section, category : ""}, function(data){
-                    console.log(data);
-                    if(data.subCategories.length > 0  &&  data.subCategories[0] !== null){
-                        $('#subsection-select'+idNumb).html(''); // Empty temp options
-                        validOptions[idNumb] = true; // There are options for this row and sub category
-                    } else { //TODO could split into individual functions
-                        // Find all descriptions for the currently selected sub category
-                        $.post("/sections/desc",{category : selections[idNumb].category,section : selections[idNumb].section, subCategory : ""}, function(data){
-                            if(data.descriptions.length > 0 &&  data.descriptions[0] !== null){
-                                $('#description-select'+idNumb).html(''); // Empty temp options
-                            } else {
-                                return;
-                            }
-                            // Add sub section options
-                            for(var i = 0; i < data.descriptions.length; i++){
-                                $('#description-select'+idNumb).append('<option>' + data.descriptions[i] + '</option>');
-                            }
-                            $(".selectpicker").selectpicker('refresh');
-                        });
-                        return;
-                    }
-                    // Add sub section options
-                    for(var i = 0; i < data.subCategories.length; i++){
-                        $('#subsection-select'+idNumb).append('<option>' + data.subCategories[i] + '</option>');
-                    }
-                    $(".selectpicker").selectpicker('refresh');
-                });
-            }
+            //if(data.categories.length > 0  &&  data.categories[0] === null){ // Special case where category is null
+            //    console.log("Finding suvb");
+            //    // Find all sub categories for the currently selected category
+            //    $.post("/sections/sc",{section : selections[idNumb].section, category : ""}, function(data){
+            //        console.log(data);
+            //        if(data.subCategories.length > 0  &&  data.subCategories[0] !== null){
+            //            $('#subsection-select'+idNumb).html(''); // Empty temp options
+            //            validOptions[idNumb] = true; // There are options for this row and sub category
+            //        } else { //TODO could split into individual functions
+            //            // Find all descriptions for the currently selected sub category
+            //            $.post("/sections/desc",{category : selections[idNumb].category,section : selections[idNumb].section, subCategory : ""}, function(data){
+            //                if(data.descriptions.length > 0 &&  data.descriptions[0] !== null){
+            //                    $('#description-select'+idNumb).html(''); // Empty temp options
+            //                } else {
+            //                    return;
+            //                }
+            //                // Add sub section options
+            //                for(var i = 0; i < data.descriptions.length; i++){
+            //                    $('#description-select'+idNumb).append('<option>' + data.descriptions[i] + '</option>');
+            //                }
+            //                $(".selectpicker").selectpicker('refresh');
+            //            });
+            //            return;
+            //        }
+            //        // Add sub section options
+            //        for(var i = 0; i < data.subCategories.length; i++){
+            //            $('#subsection-select'+idNumb).append('<option>' + data.subCategories[i] + '</option>');
+            //        }
+            //        $(".selectpicker").selectpicker('refresh');
+            //    });
+            //}
 
 
             // Add the options to the drop down

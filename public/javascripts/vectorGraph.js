@@ -19,16 +19,11 @@ function VectorGraphData(id){
     this.svg = null;
 }
 
-function updateVectorGraph(vecData, lines){
-
-}
-
 function createVectorGraph(data,xLabel, yLabel, divID){
-
     var vectorGraph = null;
 
     vectorGraphs.forEach(function (elem) {
-        if (elem.id === vectorGraph.id){vectorGraph = elem;}
+        if (elem.id === divID){vectorGraph = elem;}
     });
 
 
@@ -157,7 +152,7 @@ function createVectorGraph(data,xLabel, yLabel, divID){
                 yPosition = yPosition - 10;
 
                 //Create the tooltip label
-                svg.append("text")
+                vectorGraph.svg.append("text")
                     .attr("id", "tooltip")
                     .attr("x", xPosition)
                     .attr("y", yPosition)
