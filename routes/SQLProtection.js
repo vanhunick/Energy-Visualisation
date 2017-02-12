@@ -96,6 +96,7 @@ function getValidCategories(){
         .distinct().toString();
 
     var validRows = [];
+    validRows.push("");
 
     pg.connect(global.databaseURI, function (err, client, done) {
         done(); // closes the connection once result has been returned

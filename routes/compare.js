@@ -53,14 +53,8 @@ function search(req, res){
     selections.push(row2);
     selections.push(row3);
 
-    res.render('compare', {selections : JSON.stringify(selections).replace(/\\n/g, "\\n")
-        .replace(/\\'/g, "\\'")
-        .replace(/\\"/g, '\\"')
-        .replace(/\\&/g, "\\&")
-        .replace(/\\r/g, "\\r")
-        .replace(/\\t/g, "\\t")
-        .replace(/\\b/g, "\\b")
-        .replace(/\\f/g, "\\f")}); // Send the search results and render index
+    //res.render('compare', {selections : JSON.stringify(selections)}); // Send the search results and render index
+    res.render('compare', {selections : JSON.stringify(selections)}); // Send the search results and render index
 
     return;
 
@@ -76,7 +70,6 @@ function search(req, res){
             console.error(err);
             return;
         }
-
 
         client.query(queryString, function(error, result){
             done();
@@ -121,7 +114,11 @@ router.post('/search', function(req, res, next) {
         if(i === 0){ //Row 0 has to have data
             // There is always a section and a category
             expr.and("(section = '" + selections[i].section + "'")
-                .and("category = '" + selections[i].category + "'");
+
+            if(selections[i].category != ""){
+                expr.and("category = '" + selections[i].category + "'");
+            }
+
 
             // Check is the sub category exists
             if(selections[i].subCategory !== ""){

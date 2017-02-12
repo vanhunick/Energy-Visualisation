@@ -71,8 +71,13 @@ router.post('/sc', function(req, res, next) {
     var queryString = squel.select()
         .from("large_strata_energy")
         .field("sub_category").distinct()
-        .where("section = '"+req.body.section+"'")
-        .where("category = '"+req.body.category+"'").toString();
+        .where("section = '"+req.body.section+"'");
+
+    if(req.body.category !== ""){
+        queryString = queryString.where("category = '"+req.body.category+"'");
+    }
+
+    console.log(queryString.toString());
 
 
     // Connect to the database
@@ -86,7 +91,7 @@ router.post('/sc', function(req, res, next) {
             return;
         }
 
-        client.query(queryString, function (error, result) {
+        client.query(queryString.toString(), function (error, result) {
             done();
 
             var subCategories = [];
@@ -130,6 +135,10 @@ router.post('/desc', function(req, res, next) {
         .from("large_strata_energy")
         .field("description").distinct();
 
+    if(req.body.category !== ""){
+        queryString = queryString.where("category = '"+ req.body.category+ "'")
+    }
+
     if(req.body.subCategory !== ''){
 
         // Check valid subCategory
@@ -139,11 +148,9 @@ router.post('/desc', function(req, res, next) {
         }
 
         queryString = queryString.where("section = '"+ req.body.section + "'")
-            .where("category = '"+ req.body.category+ "'")
             .where("sub_category = '"+ req.body.subCategory+ "'").toString(); // Adds subcategory clause
     } else {
-        queryString = queryString.where("section = '"+ req.body.section + "'")
-            .where("category = '"+ req.body.category+ "'").toString();
+        queryString = queryString.where("section = '"+ req.body.section + "'").toString();
     }
 
 

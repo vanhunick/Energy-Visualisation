@@ -50,12 +50,14 @@ function validateSearchParams(){
             returnVal = false; // There is a possible sub category so it has to be chosen from
         }
 
-        // Check if one of the selections is empty
-        if(elem.section === "" || elem.category === "" || elem.description === ""){
-            // Now check if one of the selections is not empty
-            if(elem.section !== "" || elem.category !== "" || elem.description !== ""){
-                $('#error-div').append('<h4 style="color : red;">Partial Row Selected</h4>');
-                returnVal = false; // A row cannot have one item selected and another empty
+        if(!(elem.category === "" && elem.section !== "" && elem.subCategory!== "" && elem.description !== "")){ // Special case where  category is null
+            // Check if one of the selections is empty
+            if(elem.section === "" || elem.category === "" || elem.description === ""){
+                // Now check if one of the selections is not empty
+                if(elem.section !== "" || elem.category !== "" || elem.description !== ""){
+                    $('#error-div').append('<h4 style="color : red;">Partial Row Selected</h4>');
+                    returnVal = false; // A row cannot have one item selected and another empty
+                }
             }
         }
     });
@@ -88,6 +90,7 @@ function loadFromURL(urlSelections){
     lastSearch = new Selection(urlSelections[0],urlSelections[1],urlSelections[2],urlSelections[3]); //TODO copy values
     // Send array of selected sections to server and the company
     $.post("/compare/search",{company : selectedCompany, selections : JSON.stringify(urlSelections)}, function(data){
+        console.log(data);
         setSelectionsFromURL(urlSelections[0]);
         setSelectionsFromURL(urlSelections[1]);
         setSelectionsFromURL(urlSelections[2]);
@@ -718,7 +721,43 @@ function addSection(numberSections){
         $.post("/sections/s",{selected : section }, function(data){
             if(data.categories.length > 0  &&  data.categories[0] !== null){
                 $('#category-select'+idNumb).html(''); // Empty temp options
+            } else { // The one special case where category is null
+
             }
+            if(data.categories.length > 0  &&  data.categories[0] === null){ // Special case where category is null
+                console.log("Finding suvb");
+                // Find all sub categories for the currently selected category
+                $.post("/sections/sc",{section : selections[idNumb].section, category : ""}, function(data){
+                    console.log(data);
+                    if(data.subCategories.length > 0  &&  data.subCategories[0] !== null){
+                        $('#subsection-select'+idNumb).html(''); // Empty temp options
+                        validOptions[idNumb] = true; // There are options for this row and sub category
+                    } else { //TODO could split into individual functions
+                        // Find all descriptions for the currently selected sub category
+                        $.post("/sections/desc",{category : selections[idNumb].category,section : selections[idNumb].section, subCategory : ""}, function(data){
+                            if(data.descriptions.length > 0 &&  data.descriptions[0] !== null){
+                                $('#description-select'+idNumb).html(''); // Empty temp options
+                            } else {
+                                return;
+                            }
+                            // Add sub section options
+                            for(var i = 0; i < data.descriptions.length; i++){
+                                $('#description-select'+idNumb).append('<option>' + data.descriptions[i] + '</option>');
+                            }
+                            $(".selectpicker").selectpicker('refresh');
+                        });
+                        return;
+                    }
+                    // Add sub section options
+                    for(var i = 0; i < data.subCategories.length; i++){
+                        //if(data.categories[i] === null)continue;
+                        $('#subsection-select'+idNumb).append('<option>' + data.subCategories[i] + '</option>');
+                    }
+                    $(".selectpicker").selectpicker('refresh');
+                });
+            }
+
+
             // Add the options to the drop down
             for(var i = 0; i < data.categories.length; i++){
                 $('#category-select'+idNumb).append('<option>' + data.categories[i] + '</option>');
