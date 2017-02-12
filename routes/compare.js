@@ -54,7 +54,7 @@ function search(req, res){
     selections.push(row3);
 
     //res.render('compare', {selections : JSON.stringify(selections)}); // Send the search results and render index
-    res.render('compare', {selections : JSON.stringify(selections)}); // Send the search results and render index
+    res.render('compare', {selections : selections}); // Send the search results and render index
 
     return;
 
@@ -113,24 +113,24 @@ router.post('/search', function(req, res, next) {
         if(selections[i].section === "")continue; // TODO find better way to handle B and D table null
         if(i === 0){ //Row 0 has to have data
             // There is always a section and a category
-            expr.and("(section = '" + selections[i].section + "'")
+            expr.and("(section = '" + selections[i].section.replace(/'/g , "''") + "'");
 
             if(selections[i].category != ""){
-                expr.and("category = '" + selections[i].category + "'");
+                expr.and("category = '" + selections[i].category.replace(/'/g , "''") + "'");
             }
 
 
             // Check is the sub category exists
             if(selections[i].subCategory !== ""){
-                expr.and("sub_category = '" + selections[i].subCategory + "'");
+                expr.and("sub_category = '" + selections[i].subCategory.replace(/'/g , "''") + "'");
             }
 
             // Add the description condition
-            expr.and("description = '" + selections[i].description + "')");
+            expr.and("description = '" + selections[i].description.replace(/'/g , "''") + "')");
 
         } else {
             var andExpr = squel.expr().and("section = '" + selections[i].section  + "'")
-                .and("category = '" + selections[i].category  + "'");
+                .and("category = '" + selections[i].category.replace(/'/g , "''")  + "'");
 
             // Check is the sub category exists
             if(selections[i].subCategory !== ""){
@@ -144,6 +144,9 @@ router.post('/search', function(req, res, next) {
     }
 
     q.where(expr);
+    console.log("SEARCHING HERE");
+    console.log(q.toString());
+    console.log(q.toString().replace(/'/g , "''"));
 
     // Connect to the database
     pg.connect(global.databaseURI, function(err, client, done) {

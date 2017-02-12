@@ -24,8 +24,6 @@ var selectionDataArray;
 var selectionTablesArray;
 var combinedSelectionDataArray;
 
-
-
 $(document).ready( function() {
     // Highlight the selected link
     $(".nav-link").removeClass('active');
@@ -50,16 +48,13 @@ function validateSearchParams(){
             returnVal = false; // There is a possible sub category so it has to be chosen from
         }
 
-        //if(!(elem.category === "" && elem.section !== "" && elem.subCategory!== "" && elem.description !== "")){ // Special case where  category is null
-            // Check if one of the selections is empty
-            if(elem.section === "" || elem.category === "" || elem.description === ""){
-                // Now check if one of the selections is not empty
-                if(elem.section !== "" || elem.category !== "" || elem.description !== ""){
-                    $('#error-div').append('<h4 style="color : red;">Partial Row Selected</h4>');
-                    returnVal = false; // A row cannot have one item selected and another empty
-                }
+        if(elem.section === "" || elem.category === "" || elem.description === ""){
+            // Now check if one of the selections is not empty
+            if(elem.section !== "" || elem.category !== "" || elem.description !== ""){
+                $('#error-div').append('<h4 style="color : red;">Partial Row Selected</h4>');
+                returnVal = false; // A row cannot have one item selected and another empty
             }
-        //}
+        }
     });
     if(returnVal)$('#error-div').html('');
     return returnVal;
@@ -134,10 +129,6 @@ function loadFromURL(urlSelections){
     });
 }
 
-
-function showCombinedVector(){
-
-}
 
 function showTables(selectionTablesArray){
     selectionTablesArray.forEach(function (tableData) {
@@ -235,6 +226,7 @@ function showAllCombinedGraphs(selectionData, showTitle){
         $('#full-table-'+selection.id+'-div').show();
     });
 
+    // Add in A / B over C / D
     if(selectionData.length === 2){
         $('#title-abcd-vec').append('<h4 class="combined-title">'+selectionData[0].title1+' / '+selectionData[0].title2+'</h4>')
             .append('<h4>Over</h4>')
@@ -295,26 +287,9 @@ function insertTable(tableRows,id){
     var max = tableRows.reduce(function(prev, curr) {
         return prev.obs_yr > curr.obs_yr ? prev : curr;
     }).obs_yr; //TODO this line might need to be disc_yr
-
-
-    // Find the min and max year from the data
-    //min = tableRows.reduce(function(prev, curr) {
-    //    return prev.disc_yr < curr.disc_yr ? prev : curr;
-    //}).obs_yr;
-    //
-    //max = tableRows.reduce(function(prev, curr) {
-    //    return prev.disc_yr > curr.disc_yr ? prev : curr;
-    //}).obs_yr; //TODO this line might need to be disc_yr
-    //
-    //
-
-
+    
     // Create cells for each of the years to use as header
     var years = "";
-    //for(var i = min; i <= max; i++){
-    //    years += "<th>" + i + "</th>";
-    //}
-
     availableObsYears.forEach(function (year) {
        years += "<th>" + year + "</th>";
     });

@@ -266,6 +266,7 @@ router.get('/sections', function(req, res) {
 });
 
 router.post('/search', function(req, res, next) {
+    console.log("Here IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII");
     // Check valid section
     if(!SQLProtection.validSection(req.body.section)){
         res.send({rows: []});
@@ -311,6 +312,8 @@ router.post('/search', function(req, res, next) {
     }
 
     queryString = queryString.where("description = '"+ req.body.description + "'").toString();
+
+    console.log(queryString);
 
     // Connect to the database
     pg.connect(global.databaseURI, function (err, client, done) {

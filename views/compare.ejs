@@ -297,8 +297,11 @@
 
 <script>
     // TODO FIND PROPER SOLUTION TO REMOVING AND ADDING BACK IN " ' "
+
+    var s =  <%- JSON.stringify(selections) %>;
+
     if('<%- selections %>' !== ""){
-        var s =   JSON.parse('<%- selections %>');
+
         if(s.length > 0){
             loadFromURL(s);
         }
