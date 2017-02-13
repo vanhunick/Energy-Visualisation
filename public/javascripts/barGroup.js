@@ -53,12 +53,13 @@ function createdGroupedBarGraph(data,keys,yLabel, divID){
 
     var g = curBarGraph.svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+    var dpFormat = d3.format(".2f");
 
     var tip = d3.tip()
       .attr('class', 'd3-tip')
       .offset([-10, 0])
       .html(function(d) {
-        return "<strong>Value:</strong> <span style='color:lightgreen'>" + d.value + "</span><br><br><strong>Year:</strong> <span style='color:lightgreen'>" + d.key + "</span>";
+        return "<strong>Value:</strong> <span style='color:lightgreen'>" + dpFormat(d.value) + "</span><br><br><strong>Year:</strong> <span style='color:lightgreen'>" + d.key + "</span>";
       });
 
       curBarGraph.svg.call(tip);

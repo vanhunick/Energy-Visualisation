@@ -90,6 +90,8 @@ function createVectorGraph(data,xLabel, yLabel, divID){
         .attr("stroke", "#black")
         .call(vectorGraph.xAxis.scale(vectorGraph.x));
 
+        var dpFormat = d3.format(".2f");
+
     // add the y Axis
     vectorGraph.svg.append("g")
         .attr("class","yAxis")
@@ -100,7 +102,7 @@ function createVectorGraph(data,xLabel, yLabel, divID){
           .attr('class', 'd3-tip')
           .offset([-10, 0])
           .html(function(d) {
-            return "<strong>EDB:</strong> <span style='color:lightgreen'>" + d.edb + "</span><br><br><strong>Year:</strong> <span style='color:lightgreen'>" + d.year + "</span><br><br><strong>Value:</strong> <span style='color:lightgreen'>[" + d.valueA + ", " + d.valueB +"]</span>";
+            return "<strong>EDB:</strong> <span style='color:lightgreen'>" + d.edb + "</span><br><br><strong>Year:</strong> <span style='color:lightgreen'>" + d.year + "</span><br><br><strong>Value:</strong> <span style='color:lightgreen'>[" + dpFormat(d.valueA)	 + ", " + dpFormat(d.valueB) +"]</span>";
           });
 
       vectorGraph.svg.call(tip);
@@ -228,10 +230,11 @@ function createVectorGraph(data,xLabel, yLabel, divID){
                 return "translate("+ x +"," + (y +vHeight +vMargin.bottom/3 ) + ")";
             });
 
-        legend.append("rect")
-            .attr("x", vMargin.left + 45)
-            .attr("width", 19)
-            .attr("height", 19)
+        legend.append("circle")
+            .attr("cx", vMargin.left + 55)
+            .attr("cy", 9.5)
+            .attr("r", 7.5)
+            // .attr("height", 19)
             .attr("fill", color);
 
         legend.append("text")

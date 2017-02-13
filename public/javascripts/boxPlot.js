@@ -43,7 +43,6 @@ function createBoxPlot(dataObject, divID, title, unit){
         boxPlotObjects = new BoxPlotData( x,null,null,null,null,null,false,divID);
         plots.push(boxPlotObjects);
     } else {
-        console.log("Removing");
         d3.select(divID+' svg').remove();
     }
 
@@ -87,12 +86,14 @@ function createBoxPlot(dataObject, divID, title, unit){
         .attr("transform", function(d) { return "translate(" +  boxPlotObjects.x(d[0])  + "," + boxMargin.top + ")"; } )
         .call(boxPlotObjects.chart.width(boxPlotObjects.x.bandwidth())); //V4 Updated
 
+        var dpFormat = d3.format(".2f");
+
 
         var tip = d3.tip()
           .attr('class', 'd3-tip')
           .offset([-10, 0])
           .html(function(d) {
-            return "<strong>Value:</strong> <span style='color:lightgreen'>" + d.value + "</span><br><br><strong>EDB:</strong> <span style='color:lightgreen'>" + d.edb + "</span>";
+            return "<strong>Value:</strong> <span style='color:lightgreen'>" + dpFormat(d.value) + "</span><br><br><strong>EDB:</strong> <span style='color:lightgreen'>" + d.edb + "</span>";
           });
 
           boxPlotObjects.svg.call(tip);
