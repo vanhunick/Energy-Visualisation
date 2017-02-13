@@ -42,6 +42,9 @@ function createBoxPlot(dataObject, divID, title, unit){
         var x = d3.scaleBand().rangeRound([0, boxWidth]).padding(0.7,0.3);
         boxPlotObjects = new BoxPlotData( x,null,null,null,null,null,false,divID);
         plots.push(boxPlotObjects);
+    } else {
+        console.log("Removing");
+        d3.select(divID+' svg').remove();
     }
 
     // the y-axis
@@ -50,50 +53,32 @@ function createBoxPlot(dataObject, divID, title, unit){
         .range([boxHeight + boxMargin.top, 0 + boxMargin.top]);
 
 
-    if(!boxPlotObjects.created){
-        boxPlotObjects.chart = d3.box()
-            .whiskers(iqr(1.5))
-            .height(boxHeight)
-            .domain(boxPlotObjects.y.domain())
-            .showLabels(labels);
-    }
+
+    boxPlotObjects.chart = d3.box()
+        .whiskers(iqr(1.5))
+        .height(boxHeight)
+        .domain(boxPlotObjects.y.domain())
+        .showLabels(labels);
 
 
-
-    if(!boxPlotObjects.created){
-        console.log(divID);
-        boxPlotObjects.svg = d3.select(divID).append("svg")
+    boxPlotObjects.svg = d3.select(divID).append("svg")
             .attr("width", boxWidth + boxMargin.left + boxMargin.right)
             .attr("height", boxHeight + boxMargin.top + boxMargin.bottom)
             .attr("class", "box")
             .append("g")
             .attr("transform", "translate(" + boxMargin.left + "," + boxMargin.top + ")");
-    }
 
     boxPlotObjects.x.domain( data.map(function(d) {return d[0] } ) );
 
 
-    if(boxPlotObjects.created){
-        boxPlotObjects.svg.select(".xAis").call(boxPlotObjects.xAxis);
-        boxPlotObjects.svg.select(".yAis").call(boxPlotObjects.yAxis);
-    } else {
-        boxPlotObjects.xAxis = d3.axisBottom(boxPlotObjects.x);
-        boxPlotObjects.yAxis = d3.axisLeft(boxPlotObjects.y);
-    }
+    boxPlotObjects.xAxis = d3.axisBottom(boxPlotObjects.x);
+    boxPlotObjects.yAxis = d3.axisLeft(boxPlotObjects.y);
 
-    if(boxPlotObjects.created){
-        boxPlotObjects.svg.selectAll(".box")
-            .data(data)
-            .append("g")
-            .attr("transform", function(d) { return "translate(" +  boxPlotObjects.x(d[0])  + "," + boxMargin.top + ")"; } )
-            .call(boxPlotObjects.chart.width(boxPlotObjects.x.bandwidth())); //V4 Updated
-    } else {
-        boxPlotObjects.svg.selectAll(".box")
-            .data(data)
-            .enter().append("g")
-            .attr("transform", function(d) { return "translate(" +  boxPlotObjects.x(d[0])  + "," + boxMargin.top + ")"; } )
-            .call(boxPlotObjects.chart.width(boxPlotObjects.x.bandwidth())); //V4 Updated
-    }
+    boxPlotObjects.svg.selectAll(".box")
+        .data(data)
+        .enter().append("g")
+        .attr("transform", function(d) { return "translate(" +  boxPlotObjects.x(d[0])  + "," + boxMargin.top + ")"; } )
+        .call(boxPlotObjects.chart.width(boxPlotObjects.x.bandwidth())); //V4 Updated
 
     // draw the boxplots
     boxPlotObjects.svg.selectAll(".box")
@@ -103,66 +88,47 @@ function createBoxPlot(dataObject, divID, title, unit){
         .call(boxPlotObjects.chart.width(boxPlotObjects.x.bandwidth())); //V4 Updated
 
 
+        var tip = d3.tip()
+          .attr('class', 'd3-tip')
+          .offset([-10, 0])
+          .html(function(d) {
+            return "<strong>Value:</strong> <span style='color:lightgreen'>" + d.value + "</span><br><br><strong>EDB:</strong> <span style='color:lightgreen'>" + d.edb + "</span>";
+          });
+
+          boxPlotObjects.svg.call(tip);
 
 
-
-    if(boxPlotObjects.created){
-        boxPlotObjects.svg.selectAll(".dot")
-            .data(scatterData)
-            .attr("r", 3.5)
-            .attr("cx", function(d) { return boxPlotObjects.x(d.year) + whiskBoxWidth/2; })
-            .attr("cy", function(d) { return boxPlotObjects.y(d.value); })
-            .on("mouseover", function(d) {
-
-                var xPosition = parseFloat(d3.select(this).attr("cx"));
-                var yPosition = parseFloat(d3.select(this).attr("cy") + 10);
-
-                //Create the tooltip label
-                boxPlotObjects.svg.append("text")
-                    .attr("id", "tooltip")
-                    .attr("x", xPosition)
-                    .attr("y", yPosition - 10)
-                    .attr("text-anchor", "middle")
-                    .attr("font-family", "sans-serif")
-                    .attr("font-size", "18px")
-                    .attr("font-weight", "bold")
-                    .attr("fill", "black")
-                    .text("" + d.edb);
-
-            }).on("mouseout", function() {
-            //Remove the tooltip
-            d3.select("#tooltip").remove();
-        });
-    } else {
-        boxPlotObjects.svg.selectAll(".dot")
+    boxPlotObjects.svg.selectAll(".dot")
             .data(scatterData)
             .enter().append("circle")
             .attr("class", "dot")
             .attr("r", 3.5)
             .attr("cx", function(d) { return boxPlotObjects.x(d.year) + whiskBoxWidth/2; })
             .attr("cy", function(d) { return boxPlotObjects.y(d.value); })
-            .on("mouseover", function(d) {
+            .on('mouseover', tip.show)
+            .on('mouseout', tip.hide);
 
-                var xPosition = parseFloat(d3.select(this).attr("cx"));
-                var yPosition = parseFloat(d3.select(this).attr("cy") + 10);
-
-                //Create the tooltip label
-                boxPlotObjects.svg.append("text")
-                    .attr("id", "tooltip")
-                    .attr("x", xPosition)
-                    .attr("y", yPosition - 20)
-                    .attr("text-anchor", "middle")
-                    .attr("font-family", "sans-serif")
-                    .attr("font-size", "18px")
-                    .attr("font-weight", "bold")
-                    .attr("fill", "black")
-                    .text("" + d.edb);
-
-            }).on("mouseout", function() {
-            //Remove the tooltip
-            d3.select("#tooltip").remove();
-        });
-    }
+            // .on("mouseover", function(d) {
+            //
+            //     var xPosition = parseFloat(d3.select(this).attr("cx"));
+            //     var yPosition = parseFloat(d3.select(this).attr("cy") + 10);
+            //
+            //     //Create the tooltip label
+            //     boxPlotObjects.svg.append("text")
+            //         .attr("id", "tooltip")
+            //         .attr("x", xPosition)
+            //         .attr("y", yPosition - 20)
+            //         .attr("text-anchor", "middle")
+            //         .attr("font-family", "sans-serif")
+            //         .attr("font-size", "18px")
+            //         .attr("font-weight", "bold")
+            //         .attr("fill", "black")
+            //         .text("" + d.edb);
+            //
+            // }).on("mouseout", function() {
+            // //Remove the tooltip
+            // d3.select("#tooltip").remove();
+        // });
 
     // Create the scatter plot over top
 

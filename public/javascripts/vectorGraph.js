@@ -56,14 +56,6 @@ function createVectorGraph(data,xLabel, yLabel, divID){
     var yValues = [];
     allValues.forEach(function (e){ yValues.push(e.valueA);});
 
-    //var x = d3.scaleLinear().rangeRound([vWidth, 0]);
-
-    //var y = d3.scaleLinear()
-    //.rangeRound([vHeight, 0]);
-
-    //var yAxis = d3.axisLeft();
-    //var xAvis = d3.axisBottom();
-
     // Create the svg and append to the div
     if(!vectorGraph.created){
         vectorGraph.svg = d3.select(divID).append("svg")
@@ -92,8 +84,6 @@ function createVectorGraph(data,xLabel, yLabel, divID){
         vectorGraph.yAxis.scale(vectorGraph.y);
     }
 
-
-
     vectorGraph.svg.append("g")
         .attr("class","xAxis")
         .attr("transform", "translate(0," + vHeight + ")")
@@ -106,6 +96,16 @@ function createVectorGraph(data,xLabel, yLabel, divID){
         .attr("fill", "black")
         .call(vectorGraph.yAxis);
 
+        var tip = d3.tip()
+          .attr('class', 'd3-tip')
+          .offset([-10, 0])
+          .html(function(d) {
+            return "<strong>EDB:</strong> <span style='color:lightgreen'>" + d.edb + "</span><br><br><strong>Year:</strong> <span style='color:lightgreen'>" + d.year + "</span><br><br><strong>Value:</strong> <span style='color:lightgreen'>[" + d.valueA + ", " + d.valueB +"]</span>";
+          });
+
+      vectorGraph.svg.call(tip);
+
+
 
     if(vectorGraph.created){
         vectorGraph.svg.selectAll(".dotm")
@@ -115,28 +115,8 @@ function createVectorGraph(data,xLabel, yLabel, divID){
             .attr("cx", function(d) {return vectorGraph.x(d.valueB); })
             .attr("cy", function(d) { return vectorGraph.y(d.valueA); })
             .attr("fill", function(d) { return color(d.edb); })
-            .on("mouseover", function(d) {
-
-                var xPosition = parseFloat(d3.select(this).attr("cx"));
-                var yPosition = parseFloat(d3.select(this).attr("cy"));
-                yPosition = yPosition - 10;
-
-                //Create the tooltip label
-                svg.append("text")
-                    .attr("id", "tooltip")
-                    .attr("x", xPosition)
-                    .attr("y", yPosition)
-                    .attr("text-anchor", "middle")
-                    .attr("font-family", "sans-serif")
-                    .attr("font-size", "18px")
-                    .attr("font-weight", "bold")
-                    .attr("fill", "#64B5F6")
-                    .text(""+ d.year);
-
-            }).on("mouseout", function() {
-            //Remove the tooltip
-            d3.select("#tooltip").remove();
-        });
+            .on('mouseover', tip.show)
+            .on('mouseout', tip.hide);
     } else {
         vectorGraph.svg.selectAll(".dotm")
             .data(allValues)
@@ -146,31 +126,9 @@ function createVectorGraph(data,xLabel, yLabel, divID){
             .attr("cx", function(d) {return vectorGraph.x(d.valueB); })
             .attr("cy", function(d) { return vectorGraph.y(d.valueA); })
             .attr("fill", function(d) { return color(d.edb); })
-            .on("mouseover", function(d) {
-
-                var xPosition = parseFloat(d3.select(this).attr("cx"));
-                var yPosition = parseFloat(d3.select(this).attr("cy"));
-                yPosition = yPosition - 10;
-
-                //Create the tooltip label
-                vectorGraph.svg.append("text")
-                    .attr("id", "tooltip")
-                    .attr("x", xPosition)
-                    .attr("y", yPosition)
-                    .attr("text-anchor", "middle")
-                    .attr("font-family", "sans-serif")
-                    .attr("font-size", "18px")
-                    .attr("font-weight", "bold")
-                    .attr("fill", "#64B5F6")
-                    .text(""+ d.year);
-
-            }).on("mouseout", function() {
-            //Remove the tooltip
-            d3.select("#tooltip").remove();
-        });
+            .on('mouseover', tip.show)
+            .on('mouseout', tip.hide);
     }
-
-
 
     var lines = []; // x,y,x1,y1
 
@@ -184,9 +142,13 @@ function createVectorGraph(data,xLabel, yLabel, divID){
     // Build arrow
     if(!vectorGraph.created){
         vectorGraph.svg.append("svg:defs").selectAll("marker")
-            .data(["end"])      // Different link/path types can be defined here
-            .enter().append("svg:marker")    // This section adds in the arrows
-            .attr("id", String)
+            .data(lines)
+            .enter().append("svg:marker")
+            .attr("id", function(d){
+              if(d.end){
+                  return "end"+d.edb.replace(/ /g , "");
+              }
+            })
             .attr("viewBox", "0 -5 10 10")
             .attr("refX", 15)
             .attr("refY", -1.5)
@@ -194,11 +156,12 @@ function createVectorGraph(data,xLabel, yLabel, divID){
             .attr("markerHeight", 6)
             .attr("orient", "auto")
             .append("svg:path")
-            .attr("d", "M0,-5L10,0L0,5");
+            .attr("d", "M0,-5L10,0L0,5")
+            .style("fill", function(d){ return color(d.edb);});
     }
 
     if(vectorGraph.created){
-        svg.selectAll(".line")
+        vectorGraph.svg.selectAll(".line")
             .data(lines)
             .attr("x1",  function(d) {return x(d.x);})
             .attr("y1", function(d) {return y(d.y);})
@@ -208,7 +171,7 @@ function createVectorGraph(data,xLabel, yLabel, divID){
             .attr("stroke", function(d) { return color(d.edb);})
             .attr("marker-end", function(d){
                 if(d.end){
-                    return "url(#end)";
+                    return "url(#end"+d.edb.replace(/ /g , "") +")";
                 }
             });
     } else {
@@ -223,7 +186,7 @@ function createVectorGraph(data,xLabel, yLabel, divID){
             .attr("stroke", function(d) { return color(d.edb);})
             .attr("marker-end", function(d){
                 if(d.end){
-                    return "url(#end)";
+                    return "url(#end"+d.edb.replace(/ /g , "")+")";
                 }
             });
     }

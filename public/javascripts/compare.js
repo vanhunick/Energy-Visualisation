@@ -97,11 +97,13 @@ function loadFromURL(urlSelections){
         selectionTablesArray = [];
         combinedSelectionDataArray = [];
 
-        // Contains if a table contains values
+        // An array of true / false values if a table contains values
         var selectedRows = [copyOfDataTables.tableA.length > 0,copyOfDataTables.tableB.length > 0,copyOfDataTables.tableC.length > 0,copyOfDataTables.tableD.length > 0];
+
+        // An array with the tables data
         var tables = [copyOfDataTables.tableA,copyOfDataTables.tableB,copyOfDataTables.tableC,copyOfDataTables.tableD,copyOfDataTables.tableAB,copyOfDataTables.tableCD];
 
-        // Creates the 4 normal tables
+        // Creates the 4 normal tables and the combined tables
         var ids = ['a','b','c','d','ab','cd'];
         for(var i = 0; i < selectedRows.length; i++){
             if(selectedRows[i]){
@@ -124,7 +126,7 @@ function loadFromURL(urlSelections){
         }
 
         showTables(selectionTablesArray); // Show the tables
-        showAllRegularGraphs(selectionDataArray, true); // Show all but combined and vector graphs
+        showAllRegularGraphs(selectionDataArray, true); // Show all but combined and vector graphs true indicates it should add titles in
         showAllCombinedGraphs(combinedSelectionDataArray, true); // Show the combined and vector graphs
     });
 }
@@ -162,7 +164,6 @@ function filterRowsToTables(rows){
     }
     return new DataTables(aRows,bRows,cRows,dRows, abRows, cdRows);
 }
-
 
 
 // Shows graphs for A,B,C,D
@@ -530,14 +531,6 @@ function createDataForGroupedGraph(rows){
     var data = [];
     var edbDone = [];
 
-    // Find the min and max year from the data
-    //var min = rows.reduce(function(prev, curr) {
-    //    return prev.disc_yr < curr.disc_yr ? prev : curr;
-    //}).obs_yr;
-    //
-    //var max = rows.reduce(function(prev, curr) {
-    //    return prev.disc_yr > curr.disc_yr ? prev : curr;
-    //}).obs_yr;
 
     for(var i = 0; i < rows.length; i++){
         if(!edbDone.includes(rows[i].edb)){
@@ -710,39 +703,6 @@ function addSection(numberSections){
             } else { // The one special case where category is null
 
             }
-            //if(data.categories.length > 0  &&  data.categories[0] === null){ // Special case where category is null
-            //    console.log("Finding suvb");
-            //    // Find all sub categories for the currently selected category
-            //    $.post("/sections/sc",{section : selections[idNumb].section, category : ""}, function(data){
-            //        console.log(data);
-            //        if(data.subCategories.length > 0  &&  data.subCategories[0] !== null){
-            //            $('#subsection-select'+idNumb).html(''); // Empty temp options
-            //            validOptions[idNumb] = true; // There are options for this row and sub category
-            //        } else { //TODO could split into individual functions
-            //            // Find all descriptions for the currently selected sub category
-            //            $.post("/sections/desc",{category : selections[idNumb].category,section : selections[idNumb].section, subCategory : ""}, function(data){
-            //                if(data.descriptions.length > 0 &&  data.descriptions[0] !== null){
-            //                    $('#description-select'+idNumb).html(''); // Empty temp options
-            //                } else {
-            //                    return;
-            //                }
-            //                // Add sub section options
-            //                for(var i = 0; i < data.descriptions.length; i++){
-            //                    $('#description-select'+idNumb).append('<option>' + data.descriptions[i] + '</option>');
-            //                }
-            //                $(".selectpicker").selectpicker('refresh');
-            //            });
-            //            return;
-            //        }
-            //        // Add sub section options
-            //        for(var i = 0; i < data.subCategories.length; i++){
-            //            $('#subsection-select'+idNumb).append('<option>' + data.subCategories[i] + '</option>');
-            //        }
-            //        $(".selectpicker").selectpicker('refresh');
-            //    });
-            //}
-
-
             // Add the options to the drop down
             for(var i = 0; i < data.categories.length; i++){
                 if(data.categories[i] === null)continue;

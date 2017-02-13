@@ -54,6 +54,15 @@ function createdGroupedBarGraph(data,keys,yLabel, divID){
     var g = curBarGraph.svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 
+    var tip = d3.tip()
+      .attr('class', 'd3-tip')
+      .offset([-10, 0])
+      .html(function(d) {
+        return "<strong>Value:</strong> <span style='color:lightgreen'>" + d.value + "</span><br><br><strong>Year:</strong> <span style='color:lightgreen'>" + d.key + "</span>";
+      });
+
+      curBarGraph.svg.call(tip);
+
     if(curBarGraph.created){
         g.append("g")
             .selectAll("g")
@@ -66,7 +75,9 @@ function createdGroupedBarGraph(data,keys,yLabel, divID){
             .attr("y", function(d) { return curBarGraph.y(d.value); })
             .attr("width", curBarGraph.x1.bandwidth())
             .attr("height", function(d) { return height - curBarGraph.y(d.value); })
-            .attr("fill", function(d) { return z(d.key); });
+            .attr("fill", function(d) { return z(d.key); })
+            .on('mouseover', tip.show)
+            .on('mouseout', tip.hide);
     }
 
     g.append("g")
@@ -81,7 +92,9 @@ function createdGroupedBarGraph(data,keys,yLabel, divID){
         .attr("y", function(d) { return curBarGraph.y(d.value); })
         .attr("width", curBarGraph.x1.bandwidth())
         .attr("height", function(d) { return height - curBarGraph.y(d.value); })
-        .attr("fill", function(d) { return z(d.key); });
+        .attr("fill", function(d) { return z(d.key); })
+        .on('mouseover', tip.show)
+        .on('mouseout', tip.hide);
 
     g.append("g")
         .attr("class", "axis")
@@ -144,6 +157,3 @@ function createdGroupedBarGraph(data,keys,yLabel, divID){
 
     curBarGraph.created = true;
 }
-
-
-
