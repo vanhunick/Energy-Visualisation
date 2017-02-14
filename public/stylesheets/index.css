@@ -44,8 +44,14 @@ a {
   background:#F0F0F0;
   /*margin-top: 2%;*/
 }
+
+.edb-cell {
+  /*color: black;*/
+}
+
 .row-selected {
-  color: deepskyblue;
+  color: red;
+  /*background: lightgrey;*/
 }
 
 .bar {
@@ -142,9 +148,7 @@ a {
   font-size: 24px;
   color: steelblue;
 }
-.edb-cell {
-  color: black;
-}
+
 
 /*The top row of each table with EBD header and years*/
 .table-head {
@@ -224,6 +228,8 @@ a {
     stroke-width : 2;
     stroke : red;
 }
+
+
 
 /*Nav bar css*/
 /*https://work.smarchal.com/twbscolor/css/e74c3cc0392becf0f1ffbbbc0*/

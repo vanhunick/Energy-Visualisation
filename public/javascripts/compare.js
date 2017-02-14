@@ -264,6 +264,7 @@ function combineTables(table1Rows, table2Rows){
 }
 
 
+
 // Here every row belongs to the specific table
 function insertTable(tableRows,id){
     // Sorts the EDB names
@@ -306,6 +307,9 @@ function insertTable(tableRows,id){
     var cellValues = [];
     var observerd = true;
 
+
+    var dpFormat = d3.format(".2f");
+
     // Create the rows of data
     for(var i = 0; i < tableRows.length; i++){
         if(!done.includes(tableRows[i].edb)){
@@ -325,7 +329,7 @@ function insertTable(tableRows,id){
                     // Check it matches edb and year inserting into
                     if(tableRows[j].edb === tableRows[i].edb && tableRows[j].obs_yr === availableObsYears[k] && (!yearDone.includes(tableRows[j].obs_yr))){
                         yearDone.push(tableRows[j].obs_yr);
-                        row += "<th class='cell "+availableObsYears[k]+"' id='t"+id+""+cellCount+"'>" + tableRows[j].value + "</th>";
+                        row += "<th origValue='"+ tableRows[j].value +"' class='cell "+availableObsYears[k]+"' id='t"+id+""+cellCount+"'>" + dpFormat(tableRows[j].value) + "</th>";
 
                         // Save the value and the id of the cell to display percentage
                         cellValues.push({ id : "#t"+id+""+cellCount, value : tableRows[j].value });
@@ -356,11 +360,16 @@ function insertTable(tableRows,id){
 function rowClicked(id){
   var text = $("#"+id+" .edb-cell").text();
 
-  $("#"+id+" .edb-cell").css("color", "red");
+console.log()
+
+  $('.table').find('tr').removeClass('row-selected');
+
+
+  $("#"+id).attr("class","row-selected");
   var edb = $("#"+id+".edb-cell").text();
 
-console.log(text.replace(/ /g , ""));
-console.log("."+d3.selectAll(text.replace(/ /g , "")));
+  d3.selectAll(".bar-selected")
+  .classed("bar-selected", false);
 
   d3.selectAll("."+text.replace(/ /g , ""))
   .classed("bar-selected", true);
@@ -894,30 +903,12 @@ function applyCPI(units){
         }
 
         if(cSelected && dSelected){
-            var cdRows = combineTables(dataTables.aRows,dataTables.bRows);
+            var cdRows = combineTables(dataTables.cRows,dataTables.dRows);
             combinedSelectionDataArray[1].rows = cdRows;
         }
 
         showAllCombinedGraphs(combinedSelectionDataArray, false);
 
-
-        //
-        //
-        //
-        //if(bSelected && titles.bUnit.includes('$')){
-        //    applyCPIToTable('#tableB',cpiValues);
-        //    applyCPIToTableRows(copyOfDataTables.tableB, cpiValues);
-        //}
-        //
-        //if(cSelected && titles.cUnit.includes('$')){
-        //    applyCPIToTable('#tableC',cpiValues);
-        //    applyCPIToTableRows(copyOfDataTables.tableC, cpiValues);
-        //}
-        //
-        //if(dSelected && titles.dUnit.includes('$')){
-        //    applyCPIToTable('#tableD',cpiValues);
-        //    applyCPIToTableRows(copyOfDataTables.tableD, cpiValues);
-        //}
     }
 }
 
@@ -932,6 +923,9 @@ function applyCPIToTableRows(rows, cpiValues){
         return prev.disc_yr > curr.disc_yr ? prev : curr;
     }).obs_yr;
 
+    var dpFormat = d3.format(".2f");
+
+
     for(var cur = minYear; cur <=maxYear; cur++){ // Go through each possible year
         rows.forEach(function(elem, index){ // Grab every Row
             var year = rows[index].obs_yr; // Grab the year of the cell by checking the class
@@ -942,6 +936,7 @@ function applyCPIToTableRows(rows, cpiValues){
                 if(cpiValues[i].year === cur){
                     if(year <= cur){
                         valueOfCell = valueOfCell * (1 + (cpiValues[i].value / 100));
+                        valueOfCell = dpFormat(valueOfCell);
                     }
                 }
             }
@@ -968,17 +963,20 @@ function applyCPIToTable(table, cpiValues){
         maxYear = year > maxYear ? year : maxYear;
     });
 
+    var dpFormat = d3.format(".2f");
 
     for(var cur = minYear; cur <=maxYear; cur++){ // Go through each possible year
         $('.cell', table).each(function(index){ // Grab every cell
             var year = +$(this).attr("class").split(' ')[1]; // Grab the year of the cell by checking the class
 
-            var valueOfCell = $(this).text();
+            var valueOfCell = $(this).attr("origValue");
 
             for(var i = 0; i < cpiValues.length; i++){
                 if(cpiValues[i].year === cur){
                     if(year <= cur){
                         valueOfCell = valueOfCell * (1 + (cpiValues[i].value / 100));
+                        valueOfCell = dpFormat(valueOfCell);
+
                     }
                 }
             }

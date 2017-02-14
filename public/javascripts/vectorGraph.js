@@ -223,6 +223,7 @@ function createVectorGraph(data,xLabel, yLabel, divID){
             .selectAll("g")
             .data(edbs)
             .enter().append("g")
+            .append("svg:a")
             .attr("transform", function(d, i) {
                 var y = Math.floor(i / 5) * 20;
 
