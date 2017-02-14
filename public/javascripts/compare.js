@@ -122,7 +122,7 @@ function loadFromURL(urlSelections){
                         var titleJump = tables[i+1][0].section + ", " + tables[i+1][0].category;
                         var subTitleJump = tables[i+1][0].sub_category === null ? tables[i+1][0].description : tables[i+1][0].sub_category + ", " + tables[i+1][0].description;
                         selectionTablesArray.push(new SelectedTableData(tables[i+jump],ids[i+jump], title + ", " + subtitle, titleJump + ", " + subTitleJump));
-                        combinedSelectionDataArray.push(new SelectionDataCombined(tables[i+jump],tables[i],tables[i+1], title + " " + subtitle, titleJump + " " + subTitleJump,tables[i][0].units,tables[i+1][0].units,ids[i+jump]));
+                        combinedSelectionDataArray.push(new SelectionDataCombined(tables[i+jump],tables[i],tables[i+1], title + " " + subtitle, titleJump + " " + subTitleJump,tables[i][0].units,tables[i+1][0].units,ids[i+jump])); // TODO ask how to format titles for combined
                     }
                 }
             }
@@ -212,19 +212,19 @@ function showAllCombinedGraphs(selectionData, showTitle){
     selectionData.forEach(function(selection){
         // Insert Bar graph
         if(showTitle){
-            $('#title-'+selection.id+'-bar').append('<h3 class="combined-title">'+selection.title1+' <span class="over">over</span>,'+selection.title2+'</h3>');
+            $('#title-'+selection.id+'-bar').append('<h4 class="combined-title">'+selection.title1+'<br><span class="over">over</span><br>'+selection.title2+'</h4>');
         }
         var tableABData = createDataForGroupedGraph(selection.rows);
         createdGroupedBarGraph(tableABData.data, tableABData.keys, selection.unit1 + " / " + selection.unit2, "#grouped-bar-"+selection.id);
 
         // Create and insert combined box plot
         if(showTitle){
-            $('#title-'+selection.id+'-box').append('<h3 class="combined-title">'+selection.title1+' <span class="over">over</span>,'+selection.title2+'</h3>');
+            $('#title-'+selection.id+'-box').append('<h4 class="combined-title">'+selection.title1+' <br><span class="over">over</span><br>'+selection.title2+'</h4>');
         }
         createBoxPlot(createDataForBoxPlot(selection.rows), "#boxplot"+selection.id+"-div", selection.unit1 + " / " + selection.unit2);
 
         if(showTitle){
-            $('#title-'+selection.id+'-vector').append('<h3 class="combined-title">'+selection.title1+' <span class="over">over</span>,'+selection.title2+'</h3>');
+            $('#title-'+selection.id+'-vector').append('<h4 class="combined-title">'+selection.title1+'<br><span class="over">over</span><br>'+selection.title2+'</h4>');
         }
         createVectorGraph(createDataForVectorGraph(selection.table1Rows,selection.table2Rows),selection.unit1,selection.unit2,"#vector-graph-div-"+selection.id);
         $('#full-table-'+selection.id+'-div').show();
@@ -359,22 +359,53 @@ function insertTable(tableRows,id){
     applyGradientCSS(cellValues, percent);
 }
 
+var rowSelected = "";
+
 function rowClicked(id){
+  if(rowSelected === id){// Clicked on the same row so unselect
+    // Remove all selected classes from elements
+    $('.table').find('tr').removeClass('row-selected');
+    d3.selectAll(".bar-selected").classed("bar-selected", false);
+    d3.selectAll(".line-selected-table").classed("line-selected", false);
+    d3.selectAll(".vec-dot-selected").classed("vec-dot-selected", false);
+    rowSelected = ""; // Nothing is selected
+    return;
+  }
+
+  rowSelected = id;
+
   var text = $("#"+id+" .edb-cell").text();
 
-console.log()
+  console.log()
 
   $('.table').find('tr').removeClass('row-selected');
 
 
-  $("#"+id).attr("class","row-selected");
+  // $("#"+id).attr("class","row-selected");
+  $("#"+id).addClass("row-selected");
+
   var edb = $("#"+id+".edb-cell").text();
 
+  // Select all rectangle with the selected class and remove class
   d3.selectAll(".bar-selected")
   .classed("bar-selected", false);
 
-  d3.selectAll("."+text.replace(/ /g , ""))
+// Select all lines with the selected class and remove class
+  d3.selectAll(".line-selected-table")
+  .classed("line-selected", false);
+
+  d3.selectAll(".vec-dot-selected")
+  .classed("vec-dot-selected", false);
+
+  // Select all rectangle with the correct EDB and outline bars
+  d3.selectAll("rect."+text.replace(/ /g , ""))
   .classed("bar-selected", true);
+
+  d3.selectAll("line."+text.replace(/ /g , ""))
+  .classed("line-selected-table", true);
+
+  d3.selectAll(".dot."+text.replace(/ /g , ""))
+  .classed("vec-dot-selected", true);
 }
 
 function applyGradientCSS(cellValues, percent){

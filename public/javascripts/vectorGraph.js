@@ -123,7 +123,7 @@ function createVectorGraph(data,xLabel, yLabel, divID){
         vectorGraph.svg.selectAll(".dotm")
             .data(allValues)
             .enter().append("circle")
-            .attr("class", "dot")
+            .attr("class", "dotm")
             .attr("r", 3.5)
             .attr("cx", function(d) {return vectorGraph.x(d.valueB); })
             .attr("cy", function(d) { return vectorGraph.y(d.valueA); })

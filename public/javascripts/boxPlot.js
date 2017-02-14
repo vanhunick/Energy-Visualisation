@@ -51,14 +51,11 @@ function createBoxPlot(dataObject, divID,unit){
         .domain([min, max]).nice()
         .range([boxHeight + boxMargin.top, 0 + boxMargin.top]);
 
-
-
     boxPlotObjects.chart = d3.box()
         .whiskers(iqr(1.5))
         .height(boxHeight)
         .domain(boxPlotObjects.y.domain())
         .showLabels(labels);
-
 
     boxPlotObjects.svg = d3.select(divID).append("svg")
             .attr("width", boxWidth + boxMargin.left + boxMargin.right)
@@ -68,8 +65,6 @@ function createBoxPlot(dataObject, divID,unit){
             .attr("transform", "translate(" + boxMargin.left + "," + boxMargin.top + ")");
 
     boxPlotObjects.x.domain( data.map(function(d) {return d[0] } ) );
-
-
     boxPlotObjects.xAxis = d3.axisBottom(boxPlotObjects.x);
     boxPlotObjects.yAxis = d3.axisLeft(boxPlotObjects.y);
 
@@ -88,7 +83,6 @@ function createBoxPlot(dataObject, divID,unit){
 
         var dpFormat = d3.format(".2f");
 
-
         var tip = d3.tip()
           .attr('class', 'd3-tip')
           .offset([-10, 0])
@@ -102,7 +96,7 @@ function createBoxPlot(dataObject, divID,unit){
     boxPlotObjects.svg.selectAll(".dot")
             .data(scatterData)
             .enter().append("circle")
-            .attr("class", "dot")
+            .attr("class",function(d){return "dot "+d.edb.replace(/ /g , "");})
             .attr("r", 3.5)
             .attr("cx", function(d) { return boxPlotObjects.x(d.year) + whiskBoxWidth/2; })
             .attr("cy", function(d) { return boxPlotObjects.y(d.value); })
@@ -141,7 +135,6 @@ function createBoxPlot(dataObject, divID,unit){
         .style("font-size", "18px")
         .attr("class", "unit-text")
         .text(unit);
-        console.log(unit);
 
     // Add year as the x-axis label
     boxPlotObjects.svg.append("text")

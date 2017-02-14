@@ -45,14 +45,11 @@ a {
   /*margin-top: 2%;*/
 }
 
-.edb-cell {
-  /*color: black;*/
-}
+/*.edb-cell {
+  color: black;
+}*/
 
-.row-selected {
-  color: red;
-  /*background: lightgrey;*/
-}
+
 
 .bar {
   fill: steelblue;
@@ -104,6 +101,10 @@ a {
   background-color: white;
 }
 
+.row-selected {
+  color: green;
+}
+
 .full {
   display: none;
 }
@@ -112,18 +113,27 @@ a {
 .box {
   font: 10px sans-serif;
 }
-
+/*.box circle*/
 .box line,
-.box rect,
-.box circle {
+.box rect
+ {
   fill: #64B5F6;
   stroke: #000; /* circle stroke*/
   stroke-width: 1px;
 }
 
-.box circle {
-  /*fill: #e74c3c;*/
+
+.dot {
   fill : #FFFF66;
+  /*fill: #64B5F6;*/
+  stroke: #000; /* circle stroke*/
+  stroke-width: 1px;
+}
+
+.vec-dot-selected {
+  fill : green;
+  stroke-width : 3;
+  stroke : green;
 }
 
 .box .center {
@@ -224,10 +234,16 @@ a {
   stroke-width : 5;
 }
 
-.bar-selected {
-    stroke-width : 2;
-    stroke : red;
+.line-selected-table {
+  stroke-width : 5;
 }
+
+.bar-selected {
+    stroke-width : 3;
+    stroke : green;
+}
+
+
 
 
 
