@@ -154,8 +154,9 @@ function createVectorGraph(data,xLabel, yLabel, divID){
             .attr("viewBox", "0 -5 10 10")
             .attr("refX", 15)
             .attr("refY", -1.5)
-            .attr("markerWidth", 6)
-            .attr("markerHeight", 6)
+            .attr("markerWidth", 9)
+            .attr("markerHeight", 9)
+            .attr("markerUnits","userSpaceOnUse")
             .attr("orient", "auto")
             .append("svg:path")
             .attr("d", "M0,-5L10,0L0,5")
@@ -170,6 +171,7 @@ function createVectorGraph(data,xLabel, yLabel, divID){
             .attr("x2", function(d) {return x(d.x1);})
             .attr("y2", function(d) {return y(d.y1);})
             .attr("stroke-width", 2)
+            .attr("class",function(d){return ""+d.edb.replace(/ /g , "");} ) // Add ebd as the class
             .attr("stroke", function(d) { return color(d.edb);})
             .attr("marker-end", function(d){
                 if(d.end){
@@ -185,6 +187,7 @@ function createVectorGraph(data,xLabel, yLabel, divID){
             .attr("x2", function(d) {return vectorGraph.x(d.x1);})
             .attr("y2", function(d) {return vectorGraph.y(d.y1);})
             .attr("stroke-width", 2)
+            .attr("class",function(d){return ""+d.edb.replace(/ /g , "");} ) // Add ebd as the class
             .attr("stroke", function(d) { return color(d.edb);})
             .attr("marker-end", function(d){
                 if(d.end){
@@ -228,6 +231,14 @@ function createVectorGraph(data,xLabel, yLabel, divID){
                 x = x + vMargin.left;
 
                 return "translate("+ x +"," + (y +vHeight +vMargin.bottom/3 ) + ")";
+            })
+            .on('mouseover', function(d){
+              vectorGraph.svg.selectAll('line.'+d.replace(/ /g , ""))
+              .classed("line-selected", true);
+            }).
+            on('mouseout', function(d){
+              vectorGraph.svg.selectAll('line.'+d.replace(/ /g , ""))
+              .classed("line-selected", false);
             });
 
         legend.append("circle")

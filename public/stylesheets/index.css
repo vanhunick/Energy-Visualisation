@@ -216,6 +216,9 @@ a {
   left: 0;
 }
 
+.line-selected {
+  stroke-width : 5;
+}
 
 /*Nav bar css*/
 /*https://work.smarchal.com/twbscolor/css/e74c3cc0392becf0f1ffbbbc0*/
