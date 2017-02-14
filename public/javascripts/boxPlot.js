@@ -23,7 +23,7 @@ function BoxPlotData(x,y,xAxis,yAxis,svg,chart,created, id){
 }
 
 
-function createBoxPlot(dataObject, divID, title, unit){
+function createBoxPlot(dataObject, divID,unit){
     var boxPlotObjects = null;
     var data = dataObject.data;
     var min = dataObject.min;
@@ -109,32 +109,7 @@ function createBoxPlot(dataObject, divID, title, unit){
             .on('mouseover', tip.show)
             .on('mouseout', tip.hide);
 
-            // .on("mouseover", function(d) {
-            //
-            //     var xPosition = parseFloat(d3.select(this).attr("cx"));
-            //     var yPosition = parseFloat(d3.select(this).attr("cy") + 10);
-            //
-            //     //Create the tooltip label
-            //     boxPlotObjects.svg.append("text")
-            //         .attr("id", "tooltip")
-            //         .attr("x", xPosition)
-            //         .attr("y", yPosition - 20)
-            //         .attr("text-anchor", "middle")
-            //         .attr("font-family", "sans-serif")
-            //         .attr("font-size", "18px")
-            //         .attr("font-weight", "bold")
-            //         .attr("fill", "black")
-            //         .text("" + d.edb);
-            //
-            // }).on("mouseout", function() {
-            // //Remove the tooltip
-            // d3.select("#tooltip").remove();
-        // });
-
     // Create the scatter plot over top
-
-
-
     // draw y axis
     boxPlotObjects.svg.append("g")
         .attr("class", "y axis")
@@ -166,6 +141,7 @@ function createBoxPlot(dataObject, divID, title, unit){
         .style("font-size", "18px")
         .attr("class", "unit-text")
         .text(unit);
+        console.log(unit);
 
     // Add year as the x-axis label
     boxPlotObjects.svg.append("text")

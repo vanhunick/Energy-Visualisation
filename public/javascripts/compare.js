@@ -5,6 +5,9 @@
 // Holds the currently selected items in the filter rows
 var selections = [];
 
+var dpFormat = d3.format(".4f");
+
+
 // Holds a object that contains the rows of selections that were last searched
 var lastSearch = null;
 var validOptions = [false,false,false]; // Each boolean represents if a sub category should exist in the selection row
@@ -199,7 +202,7 @@ function showAllRegularGraphs(selectionData, addTitles){
                 .append('<h4 class="subTitle">'+selection.subTitle+'</h4>');
         }
 
-        createBoxPlot(createDataForBoxPlot(selection.rows), "#boxplot"+selection.id+"-div", selection.aUnit);
+        createBoxPlot(createDataForBoxPlot(selection.rows), "#boxplot"+selection.id+"-div", selection.unit);
         $('#full-table-'+selection.id+'-div').show();
     });
 }
@@ -308,7 +311,6 @@ function insertTable(tableRows,id){
     var observerd = true;
 
 
-    var dpFormat = d3.format(".2f");
 
     // Create the rows of data
     for(var i = 0; i < tableRows.length; i++){
@@ -923,7 +925,6 @@ function applyCPIToTableRows(rows, cpiValues){
         return prev.disc_yr > curr.disc_yr ? prev : curr;
     }).obs_yr;
 
-    var dpFormat = d3.format(".2f");
 
 
     for(var cur = minYear; cur <=maxYear; cur++){ // Go through each possible year
@@ -936,7 +937,6 @@ function applyCPIToTableRows(rows, cpiValues){
                 if(cpiValues[i].year === cur){
                     if(year <= cur){
                         valueOfCell = valueOfCell * (1 + (cpiValues[i].value / 100));
-                        valueOfCell = dpFormat(valueOfCell);
                     }
                 }
             }
@@ -963,7 +963,6 @@ function applyCPIToTable(table, cpiValues){
         maxYear = year > maxYear ? year : maxYear;
     });
 
-    var dpFormat = d3.format(".2f");
 
     for(var cur = minYear; cur <=maxYear; cur++){ // Go through each possible year
         $('.cell', table).each(function(index){ // Grab every cell
