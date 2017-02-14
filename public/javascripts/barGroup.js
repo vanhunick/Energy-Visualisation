@@ -81,19 +81,21 @@ function createdGroupedBarGraph(data,keys,yLabel, divID){
             .on('mouseout', tip.hide);
     }
 
+
     g.append("g")
         .selectAll("g")
         .data(data)
         .enter().append("g")
         .attr("transform", function(d) { return "translate(" + curBarGraph.x0(d.edb) + ",0)"; })
         .selectAll("rect")
-        .data(function(d) { return keys.map(function(key) { return {key: key, value: d[key]}; }); })
+        .data(function(d) { return keys.map(function(key) { return {key: key, edb : d.edb, value: d[key]}; }); })
         .enter().append("rect")
         .attr("x", function(d) { return curBarGraph.x1(d.key); })
         .attr("y", function(d) { return curBarGraph.y(d.value); })
         .attr("width", curBarGraph.x1.bandwidth())
         .attr("height", function(d) { return height - curBarGraph.y(d.value); })
         .attr("fill", function(d) { return z(d.key); })
+        .attr("class",function(d){return ""+d.edb.replace(/ /g , "");} ) // Add ebd as the class
         .on('mouseover', tip.show)
         .on('mouseout', tip.hide);
 

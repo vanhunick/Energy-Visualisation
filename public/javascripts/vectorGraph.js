@@ -152,8 +152,8 @@ function createVectorGraph(data,xLabel, yLabel, divID){
               }
             })
             .attr("viewBox", "0 -5 10 10")
-            .attr("refX", 15)
-            .attr("refY", -1.5)
+            .attr("refX", 9)
+            .attr("refY", -0.5)
             .attr("markerWidth", 9)
             .attr("markerHeight", 9)
             .attr("markerUnits","userSpaceOnUse")

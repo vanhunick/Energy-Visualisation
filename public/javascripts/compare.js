@@ -288,7 +288,7 @@ function insertTable(tableRows,id){
     var max = tableRows.reduce(function(prev, curr) {
         return prev.obs_yr > curr.obs_yr ? prev : curr;
     }).obs_yr; //TODO this line might need to be disc_yr
-    
+
     // Create cells for each of the years to use as header
     var years = "";
     availableObsYears.forEach(function (year) {
@@ -338,9 +338,9 @@ function insertTable(tableRows,id){
             $("#"+id).append(row + '</tr>');
             // Here we can check the unit type and highlight appropriately
             // Assing a on click function to each of the rows to generate the bar graph with the row specific data
-            //$( "#row"+i+"").click(function(event) {
-            //    showBarWithRowElem(this.id);
-            //});
+            $("#row"+id+i).click(function(event) {
+               rowClicked(this.id);
+            });
         }
     }
 
@@ -353,6 +353,18 @@ function insertTable(tableRows,id){
     applyGradientCSS(cellValues, percent);
 }
 
+function rowClicked(id){
+  var text = $("#"+id+" .edb-cell").text();
+
+  $("#"+id+" .edb-cell").css("color", "red");
+  var edb = $("#"+id+".edb-cell").text();
+
+console.log(text.replace(/ /g , ""));
+console.log("."+d3.selectAll(text.replace(/ /g , "")));
+
+  d3.selectAll("."+text.replace(/ /g , ""))
+  .classed("bar-selected", true);
+}
 
 function applyGradientCSS(cellValues, percent){
 
