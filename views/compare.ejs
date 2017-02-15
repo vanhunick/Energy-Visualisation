@@ -113,6 +113,14 @@
                                     <div class="col-md-2"></div>
                                 </div>
 
+                                <div class="row">
+                                    <div class="col-md-2"></div>
+                                    <div class="col-md-8 text-center ">
+                                        <table class="table table-nonfluid" id="table-totala"></table>
+                                    </div>
+                                    <div class="col-md-2"></div>
+                                </div>
+
                                 <div class="row group-row" >
                                     <div id="title-a-bar" class="text-center"></div>
                                     <div class="col-lg-12 text-center" id="grouped-bar-a" ></div>
@@ -138,6 +146,16 @@
                                     </div>
                                     <div class="col-md-2"></div>
                                 </div>
+
+                                <div class="row">
+                                    <div class="col-md-2"></div>
+                                    <div class="col-md-8 text-center ">
+                                        <table class="table table-nonfluid" id="table-totalb"></table>
+                                    </div>
+                                    <div class="col-md-2"></div>
+                                </div>
+
+
                                 <div class="row group-row">
                                     <div id="title-b-bar" class="text-center"></div>
                                     <div class="col-lg-12 text-center" id="grouped-bar-b"></div>
@@ -160,6 +178,14 @@
                                         <h2 class="table-title"><b>Selection C</b></h2>
                                         <div id="title-c" class="text-left"></div>
                                         <table class="table" id="tablec"></table>
+                                    </div>
+                                    <div class="col-md-2"></div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-2"></div>
+                                    <div class="col-md-8 text-center ">
+                                        <table class="table table-nonfluid" id="table-totalc"></table>
                                     </div>
                                     <div class="col-md-2"></div>
                                 </div>
@@ -190,6 +216,14 @@
                                     <div class="col-md-2"></div>
                                 </div>
 
+                                <div class="row">
+                                    <div class="col-md-2"></div>
+                                    <div class="col-md-8 text-center ">
+                                        <table class="table table-nonfluid" id="table-totald"></table>
+                                    </div>
+                                    <div class="col-md-2"></div>
+                                </div>
+
                                 <div class="row group-row">
                                     <div id="title-d-bar" class="text-center"></div>
                                     <div class="col-lg-12 text-center" id="grouped-bar-d"></div>
@@ -212,6 +246,14 @@
                                         <h2 class="table-title"><b>Table selection  A over  selection B</b></h2>
                                         <div id="title-ab" class="text-left"></div>
                                         <table class="table" id="tableab"></table>
+                                    </div>
+                                    <div class="col-md-2"></div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-2"></div>
+                                    <div class="col-md-8 text-center ">
+                                        <table class="table table-nonfluid" id="table-totalab"></table>
                                     </div>
                                     <div class="col-md-2"></div>
                                 </div>
@@ -242,6 +284,14 @@
                                         <h2 class="table-title "><b>Table selection  C over selection D</b></h2>
                                         <div id="title-cd" class="text-left"></div>
                                         <table class="table" id="tablecd"></table>
+                                    </div>
+                                    <div class="col-md-2"></div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-2"></div>
+                                    <div class="col-md-8 text-center ">
+                                        <table class="table table-nonfluid" id="table-totalcd"></table>
                                     </div>
                                     <div class="col-md-2"></div>
                                 </div>
@@ -280,14 +330,7 @@
             </div>
         </div>
     </div>
-
-
-
-
-
-
 </div>
-
 </body>
 <script src="https://d3js.org/d3-timer.v1.min.js"></script>
 <script src="/javascripts/barGroup.js"></script>
@@ -296,8 +339,6 @@
 <script src="/javascripts/vectorGraph.js"></script>
 
 <script>
-    // TODO FIND PROPER SOLUTION TO REMOVING AND ADDING BACK IN " ' "
-
     var s =  <%- JSON.stringify(selections) %>;
 
     if('<%- selections %>' !== ""){

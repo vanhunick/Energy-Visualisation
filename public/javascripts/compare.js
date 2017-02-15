@@ -14,7 +14,8 @@ var regions = {
        "MainPower NZ","Marlborough Lines","Nelson Electricity","Network Tasman",
        "Network Waitaki","Orion NZ","OtagoNet","The Power Company","Westpower"],
   usi : ["Alpine Energy","Buller Electricity","MainPower NZ","Marlborough Lines","Nelson Electricity","Network Tasman","Orion NZ","Westpower"],
-  lsi : ["Aurora Energy","Electricity Ashburton","Electricity Invercargill","Network Waitaki","OtagoNet","The Power Company"]
+  lsi : ["Aurora Energy","Electricity Ashburton","Electricity Invercargill","Network Waitaki","OtagoNet","The Power Company"],
+  nz : ["","","","","","","","","","","","","","","","","","","","","","","","","","","","",""]
 };
 
 // Holds the currently selected items in the filter rows
@@ -267,10 +268,6 @@ function combineTables(table1Rows, table2Rows){
     for(var i = 0; i < at.length; i++){
         for(var j = 0; j < bt.length; j++){
             if(at[i].edb === bt[j].edb && at[i].obs_yr === bt[j].obs_yr && at[i].disc_yr === bt[j].disc_yr){
-              console.log(at[i].value / (bt[j].value === '0' || bt[j].value === 0)  ? 1 : bt[j].value);
-              console.log(at[i].value + " " + (bt[j].value === '0' ? 1 : bt[j].value) );
-              console.log(at[i].value + " " + bt[j].value );
-
                 combined.push({ disc_yr : bt[j].disc_yr ,
                     edb : bt[j].edb,
                     "obs_yr" : bt[j].obs_yr,
@@ -301,7 +298,7 @@ function insertTotalsTable(tableRows, id, regions){
     });
 
     var regionStrings = ["n","uni","eni", "swni", "s", "usi", "lsi"];
-    var names = {n : "North Island", uni : "Upper North Island", eni : "Eastern North Island", swni : "South-West North Island", s : "South Island", usi : "Upper South Island", lsi : "Lower South Island"};
+    var names = {n : "North Island", uni : "Upper North Island", eni : "Eastern North Island", swni : "South-West North Island", s : "South Island", usi : "Upper South Island", lsi : "Lower South Island", nz : "New Zealand"};
     var totals = {}; // reg : "" , years : []
 
     for(var i = 0; i < availableObsYears.length; i++){
@@ -309,7 +306,6 @@ function insertTotalsTable(tableRows, id, regions){
             regionStrings.forEach(function(regionString){
                   if(regions[regionString].includes(row.edb)){
                       if(totals[regionString] === undefined){
-                        console.log(regionString)
                         totals[regionString] = [+row.value];
                       } else {
                         if(i === totals[regionString].length){
@@ -323,6 +319,14 @@ function insertTotalsTable(tableRows, id, regions){
 
         });
     }
+
+    var nz = [];
+
+    for(var i = 0; i < availableObsYears.length; i++){
+      nz.push(totals["n"][i] + totals["s"][i]);
+    }
+    totals["nz"] = nz;
+
 
     // Insert Caption for table
     var years = "";
