@@ -2,10 +2,25 @@
  * Created by Nicky on 23/01/2017.
  */
 
+
+var regions = {
+  n : ["Centralines","Counties Power","Eastland Network","Electra","Horizon Energy","Northpower",
+       "Powerco","Scanpower","The Lines Company","Top Energy","Unison Networks","Vector Lines",
+       "Waipa Networks","WEL Networks","Wellington Electricity"],
+  uni : ["Counties Power","Horizon Energy","Northpower","The Lines Company","Top Energy","Vector Lines","Waipa Networks","WEL Networks"],
+  eni : ["Centralines","Eastland Network","Scanpower","Unison Networks"],
+  swni : ["Electra","Powerco","Wellington Electricity"],
+  s : ["Alpine Energy","Aurora Energy","Buller Electricity","Electricity Ashburton","Electricity Invercargill",
+       "MainPower NZ","Marlborough Lines","Nelson Electricity","Network Tasman",
+       "Network Waitaki","Orion NZ","OtagoNet","The Power Company","Westpower"],
+  usi : ["Alpine Energy","Buller Electricity","MainPower NZ","Marlborough Lines","Nelson Electricity","Network Tasman","Orion NZ","Westpower"],
+  lsi : ["Aurora Energy","Electricity Ashburton","Electricity Invercargill","Network Waitaki","OtagoNet","The Power Company"]
+};
+
 // Holds the currently selected items in the filter rows
 var selections = [];
 
-var dpFormat = d3.format(".4f");
+var dpFormat = d3.format(".4r");
 
 
 // Holds a object that contains the rows of selections that were last searched
@@ -112,7 +127,7 @@ function loadFromURL(urlSelections){
             if(selectedRows[i]){
                 var title = tables[i][0].section + ", " + tables[i][0].category;
                 var subtitle = tables[i][0].sub_category === null ? tables[i][0].description : tables[i][0].sub_category + ", " + tables[i][0].description;
-                selectionTablesArray.push(new SelectedTableData(tables[i],ids[i],title,subtitle));
+                selectionTablesArray.push(new SelectedTableData(tables[i],ids[i],title,subtitle, tables[i][0].units)); // TODO add unit for combined
                 selectionDataArray.push(new SelectionData(tables[i], title, subtitle ,tables[i][0].units,ids[i]));
 
                 // Check for combined special case
@@ -131,6 +146,7 @@ function loadFromURL(urlSelections){
         showTables(selectionTablesArray); // Show the tables
         showAllRegularGraphs(selectionDataArray, true); // Show all but combined and vector graphs true indicates it should add titles in
         showAllCombinedGraphs(combinedSelectionDataArray, true); // Show the combined and vector graphs
+
     });
 }
 
@@ -141,6 +157,7 @@ function showTables(selectionTablesArray){
             .append('<h4 class="subTitle">'+tableData.subTitle+'</h4>');
 
         insertTable(tableData.rows,'table'+tableData.id);
+        insertTotalsTable(tableData.rows, 'table-total'+tableData.id, regions);
     })
 }
 
@@ -173,13 +190,13 @@ function filterRowsToTables(rows){
 function showAllRegularGraphs(selectionData, addTitles){
     selectionData.forEach(function (selection) {
 
-        var negative;
-        selection.rows.forEach(function (elem) {
-            if(elem.value < 0){
-                negative = true;
-                return;
-            }
-        })
+        var negative = false;
+        // selection.rows.forEach(function (elem) {
+        //     if(elem.value < 0){
+        //         negative = true;
+        //         return;
+        //     }
+        // })
 
         if(negative){
             $('#title-'+selection.id+'-bar').append('<h3 class="title" style="color:red;">Cannot create bar graph with negative numbers</h3>'); // Display error
@@ -250,10 +267,14 @@ function combineTables(table1Rows, table2Rows){
     for(var i = 0; i < at.length; i++){
         for(var j = 0; j < bt.length; j++){
             if(at[i].edb === bt[j].edb && at[i].obs_yr === bt[j].obs_yr && at[i].disc_yr === bt[j].disc_yr){
+              console.log(at[i].value / (bt[j].value === '0' || bt[j].value === 0)  ? 1 : bt[j].value);
+              console.log(at[i].value + " " + (bt[j].value === '0' ? 1 : bt[j].value) );
+              console.log(at[i].value + " " + bt[j].value );
+
                 combined.push({ disc_yr : bt[j].disc_yr ,
                     edb : bt[j].edb,
                     "obs_yr" : bt[j].obs_yr,
-                    value : at[i].value / (bt[j].value === '0' ? 1 : bt[j].value), // Divide the value if va if dividing by 0 make it 1
+                    value : at[i].value / (bt[j].value === '0' || bt[j].value === 0 ? 1 : bt[j].value), // Divide the value if va if dividing by 0 make it 1
                     section : bt[j].section + "" + bt[j].description + " over ", // Bit of a hack as description is inserted after section, this way both titles are added to table
                     description : at[i].section + " " + at[i].description,
                     unitA : at[i].units,
@@ -267,9 +288,74 @@ function combineTables(table1Rows, table2Rows){
 }
 
 
+function insertTotalsTable(tableRows, id, regions){
+  var totCells = [];
+
+    // First get all the availble years in the rows
+    var availableObsYears = [];
+    tableRows.forEach(function (elem) {
+        if(!availableObsYears.includes(elem.obs_yr))availableObsYears.push(elem.obs_yr);
+    });
+    availableObsYears.sort(function (a, b) {
+        return +a - +b;
+    });
+
+    var regionStrings = ["n","uni","eni", "swni", "s", "usi", "lsi"];
+    var names = {n : "North Island", uni : "Upper North Island", eni : "Eastern North Island", swni : "South-West North Island", s : "South Island", usi : "Upper South Island", lsi : "Lower South Island"};
+    var totals = {}; // reg : "" , years : []
+
+    for(var i = 0; i < availableObsYears.length; i++){
+        tableRows.filter(function(e){return e.obs_yr === availableObsYears[i];}).forEach(function(row){
+            regionStrings.forEach(function(regionString){
+                  if(regions[regionString].includes(row.edb)){
+                      if(totals[regionString] === undefined){
+                        console.log(regionString)
+                        totals[regionString] = [+row.value];
+                      } else {
+                        if(i === totals[regionString].length){
+                          totals[regionString].push(+row.value);
+                        } else {
+                            totals[regionString] [i] += + (+row.value);
+                        }
+                      }
+                  }
+            });
+
+        });
+    }
+
+    // Insert Caption for table
+    var years = "";
+    availableObsYears.forEach(function (year) {
+       years += "<th>" + year + "</th>";
+    });
+
+    var cellCount = 0;
+
+    $("#"+id).append('<tr id="head-row-totals-"'+id+' class="table-row table-head"> <th>Region</th>'+ years + '</tr>');
+
+    for (var property in totals) {
+      if (totals.hasOwnProperty(property)) {
+        var row= "<tr class='table-row' id=row-tot-"+id+i+">";
+
+        // Insert name in column and assign an id to the row
+        row += "<th class='reg-cell'>" + names[property] + "</th>";
+        totals[property].forEach(function(value){
+          row += "<th id='t-total"+id+""+cellCount+"' origValue='"+value+"' class='val-tot-cell'>" + dpFormat(value / regions[property].length) + "</th>";
+          totCells.push({id : "#t-total"+id+""+cellCount, value : value / regions[property].length});
+          cellCount++;
+        });
+        $("#"+id).append(row);
+      }
+    }
+    applyGradientCSS(totCells,false);
+}
+
 
 // Here every row belongs to the specific table
 function insertTable(tableRows,id){
+    var totals = []; // Format reg : "", year : numb
+
     // Sorts the EDB names
     tableRows.sort(function (a,b) {
         return [a.edb, b.edb].sort()[0] === a.edb ? -1 : 1; // Sort two names and return the first
@@ -357,6 +443,8 @@ function insertTable(tableRows,id){
         percent = tableRows[0].units.includes('%') || tableRows[0].units.includes('portion');
     }
     applyGradientCSS(cellValues, percent);
+
+    // Now create the average tables
 }
 
 var rowSelected = "";
@@ -375,8 +463,6 @@ function rowClicked(id){
   rowSelected = id;
 
   var text = $("#"+id+" .edb-cell").text();
-
-  console.log()
 
   $('.table').find('tr').removeClass('row-selected');
 
@@ -914,7 +1000,9 @@ function applyCPI(units){
 
         // Applies CPI to all selected tables
         selectionTablesArray.forEach(function (table) {
+          if(table.unit.includes('$')){
             applyCPIToTable('#table'+table.id,cpiValues);
+          }
         });
 
 
@@ -1061,9 +1149,10 @@ function SelectionDataCombined(rows, table1Rows,table2Rows,title1,title2,unit1,u
     this.table2Rows = table2Rows;
 }
 
-function SelectedTableData(rows,id, title, subTitle){
+function SelectedTableData(rows,id, title, subTitle, unit){
     this.rows = rows;
     this.id = id;
     this.title = title;
     this.subTitle = subTitle;
+    this.unit = unit;
 }

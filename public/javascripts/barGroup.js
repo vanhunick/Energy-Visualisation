@@ -22,6 +22,9 @@ function GroupedBarData(x0, x1,y,yAxis,svg,id){
 var z = d3.scaleOrdinal()
     .range(["#BBDEFB", "#64B5F6", "#1976D2", "#1565C0", "#0D47A1", "#d0743c", "#ff8c00"]);
 
+    var zRed = d3.scaleOrdinal()
+        .range(["#FF7373", "#FF4C4C", "#FF2626", "#B20000", "#D90000", "#d0743c", "#ff8c00"]);
+
 function createdGroupedBarGraph(data,keys,yLabel, divID){
     var curBarGraph = null;
 
@@ -49,7 +52,7 @@ function createdGroupedBarGraph(data,keys,yLabel, divID){
 
     curBarGraph.x0.domain(data.map(function(d) { return d.edb; }));
     curBarGraph.x1.domain(keys).rangeRound([0, curBarGraph.x0.bandwidth()]);
-    curBarGraph.y.domain([0, d3.max(data, function(d) { return d3.max(keys, function(key) { return d[key]; }); })]).nice();
+    curBarGraph.y.domain([0, d3.max(data, function(d) { return d3.max(keys, function(key) { return Math.abs(d[key]); }); })]).nice();
 
     var g = curBarGraph.svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
@@ -70,34 +73,46 @@ function createdGroupedBarGraph(data,keys,yLabel, divID){
             .data(data)
             .attr("transform", function(d) { return "translate(" + curBarGraph.x0(d.edb) + ",0)"; })
             .selectAll("rect")
-            .data(function(d) { return keys.map(function(key) { return {key: key, value: d[key]}; }); })
+            .data(function(d) { return keys.map(function(key) { return { neg : d[key] < 0, key: key, value: Math.abs(d[key])}; }); })
             .enter().append("rect")
             .attr("x", function(d) { return curBarGraph.x1(d.key); })
             .attr("y", function(d) { return curBarGraph.y(d.value); })
             .attr("width", curBarGraph.x1.bandwidth())
             .attr("height", function(d) { return height - curBarGraph.y(d.value); })
-            .attr("fill", function(d) { return z(d.key); })
+            .attr("fill", function(d) { if(d.neg){
+              return zRed(d.key);
+            }else {
+              return z(d.key);
+            }
+            })
             .on('mouseover', tip.show)
             .on('mouseout', tip.hide);
+    } else {
+      g.append("g")
+          .selectAll("g")
+          .data(data)
+          .enter().append("g")
+          .attr("transform", function(d) { return "translate(" + curBarGraph.x0(d.edb) + ",0)"; })
+          .selectAll("rect")
+          .data(function(d) { return keys.map(function(key) { return {neg : d[key] < 0,key: key, edb : d.edb, value: Math.abs(d[key])}; }); })
+          .enter().append("rect")
+          .attr("x", function(d) { return curBarGraph.x1(d.key); })
+          .attr("y", function(d) { return curBarGraph.y(d.value); })
+          .attr("width", curBarGraph.x1.bandwidth())
+          .attr("height", function(d) { return height - curBarGraph.y(d.value); })
+          .attr("fill", function(d) { if(d.neg){
+            return zRed(d.key);
+          }else {
+            return z(d.key);
+          }
+          })
+          .attr("class",function(d){return ""+d.edb.replace(/ /g , "");} ) // Add ebd as the class
+          .on('mouseover', tip.show)
+          .on('mouseout', tip.hide);
     }
 
 
-    g.append("g")
-        .selectAll("g")
-        .data(data)
-        .enter().append("g")
-        .attr("transform", function(d) { return "translate(" + curBarGraph.x0(d.edb) + ",0)"; })
-        .selectAll("rect")
-        .data(function(d) { return keys.map(function(key) { return {key: key, edb : d.edb, value: d[key]}; }); })
-        .enter().append("rect")
-        .attr("x", function(d) { return curBarGraph.x1(d.key); })
-        .attr("y", function(d) { return curBarGraph.y(d.value); })
-        .attr("width", curBarGraph.x1.bandwidth())
-        .attr("height", function(d) { return height - curBarGraph.y(d.value); })
-        .attr("fill", function(d) { return z(d.key); })
-        .attr("class",function(d){return ""+d.edb.replace(/ /g , "");} ) // Add ebd as the class
-        .on('mouseover', tip.show)
-        .on('mouseout', tip.hide);
+
 
     g.append("g")
         .attr("class", "axis")
