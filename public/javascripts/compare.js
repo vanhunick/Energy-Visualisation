@@ -320,7 +320,7 @@ function insertTotalsTable(tableRows, id, regions, tableExists){
     for(var i = 0; i < availableObsYears.length; i++){
       nz.push(totals["n"][i] + totals["s"][i]);
     }
-    totals["nz"] = nz; // Add the NZ property to totals
+    totals["nz"] = nz; // Add the NZ property to totals // TODO change array at the top
 
     // Insert Caption for table
     var years = "";
