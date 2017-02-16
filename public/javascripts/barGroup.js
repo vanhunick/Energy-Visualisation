@@ -1,12 +1,12 @@
-
-var margin = { top: 35, right: 85, bottom: 150, left: 50 }, // Right needs to be big to fit the edb text diagonally
+//  Margins and width / height for the graph
+var margin = { top: 35, right: 85, bottom: 150, left: 50 },
     width = 1200 - margin.left - margin.right,
     height = 800 - margin.top - margin.bottom;
 
-
-
+// The array that holds the GroupedBarData objects for every graph on the page
 var barGraphs = [];
 
+// An object to hold data for each grouped bar graph
 function GroupedBarData(x0, x1,y,yAxis,svg,id){
     this.x0 = x0;
     this.x1 = x1;
@@ -17,57 +17,50 @@ function GroupedBarData(x0, x1,y,yAxis,svg,id){
     this.created = false;
 }
 
-
 // Blue color scale
-var z = d3.scaleOrdinal()
-    .range(["#BBDEFB", "#64B5F6", "#1976D2", "#1565C0", "#0D47A1", "#d0743c", "#ff8c00"]);
+var z = d3.scaleOrdinal().range(["#BBDEFB", "#64B5F6", "#1976D2", "#1565C0", "#0D47A1", "#d0743c", "#ff8c00"]);
 
-// Red color scale
-var zRed = d3.scaleOrdinal()
-    .range(["#FF7373", "#FF4C4C", "#FF2626", "#B20000", "#D90000", "#d0743c", "#ff8c00"]);
+// Red color scale for negative values
+var zRed = d3.scaleOrdinal().range(["#FF7373", "#FF4C4C", "#FF2626", "#B20000", "#D90000", "#d0743c", "#ff8c00"]);
 
-// Green color scale
-var zSelected = d3.scaleOrdinal()
-    .range(["#C1FFC1", "#90EE90", "#5BC85B", "#31A231", "#137B13", "#d0743c", "#ff8c00"]);
+// Green color scale for selected values
+var zSelected = d3.scaleOrdinal().range(["#C1FFC1", "#90EE90", "#5BC85B", "#31A231", "#137B13", "#d0743c", "#ff8c00"]);
 
+// Highlights each bar that corrosponds to the EDB. If alreadySelected, nothing should be highlighted therefore the normal scale is applied
 function highlight(edb, alreadySelected){ // With spaces
-  // Select all rectangle with the selected class and remove class
   // Before we remove the class we need to apply the correct color scale
-
-
   d3.selectAll(".bar-selected").datum(function(d) {return d; })
   .attr("fill", function(d) {return z(d.key); });
 
-  d3.selectAll(".bar-selected")
-  .classed("bar-selected", false);
+  // Select all rectangle with the selected class and remove class
+  d3.selectAll(".bar-selected").classed("bar-selected", false);
 
-  if(alreadySelected){
-        return; // The case where the row is unselected but nothing else is selected
-  }
+  if(alreadySelected){return;} // The case where the row is unselected but nothing else is selected
 
-  // Select all rectangle with the correct EDB and outline bars
   d3.selectAll("rect."+edb.replace(/ /g , ""))
-  .classed("bar-selected", true);
-
-  d3.selectAll(".bar-selected").datum(function(d) {return d; })
-  .attr("fill", function(d) {return zSelected(d.key); });
+  .classed("bar-selected", true) // Select all rectangle with the correct EDB and outline bars and add selected class
+  .datum(function(d) {return d; }) // Grab the data bound to the elements
+  .attr("fill", function(d) {return zSelected(d.key); }); // Apply the green color scale based on the key
 }
 
+
+// Creates a Grouped bar graph with the data and inserts into div DivID
 function createdGroupedBarGraph(data,keys,yLabel, divID){
     var curBarGraph = null;
 
+    // Find the graph if it already exists and needs to be updated
     barGraphs.forEach(function (elem) {
        if(elem.id === divID)curBarGraph = elem;
     });
 
+    // If the graph does not exist create one
     if(curBarGraph === null){
-        curBarGraph = new GroupedBarData( d3.scaleBand().rangeRound([0, width]).paddingInner(0.05),
-                                          d3.scaleBand().padding(0.05),
+        curBarGraph = new GroupedBarData( d3.scaleBand().rangeRound([0, width]).paddingInner(0.05),d3.scaleBand().padding(0.05),
                                           d3.scaleLinear().rangeRound([height, 0]),d3.axisLeft(),d3.axisBottom(),divID);
         barGraphs.push(curBarGraph);
     }
 
-
+    // Only add svg if it is not created yet
     if(!curBarGraph.created){
         curBarGraph.svg =  d3.select(divID).append("svg")
             .attr("width", width + margin.left + margin.right)
@@ -77,22 +70,22 @@ function createdGroupedBarGraph(data,keys,yLabel, divID){
                 "translate(" + margin.left + "," + margin.top + ")"); // moves by a x and y value in this case the margins
     }
 
-
+    // Set the domains
     curBarGraph.x0.domain(data.map(function(d) { return d.edb; }));
     curBarGraph.x1.domain(keys).rangeRound([0, curBarGraph.x0.bandwidth()]);
     curBarGraph.y.domain([0, d3.max(data, function(d) { return d3.max(keys, function(key) { return Math.abs(d[key]); }); })]).nice();
-
     var g = curBarGraph.svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+    // The format used on the tip values
     var dpFormat = d3.format(".2f");
 
+    // Create the tip that will show up on hover
     var tip = d3.tip()
       .attr('class', 'd3-tip')
       .offset([-10, 0])
       .html(function(d) {
         return "<strong>Value:</strong> <span style='color:lightgreen'>" + dpFormat(d.value) + "</span><br><br><strong>Year:</strong> <span style='color:lightgreen'>" + d.key + "</span>";
       });
-
       curBarGraph.svg.call(tip);
 
     if(curBarGraph.created){
@@ -111,8 +104,7 @@ function createdGroupedBarGraph(data,keys,yLabel, divID){
               return zRed(d.key);
             }else {
               return z(d.key);
-            }
-            })
+            }})
             .on('mouseover', tip.show)
             .on('mouseout', tip.hide);
     } else {
@@ -132,16 +124,13 @@ function createdGroupedBarGraph(data,keys,yLabel, divID){
             return zRed(d.key);
           }else {
             return z(d.key);
-          }
-          })
+          }})
           .attr("class",function(d){return ""+d.edb.replace(/ /g , "");} ) // Add ebd as the class
           .on('mouseover', tip.show)
           .on('mouseout', tip.hide);
     }
 
-
-
-
+    // Add x axis
     g.append("g")
         .attr("class", "axis")
         .attr("transform", "translate(0," + height + ")")
@@ -154,6 +143,7 @@ function createdGroupedBarGraph(data,keys,yLabel, divID){
         .attr("transform", "rotate(55)")
         .style("text-anchor", "start");
 
+    // Update y axis or create it
     if(curBarGraph.created){
         curBarGraph.svg.select('.yAxis').call(curBarGraph.yAxis);
     } else {
@@ -177,7 +167,7 @@ function createdGroupedBarGraph(data,keys,yLabel, divID){
         .attr("class", "unit-text")
         .text(yLabel);
 
-
+    // Create the legend
     var legend = g.append("g")
         .attr("font-family", "sans-serif")
         .attr("font-size", 10)
@@ -201,5 +191,5 @@ function createdGroupedBarGraph(data,keys,yLabel, divID){
         .style("font-size", "14px")
         .text(function(d) { return d; });
 
-    curBarGraph.created = true;
+    curBarGraph.created = true; // Set the graph with the ID divID to created
 }
