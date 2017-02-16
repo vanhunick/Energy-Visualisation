@@ -3,14 +3,16 @@
  */
 var labels = false; // show the text labels beside individual boxplots?
 
-var boxMargin = {top: 30, right: 50, bottom: 100, left: 100};
-var  boxWidth = 1000 - boxMargin.left - boxMargin.right;
-var boxHeight = 800  - boxMargin.top  - boxMargin.bottom;
+// Margins and graph width / height
+var boxMargin = {top: 30, right: 50, bottom: 100, left: 100},
+    boxWidth = 1000 - boxMargin.left - boxMargin.right,
+    boxHeight = 800  - boxMargin.top  - boxMargin.bottom;
 
 
 // Encapsulate all properties of graph
 var plots = [];
 
+// Object to hold the values for each individual boxplot
 function BoxPlotData(x,y,xAxis,yAxis,svg,chart,created, id){
     this.x = x;
     this.y = y;
@@ -23,7 +25,8 @@ function BoxPlotData(x,y,xAxis,yAxis,svg,chart,created, id){
 }
 
 
-function createBoxPlot(dataObject, divID,unit){
+// Create a box plot graph with the dataObject and place it in the div with divID unit for the the y - axis
+function createBoxPlot(dataObject,divID,unit){
     var boxPlotObjects = null;
     var data = dataObject.data;
     var min = dataObject.min;
@@ -40,7 +43,7 @@ function createBoxPlot(dataObject, divID,unit){
     // The graph has not been created yet
     if(boxPlotObjects === null){
         var x = d3.scaleBand().rangeRound([0, boxWidth]).padding(0.7,0.3);
-        boxPlotObjects = new BoxPlotData( x,null,null,null,null,null,false,divID);
+        boxPlotObjects = new BoxPlotData(x,null,null,null,null,null,false,divID);
         plots.push(boxPlotObjects);
     } else {
         d3.select(divID+' svg').remove();
@@ -81,18 +84,19 @@ function createBoxPlot(dataObject, divID,unit){
         .attr("transform", function(d) { return "translate(" +  boxPlotObjects.x(d[0])  + "," + boxMargin.top + ")"; } )
         .call(boxPlotObjects.chart.width(boxPlotObjects.x.bandwidth())); //V4 Updated
 
-        var dpFormat = d3.format(".2f");
+    // The format to display the values in
+    var dpFormat = d3.format(".2f");
 
-        var tip = d3.tip()
-          .attr('class', 'd3-tip')
-          .offset([-10, 0])
-          .html(function(d) {
-            return "<strong>Value:</strong> <span style='color:lightgreen'>" + dpFormat(d.value) + "</span><br><br><strong>EDB:</strong> <span style='color:lightgreen'>" + d.edb + "</span>";
-          });
+    // Create the tip to show up on hover
+    var tip = d3.tip()
+      .attr('class', 'd3-tip')
+      .offset([-10, 0])
+      .html(function(d) {
+        return "<strong>Value:</strong> <span style='color:lightgreen'>" + dpFormat(d.value) + "</span><br><br><strong>EDB:</strong> <span style='color:lightgreen'>" + d.edb + "</span>";
+      });
+    boxPlotObjects.svg.call(tip);
 
-          boxPlotObjects.svg.call(tip);
-
-
+    // Add the dots for the scaterplot on top of the box and whisker
     boxPlotObjects.svg.selectAll(".dot")
             .data(scatterData)
             .enter().append("circle")
@@ -103,7 +107,6 @@ function createBoxPlot(dataObject, divID,unit){
             .on('mouseover', tip.show)
             .on('mouseout', tip.hide);
 
-    // Create the scatter plot over top
     // draw y axis
     boxPlotObjects.svg.append("g")
         .attr("class", "y axis")
@@ -144,9 +147,8 @@ function createBoxPlot(dataObject, divID,unit){
         .attr("class", "unit-text")
         .text("Year");
 
-    boxPlotObjects.created = true;
+    boxPlotObjects.created = true; // Set the plot to created for the ID
 }
-
 
 
 // Returns a function to compute the interquartile range.
