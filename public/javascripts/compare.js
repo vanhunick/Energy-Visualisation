@@ -2,7 +2,7 @@
  * Created by Nicky on 23/01/2017.
  */
 
-
+// Object to hold which company belongs to a specific region
 var regions = {
   n : ["Centralines","Counties Power","Eastland Network","Electra","Horizon Energy","Northpower",
        "Powerco","Scanpower","The Lines Company","Top Energy","Unison Networks","Vector Lines",
@@ -21,8 +21,8 @@ var regions = {
 // Holds the currently selected items in the filter rows
 var selections = [];
 
+// Format to use for all values displayed
 var dpFormat = d3.format(".4r");
-
 
 // Holds a object that contains the rows of selections that were last searched
 var lastSearch = null;
@@ -36,13 +36,16 @@ var cSelected = false;
 var dSelected = false;
 
 // Holds the rows for each table separately
-var dataTables;
-var copyOfDataTables;
+var dataTables; // Should never be modified
+var copyOfDataTables; // Can be modified to apply CPI
 
-var selectionDataArray;
-var selectionTablesArray;
-var combinedSelectionDataArray;
+// Three different ones created to hold ids for the divs the data is inserted into. This allows looping over the tables
+var selectionDataArray;// Contains the rows, id, title, subtitle amd init for each selection
+var selectionTablesArray; // Contains the rows, id, title, subtitle amd init for each table
+var combinedSelectionDataArray; // Contains combined rows along with titles and units
 
+
+// Called when the document is loaded
 $(document).ready( function() {
     // Highlight the selected link
     $(".nav-link").removeClass('active');
@@ -53,20 +56,43 @@ $(document).ready( function() {
         selectedCompany = $(this).find("option:selected").text();
     });
     $('#search-btn-compare').click(function(){ // Listener to search button
-        search();
+        search(); // Search encodes the selections into the url and sends to server
     });
     cpiValidationSetup(); // Set up cpi validation rules
 });
 
-// Checks that if there is a value in a selection one must be selected per row
+
+// Uses the url to find what was searches and asks server for rows relating to that search
+function loadFromURL(urlSelections){
+    loadInSections(true,urlSelections); // First load in the section rows and set the searched selections
+
+    lastSearch = new Selection(urlSelections[0],urlSelections[1],urlSelections[2],urlSelections[3]); // Set the last search
+    // Send array of selected sections to server and the company
+    $.post("/compare/search",{company : selectedCompany, selections : JSON.stringify(urlSelections)}, function(data){
+        // Queries the db for each of the secions and finds and inserts the sub sections as options
+        setSelectionsFromURL(urlSelections[0]);
+        setSelectionsFromURL(urlSelections[1]);
+        setSelectionsFromURL(urlSelections[2]);
+        setSelectionsFromURL(urlSelections[3]);
+
+        dataTables = filterRowsToTables(data.rows); // Filter the rows into their tables
+        copyOfDataTables = copyDataTables(dataTables); // Create a copy of data tables
+        createDataStructuresWithCopy(copyOfDataTables); // Sets up the data so it can easily be iterated over to create the tables and graphs
+        showTables(selectionTablesArray); // Show the tables
+        showAllRegularGraphs(selectionDataArray, true); // Show all but combined and vector graphs true indicates it should add titles in
+        showAllCombinedGraphs(combinedSelectionDataArray, true); // Show the combined and vector graphs
+    });
+}
+
+// Checks that if there is a value selected in a row the others must be selected too before searching
 function validateSearchParams(){
     var returnVal = true;
-
     selections.forEach(function (elem, i) {
-        if(elem.subCategory === "" && validOptions[i]){
+        if(elem.subCategory === "" && validOptions[i]){ // Valid options holds if there is a possible option to choosefrom in the select drop down
             returnVal = false; // There is a possible sub category so it has to be chosen from
         }
 
+        // Checks if one of the selections is empty
         if(elem.section === "" || elem.category === "" || elem.description === ""){
             // Now check if one of the selections is not empty
             if(elem.section !== "" || elem.category !== "" || elem.description !== ""){
@@ -75,96 +101,77 @@ function validateSearchParams(){
             }
         }
     });
-    if(returnVal)$('#error-div').html('');
+    if(returnVal)$('#error-div').html(''); // It is valid so romve error element
     return returnVal;
 }
 
+
 // Returns a copy of the dataTables object
 function copyDataTables(dataTables){
-    var origTables = [dataTables.tableA,dataTables.tableB,dataTables.tableC,dataTables.tableD,dataTables.tableAB,dataTables.tableCD];
-    var tables = [[],[],[],[],[],[]];
+    var origTables = [dataTables.tableA,dataTables.tableB,dataTables.tableC,dataTables.tableD,dataTables.tableAB,dataTables.tableCD]; // Add tables to array to iterate over them
+    var tables = [[],[],[],[],[],[]]; // Empty arras to insert new rows with values copies of the original
 
     for(var j = 0; j < origTables.length; j++){
-        var a = origTables[j];
-        if(a !== undefined){
-            for(var i = 0; i < a.length; i++){
+        var a = origTables[j]; // Grab the current table with index i
+        if(a !== undefined){ // It might not exist due to it not being selected
+            for(var i = 0; i < a.length; i++){ // For every row copy all the fields
                 tables[j].push({category :a[i].category, description : a[i].description,disc_yr: a[i].disc_yr,edb: a[i].edb,
                     fcast_yr: a[i].fcast_yr,network:a[i].network,note:a[i].note,obs_yr:a[i].obs_yr,p_key: a[i].p_key,sch_ref:a[i].sch_ref,
                     schedule:a[i].schedule,section:a[i].section,sub_category: a[i].sub_category,units:a[i].units,value:a[i].value})
             }
         }
     }
-    return new DataTables(tables[0],tables[1],tables[2],tables[3],tables[4],tables[5]);
+    return new DataTables(tables[0],tables[1],tables[2],tables[3],tables[4],tables[5]); // Return the copy
 }
 
-// Uses the url to find what was searches and asks server for rows relating to that search
-function loadFromURL(urlSelections){
-    loadInSections(true,urlSelections); // First load in the section rows
 
-    lastSearch = new Selection(urlSelections[0],urlSelections[1],urlSelections[2],urlSelections[3]); //TODO copy values
-    // Send array of selected sections to server and the company
-    $.post("/compare/search",{company : selectedCompany, selections : JSON.stringify(urlSelections)}, function(data){
-        setSelectionsFromURL(urlSelections[0]);
-        setSelectionsFromURL(urlSelections[1]);
-        setSelectionsFromURL(urlSelections[2]);
-        setSelectionsFromURL(urlSelections[3]);
-
-        dataTables = filterRowsToTables(data.rows); // Filter the rows into their tables
-        copyOfDataTables = copyDataTables(dataTables); // Create a copy of data tables
-
-        createDataStructuresWithCopy(copyOfDataTables);
-
-        showTables(selectionTablesArray); // Show the tables
-        showAllRegularGraphs(selectionDataArray, true); // Show all but combined and vector graphs true indicates it should add titles in
-        showAllCombinedGraphs(combinedSelectionDataArray, true); // Show the combined and vector graphs
-
-    });
-}
-
+// Creates the data structures and assigns to the global variables
 function createDataStructuresWithCopy(copyOfDataTables){
   selectionDataArray = [];
   selectionTablesArray = [];
   combinedSelectionDataArray = [];
 
-          // An array of true / false values if a table contains values
-          var selectedRows = [copyOfDataTables.tableA.length > 0,copyOfDataTables.tableB.length > 0,copyOfDataTables.tableC.length > 0,copyOfDataTables.tableD.length > 0];
+  // An array of true / false values if a table contains values
+  var selectedRows = [copyOfDataTables.tableA.length > 0,copyOfDataTables.tableB.length > 0,copyOfDataTables.tableC.length > 0,copyOfDataTables.tableD.length > 0];
 
-          // An array with the tables data
-          var tables = [copyOfDataTables.tableA,copyOfDataTables.tableB,copyOfDataTables.tableC,copyOfDataTables.tableD,copyOfDataTables.tableAB,copyOfDataTables.tableCD];
+  // An array with the tables data
+  var tables = [copyOfDataTables.tableA,copyOfDataTables.tableB,copyOfDataTables.tableC,copyOfDataTables.tableD,copyOfDataTables.tableAB,copyOfDataTables.tableCD];
 
-          // Creates the 4 normal tables and the combined tables
-          var ids = ['a','b','c','d','ab','cd'];
-          for(var i = 0; i < selectedRows.length; i++){
-              if(selectedRows[i]){
-                  var title = tables[i][0].section + ", " + tables[i][0].category;
-                  var subtitle = tables[i][0].sub_category === null ? tables[i][0].description : tables[i][0].sub_category + ", " + tables[i][0].description;
-                  selectionTablesArray.push(new SelectedTableData(tables[i],ids[i],title,subtitle, tables[i][0].units)); // TODO add unit for combined
-                  selectionDataArray.push(new SelectionData(tables[i], title, subtitle ,tables[i][0].units,ids[i]));
+  // Creates the 4 normal tables and the combined tables
+  var ids = ['a','b','c','d','ab','cd'];
+  for(var i = 0; i < selectedRows.length; i++){
+    if(selectedRows[i]){
+      var title = tables[i][0].section + ", " + tables[i][0].category;
+      var subtitle = tables[i][0].sub_category === null ? tables[i][0].description : tables[i][0].sub_category + ", " + tables[i][0].description;
+      selectionTablesArray.push(new SelectedTableData(tables[i],ids[i],title,subtitle, tables[i][0].units)); // TODO add unit for combined
+      selectionDataArray.push(new SelectionData(tables[i], title, subtitle ,tables[i][0].units,ids[i]));
 
-                  // Check for combined special case
-                  if(ids[i] === 'a' || ids[i] === 'c'){
-                      if(selectedRows[i+1]){ // Check that a selections has been made if so create the combined table
-                          var jump = i === 0 ? 4 : 3;
-                          var titleJump = tables[i+1][0].section + ", " + tables[i+1][0].category;
-                          var subTitleJump = tables[i+1][0].sub_category === null ? tables[i+1][0].description : tables[i+1][0].sub_category + ", " + tables[i+1][0].description;
-                          selectionTablesArray.push(new SelectedTableData(tables[i+jump],ids[i+jump], title + ", " + subtitle, titleJump + ", " + subTitleJump, tables[i+1][0].units));
-                          combinedSelectionDataArray.push(new SelectionDataCombined(tables[i+jump],tables[i],tables[i+1], title + " " + subtitle, titleJump + " " + subTitleJump,tables[i][0].units,tables[i+1][0].units,ids[i+jump])); // TODO ask how to format titles for combined
-                      }
-                  }
-              }
-          }
+      // Check for combined special case
+      if(ids[i] === 'a' || ids[i] === 'c'){
+        if(selectedRows[i+1]){ // Check that a selections has been made if so create the combined table
+          var jump = i === 0 ? 4 : 3;
+          var titleJump = tables[i+1][0].section + ", " + tables[i+1][0].category;
+          var subTitleJump = tables[i+1][0].sub_category === null ? tables[i+1][0].description : tables[i+1][0].sub_category + ", " + tables[i+1][0].description;
+          selectionTablesArray.push(new SelectedTableData(tables[i+jump],ids[i+jump], title + ", " + subtitle, titleJump + ", " + subTitleJump, tables[i+1][0].units));
+          combinedSelectionDataArray.push(new SelectionDataCombined(tables[i+jump],tables[i],tables[i+1], title + " " + subtitle, titleJump + " " + subTitleJump,tables[i][0].units,tables[i+1][0].units,ids[i+jump])); // TODO ask how to format titles for combined
+        }
+      }
+    }
+  }
 }
 
 
+// Shows the tables on the page givin the data in the selection table array
 function showTables(selectionTablesArray){
     selectionTablesArray.forEach(function (tableData) {
-        $('#title-'+tableData.id).append('<h2 class="title">'+tableData.title+'</h2>')
-            .append('<h4 class="subTitle">'+tableData.subTitle+'</h4>');
+        // Add in the title using the id and the tile / subtitle for each table
+        $('#title-'+tableData.id).append('<h2 class="title">'+tableData.title+'</h2>').append('<h4 class="subTitle">'+tableData.subTitle+'</h4>');
 
         insertTable(tableData.rows,'table'+tableData.id);
-        insertTotalsTable(tableData.rows, 'table-total'+tableData.id, regions,false);
+        insertTotalsTable(tableData.rows, 'table-total'+tableData.id, regions,false); // Creates and inserts the total table
     })
 }
+
 
 // Takes all rows and filers into corresponding tables
 function filterRowsToTables(rows){
@@ -194,74 +201,48 @@ function filterRowsToTables(rows){
 // Shows graphs for A,B,C,D
 function showAllRegularGraphs(selectionData, addTitles){
     selectionData.forEach(function (selection) {
-
-        var negative = false;
-        // selection.rows.forEach(function (elem) {
-        //     if(elem.value < 0){
-        //         negative = true;
-        //         return;
-        //     }
-        // })
-
-        if(negative){
-            $('#title-'+selection.id+'-bar').append('<h3 class="title" style="color:red;">Cannot create bar graph with negative numbers</h3>'); // Display error
-            $('#full-table-'+selection.id+'-div').show();
-            return;
-        }
-
-        // Create and insert the grouped bar graph
+        // Insert the titles for the graphs
         if(addTitles){
-            $('#title-'+selection.id+'-bar').append('<h2 class="title">'+selection.title+'</h2>')
-                .append('<h4 class="subTitle">'+selection.subTitle+'</h4>');
+            $('#title-'+selection.id+'-bar').append('<h2 class="title">'+selection.title+'</h2>').append('<h4 class="subTitle">'+selection.subTitle+'</h4>');
+            $('#title-'+selection.id+'-box').append('<h2 class="title">'+selection.title+'</h2>').append('<h4 class="subTitle">'+selection.subTitle+'</h4>');
         }
 
+        // Create the data needed for bar grahs and create and insert the graph
         var table1Data = createDataForGroupedGraph(selection.rows);
         createdGroupedBarGraph(table1Data.data, table1Data.keys,selection.unit,"#grouped-bar-"+selection.id);
 
-        // Create and insert Box and whisker graph
-        if(addTitles){
-            $('#title-'+selection.id+'-box').append('<h2 class="title">'+selection.title+'</h2>')
-                .append('<h4 class="subTitle">'+selection.subTitle+'</h4>');
-        }
-
+        // Create the data needed for box plot and create and insert the plot
         createBoxPlot(createDataForBoxPlot(selection.rows), "#boxplot"+selection.id+"-div", selection.unit);
         $('#full-table-'+selection.id+'-div').show();
     });
 }
 
-// Shows graphs for A/B, C/D
+
+// Shows graphs for A/B, C/D and A/B / C/D
 function showAllCombinedGraphs(selectionData, showTitle){
     selectionData.forEach(function(selection){
-        // Insert Bar graph
+        // Insert titles
         if(showTitle){
             $('#title-'+selection.id+'-bar').append('<h4 class="combined-title">'+selection.title1+'<br><span class="over">over</span><br>'+selection.title2+'</h4>');
-        }
-        var tableABData = createDataForGroupedGraph(selection.rows);
-        createdGroupedBarGraph(tableABData.data, tableABData.keys, selection.unit1 + " / " + selection.unit2, "#grouped-bar-"+selection.id);
-
-        // Create and insert combined box plot
-        if(showTitle){
             $('#title-'+selection.id+'-box').append('<h4 class="combined-title">'+selection.title1+' <br><span class="over">over</span><br>'+selection.title2+'</h4>');
-        }
-        createBoxPlot(createDataForBoxPlot(selection.rows), "#boxplot"+selection.id+"-div", selection.unit1 + " / " + selection.unit2);
-
-        if(showTitle){
             $('#title-'+selection.id+'-vector').append('<h4 class="combined-title">'+selection.title1+'<br><span class="over">over</span><br>'+selection.title2+'</h4>');
         }
+        // Create data for bar, box and vector graphs and isert into divs
+        var tableABData = createDataForGroupedGraph(selection.rows);
+        createdGroupedBarGraph(tableABData.data, tableABData.keys, selection.unit1 + " / " + selection.unit2, "#grouped-bar-"+selection.id);
+        createBoxPlot(createDataForBoxPlot(selection.rows), "#boxplot"+selection.id+"-div", selection.unit1 + " / " + selection.unit2);
         createVectorGraph(createDataForVectorGraph(selection.table1Rows,selection.table2Rows),selection.unit1,selection.unit2,"#vector-graph-div-"+selection.id);
-        $('#full-table-'+selection.id+'-div').show();
+        $('#full-table-'+selection.id+'-div').show(); // Show the div now that they have been created
     });
 
     // Add in A / B over C / D
     if(selectionData.length === 2){
-        $('#title-abcd-vec').append('<h4 class="combined-title">'+selectionData[0].title1+' / '+selectionData[0].title2+'</h4>')
-            .append('<h4>Over</h4>')
-            .append('<h4 class="combined-title">'+selectionData[1].title1+' / '+selectionData[1].title2+'</h4>');
-
+        $('#title-abcd-vec').append('<h4 class="combined-title">'+selectionData[0].title1+' / '+selectionData[0].title2+'</h4>').append('<h4>Over</h4>').append('<h4 class="combined-title">'+selectionData[1].title1+' / '+selectionData[1].title2+'</h4>');
         createVectorGraph(createDataForVectorGraph(selectionData[0].rows,selectionData[1].rows),selectionData[0].unit1 + " / " + selectionData[1].unit1,selectionData[0].unit2 + " / " + selectionData[1].unit2,"#vector-graph-div-abcd");
         $('#vector-full-div-abcd').show();
     }
 }
+
 
 // Combine two tables and return the results
 function combineTables(table1Rows, table2Rows){
@@ -289,40 +270,45 @@ function combineTables(table1Rows, table2Rows){
     return combined;
 }
 
+// Hold the original cells before cpi was applied in the for id, value
 var noCPICellsTotals = [];
 
+// Creates and inserts a total table for each reqion
 function insertTotalsTable(tableRows, id, regions, tableExists){
-    var totCells = [];
+    var totCells = []; // Hold the totals for each region
 
-    // Empty out the table
-    if(tableExists){
-      $("#"+id).html('');
-    }
+    // Empty out the table if it already exists
+    if(tableExists){$("#"+id).html('');}
 
     // First get all the availble years in the rows
     var availableObsYears = [];
     tableRows.forEach(function (elem) {
         if(!availableObsYears.includes(elem.obs_yr))availableObsYears.push(elem.obs_yr);
     });
-    availableObsYears.sort(function (a, b) {
+    availableObsYears.sort(function (a, b) { // Sort the years
         return +a - +b;
     });
 
-    var regionStrings = ["n","uni","eni", "swni", "s", "usi", "lsi"];
+    var regionStrings = ["n","uni","eni", "swni", "s", "usi", "lsi"]; // All the regions
     var names = {n : "North Island", uni : "Upper North Island", eni : "Eastern North Island", swni : "South-West North Island", s : "South Island", usi : "Upper South Island", lsi : "Lower South Island", nz : "New Zealand"};
     var totals = {}; // reg : "" , years : []
 
+    // Go through every year
     for(var i = 0; i < availableObsYears.length; i++){
+        // Get the rows for the current year
         tableRows.filter(function(e){return e.obs_yr === availableObsYears[i];}).forEach(function(row){
+
+            // Go through each of the regions
             regionStrings.forEach(function(regionString){
+                  // If the current row edb is inside the current reqion grab the value from the row and add it in the array for the current year
                   if(regions[regionString].includes(row.edb)){
                       if(totals[regionString] === undefined){
-                        totals[regionString] = [+row.value];
+                        totals[regionString] = [+row.value]; // First time this reqion has been found so have to create the property
                       } else {
-                        if(i === totals[regionString].length){
+                        if(i === totals[regionString].length){ // This means we have moved onto a new year so have to create a new slot
                           totals[regionString].push(+row.value);
                         } else {
-                            totals[regionString] [i] += + (+row.value);
+                            totals[regionString] [i] += + (+row.value); // Still in the first year with a different edb in the same region so just add the values
                         }
                       }
                   }
@@ -330,13 +316,11 @@ function insertTotalsTable(tableRows, id, regions, tableExists){
         });
     }
 
-    var nz = [];
-
+    var nz = []; // To find the totals of NZ add north and south tegether
     for(var i = 0; i < availableObsYears.length; i++){
       nz.push(totals["n"][i] + totals["s"][i]);
     }
-    totals["nz"] = nz;
-
+    totals["nz"] = nz; // Add the NZ property to totals
 
     // Insert Caption for table
     var years = "";
@@ -344,8 +328,7 @@ function insertTotalsTable(tableRows, id, regions, tableExists){
        years += "<th>" + year + "</th>";
     });
 
-    var cellCount = 0;
-
+    var cellCount = 0; // Used for id
     $("#"+id).append('<tr id="head-row-totals-"'+id+' class="table-row table-head"> <th>Region</th>'+ years + '</tr>');
 
     for (var property in totals) {
@@ -408,23 +391,17 @@ function insertTable(tableRows,id){
     var done = [];
     // Year done for edb
     var yearDone = [];
-
-    var cellCount = 0;
-    var cellValues = [];
-    var observerd = true;
-
-
+    var cellCount = 0; // For the id
+    var cellValues = []; // All the cell values
+    var observerd = true; // observerd or forcast, currently always observed
 
     // Create the rows of data
     for(var i = 0; i < tableRows.length; i++){
         if(!done.includes(tableRows[i].edb)){
             done.push(tableRows[i].edb);
-
             var row= "<tr class='table-row' id=row"+id+i+">";
-
             // Insert name in column and assign an id to the row
             row += "<th class='edb-cell'>" + tableRows[i].edb + "</th>";
-
 
             for(var k = 0; k < availableObsYears.length; k++){
                 // Iterate through all rows finding ones with the current edb
@@ -435,7 +412,6 @@ function insertTable(tableRows,id){
                     if(tableRows[j].edb === tableRows[i].edb && tableRows[j].obs_yr === availableObsYears[k] && (!yearDone.includes(tableRows[j].obs_yr))){
                         yearDone.push(tableRows[j].obs_yr);
                         row += "<th origValue='"+ tableRows[j].value +"' class='cell "+availableObsYears[k]+"' id='t"+id+""+cellCount+"'>" + dpFormat(tableRows[j].value) + "</th>";
-
                         // Save the value and the id of the cell to display percentage
                         cellValues.push({ id : "#t"+id+""+cellCount, value : tableRows[j].value });
                         cellCount++;
@@ -443,16 +419,16 @@ function insertTable(tableRows,id){
                 }
                 yearDone = [];
             }
+            $("#"+id).append(row + '</tr>'); // end and append the row
 
-            $("#"+id).append(row + '</tr>');
-            // Here we can check the unit type and highlight appropriately
             // Assing a on click function to each of the rows to generate the bar graph with the row specific data
             $("#row"+id+i).click(function(event) {
-               rowClicked(this.id);
+               rowClicked(this.id); // Call the function to highlight the data in all graphs for the edb
             });
         }
     }
 
+    //
     var percent = true;
     if(id === "tableab" || "tablcd"){
         percent = false;
@@ -460,17 +436,16 @@ function insertTable(tableRows,id){
         percent = tableRows[0].units.includes('%') || tableRows[0].units.includes('portion');
     }
     applyGradientCSS(cellValues, percent);
-
-    // Now create the average tables
 }
 
-var rowSelected = "";
+var rowSelected = ""; // Holds the id of the currently selected row
 
+// Called when a row is clicked on a table
 function rowClicked(id){
   if(rowSelected === id){// Clicked on the same row so unselect
     // Remove all selected classes from elements
     var text = $("#"+id+" .edb-cell").text();
-    highlight(text, true);
+    highlight(text, true); // highlight and removehighliting from bar graph
     $('.table').find('tr').removeClass('row-selected');
     // d3.selectAll(".bar-selected").classed("bar-selected", false);
     d3.selectAll(".line-selected-table").classed("line-selected", false);
@@ -478,15 +453,17 @@ function rowClicked(id){
     rowSelected = ""; // Nothing is selected
     return;
   }
+  rowSelected = id; // Set the lelected row
 
-  rowSelected = id;
-
+  // Grab the text using the id
   var text = $("#"+id+" .edb-cell").text();
-
+  // Remove the selected class from all rows
   $('.table').find('tr').removeClass('row-selected');
 
+  // Add the row selected class to the only one selected
   $("#"+id).addClass("row-selected");
 
+  // Get the edb from the selected row
   var edb = $("#"+id+".edb-cell").text();
 
   // Select all lines with the selected class and remove class
@@ -507,8 +484,10 @@ function rowClicked(id){
   .classed("vec-dot-selected", true);
 }
 
-function applyGradientCSS(cellValues, percent){
 
+// highlights the cell based on the percentage of the max value in the table unless already a percentage
+function applyGradientCSS(cellValues, percent){
+    // Find the max value
     var maxCellValue = -Infinity;
     cellValues.forEach(function(elem){
         maxCellValue = +elem.value > maxCellValue ? +elem.value : maxCellValue;
@@ -517,13 +496,13 @@ function applyGradientCSS(cellValues, percent){
     // Apllie css to each cell
     for(var i = 0; i < cellValues.length; i++){
         var value = (percent ? value : ((+cellValues[i].value / maxCellValue)*100)); // If percentage metric just use valud
-
         $(cellValues[i].id).css({
                 "background" : "-webkit-gradient(linear, left top, right top, color-stop(" + value +"%,#64B5F6), color-stop(" + value +"%,#FFF))",
             }
         );
     }
 }
+
 
 // Returns if a row from the DB matches one of the specified rows by the user
 function matchDBRow(DBRow, selection){
@@ -536,19 +515,18 @@ function matchDBRow(DBRow, selection){
     return false;
 }
 
+
 // Creates search parameters and creates url
 function search(){
-    if(!validateSearchParams())return;
-
+    if(!validateSearchParams())return; // First check if the selection is valid
     var rows = {
         i0 : selections[0].id,s0  : selections[0].section,c0 : selections[0].category,sc0 : selections[0].subCategory,d0 : selections[0].description,
         i1 : selections[1].id,s1  : selections[1].section,c1 : selections[1].category,sc1 : selections[1].subCategory,d1 : selections[1].description,
         i2 : selections[2].id,s2  : selections[2].section,c2 : selections[2].category,sc2 : selections[2].subCategory,d2 : selections[2].description,
         i3 : selections[3].id,s3  : selections[3].section,c3 : selections[3].category,sc3 : selections[3].subCategory,d3 : selections[3].description
     };
-
-    params = serialise(rows);
-    window.location.replace("compare?" + params);
+    params = serialise(rows); // Escape chracters for url
+    window.location.replace("compare?" + params); // Replace the url with the selections url
 }
 
 // Turns object in url string
@@ -560,6 +538,7 @@ function serialise(obj) {
         }
     return str.join("&");
 }
+
 
 // table 1 can be A and table two C or table 1 is A / B and table two is
 function createDataForVectorGraph(table1Rows,table2Rows) {
@@ -624,6 +603,7 @@ function createDataForVectorGraph(table1Rows,table2Rows) {
     return vecData;
 }
 
+
 // Creates the data needed to create box plots for one table
 function createDataForBoxPlot(tableRows){
     var yearsDone = []; // Years processed
@@ -680,10 +660,8 @@ function createDataForGroupedGraph(rows){
         return +a - +b;
     });
 
-
     var data = [];
     var edbDone = [];
-
 
     for(var i = 0; i < rows.length; i++){
         if(!edbDone.includes(rows[i].edb)){
@@ -702,15 +680,10 @@ function createDataForGroupedGraph(rows){
             }
         }
     }
-
-    var keys = availableObsYears;
-    //for(var i = 0; i <= max; i++){
-    //    keys.push(""+availableObsYears[i]);
-    //}
-    return {data : data, keys : keys};
+    return {data : data, keys : availableObsYears};
 }
 
-
+// Loads in a selection from the user by grabbing the possible sections, categories, sub categories and descriptions from the DB
 function setSelectionsFromURL(selection){
     // Find all the categories associated with this section
     $.post("/sections/s",{selected : selection.section }, function(data){
@@ -771,6 +744,7 @@ function setSelectionsFromURL(selection){
     });
 }
 
+
 // Sort the sections
 function sortSections(data){
     data.sections.sort(function(a,b){
@@ -789,6 +763,7 @@ function sortSections(data){
         return [a,b].sort()[0] === a ? -1 : 1; // Sort two names and return the first
     });
 }
+
 
 // Loads in sections along with the rows of selection boxes
 function loadInSections(fromURL, userSelections){ // if from url false selections is null
@@ -954,7 +929,6 @@ function addToSelection(id, type, data){
 }
 
 
-
 // Set up rules for validating the CPI fields
 function cpiValidationSetup(){
     $.validator.setDefaults({
@@ -983,23 +957,11 @@ function cpiValidationSetup(){
     };
 
     $('#cpi-form').validate({
-        rules : {
-            Y2012 : cpiRules,
-            Y2013 : cpiRules,
-            Y2014 : cpiRules,
-            Y2015 : cpiRules,
-            Y2016 : cpiRules
+        rules : {Y2012 : cpiRules,Y2013 : cpiRules,Y2014 : cpiRules,Y2015 : cpiRules,Y2016 : cpiRules
         },
-        messages : {
-            Y2012 : messageSet,
-            Y2013 : messageSet,
-            Y2014 : messageSet,
-            Y2015 : messageSet,
-            Y2016 : messageSet
-        }
+        messages : {Y2012 : messageSet,Y2013 : messageSet,Y2014 : messageSet,Y2015 : messageSet,Y2016 : messageSet}
     });
 }
-
 
 function applyCPI(units){
     if($('#cpi-form').valid()){
@@ -1007,11 +969,9 @@ function applyCPI(units){
             revertCPI(); // Reverts cpi before instead of saving values with cpi already applied
             copyOfDataTables = copyDataTables(dataTables); // Use the original data and create a copy of it
             createDataStructuresWithCopy(copyOfDataTables);
-
         }
         // CPI for 2012 - 2016
         var cpiValues = [{year : 2012, value : +$('#Y2012').val()},{year : 2013, value : +$('#Y2013').val()},{year : 2014, value : +$('#Y2014').val()},{year : 2015, value : +$('#Y2015').val()},{year : 2016, value : +$('#Y2016').val()}];
-
 
         // Applies CPI to all selected tables
         selectionTablesArray.forEach(function (table) {
@@ -1019,7 +979,6 @@ function applyCPI(units){
             applyCPIToTable('#table'+table.id,cpiValues);
           }
         });
-
 
         // Go through each table and check if is should have cpi applied if so modify the rows
         selectionDataArray.forEach(function (table) {
@@ -1031,8 +990,7 @@ function applyCPI(units){
         // At this point the rows have been updated so we can update the totals table
         selectionTablesArray.forEach(function (tableData) {
             insertTotalsTable(tableData.rows, 'table-total'+tableData.id, regions,true);
-        })
-
+        });
 
         showAllRegularGraphs(selectionDataArray, false);
 
@@ -1045,9 +1003,7 @@ function applyCPI(units){
             var cdRows = combineTables(dataTables.cRows,dataTables.dRows);
             combinedSelectionDataArray[1].rows = cdRows;
         }
-
         showAllCombinedGraphs(combinedSelectionDataArray, false);
-
     }
 }
 
@@ -1061,8 +1017,6 @@ function applyCPIToTableRows(rows, cpiValues){
     var maxYear = rows.reduce(function(prev, curr) {
         return prev.disc_yr > curr.disc_yr ? prev : curr;
     }).obs_yr;
-
-
 
     for(var cur = minYear; cur <=maxYear; cur++){ // Go through each possible year
         rows.forEach(function(elem, index){ // Grab every Row
@@ -1080,7 +1034,6 @@ function applyCPIToTableRows(rows, cpiValues){
             rows[index].value = valueOfCell; // CPI Applied value
         });
     }
-
 }
 
 var noCPICells = []; // Hold the original cpi values
@@ -1099,7 +1052,6 @@ function applyCPIToTable(table, cpiValues){
         minYear = year < minYear ? year : minYear;
         maxYear = year > maxYear ? year : maxYear;
     });
-
 
     for(var cur = minYear; cur <=maxYear; cur++){ // Go through each possible year
         $('.cell', table).each(function(index){ // Grab every cell
@@ -1135,7 +1087,7 @@ function Selection(a,b,c,d){
     this.dTable = d;
 }
 
-// Object for holder rows for each table
+// Object for holder rows for all tables
 function DataTables(tableA,tableB,tableC,tableD,tableAB,tableCD){
     this.tableA = tableA;
     this.tableB = tableB;
@@ -1145,6 +1097,7 @@ function DataTables(tableA,tableB,tableC,tableD,tableAB,tableCD){
     this.tableCD = tableCD;
 }
 
+// Data object for each section, used for graphs
 function SelectionData(rows,title,subTitle,unit,id){
     this.rows = rows;
     this.title = title;
@@ -1153,7 +1106,7 @@ function SelectionData(rows,title,subTitle,unit,id){
     this.unit = unit;
 }
 
-// Rows are combined
+// Data object for Rows combined
 function SelectionDataCombined(rows, table1Rows,table2Rows,title1,title2,unit1,unit2,id){
     this.rows = rows; // Combined rows
     this.title1 = title1;
@@ -1165,6 +1118,7 @@ function SelectionDataCombined(rows, table1Rows,table2Rows,title1,title2,unit1,u
     this.table2Rows = table2Rows;
 }
 
+// Data object for each table
 function SelectedTableData(rows,id, title, subTitle, unit){
     this.rows = rows;
     this.id = id;
