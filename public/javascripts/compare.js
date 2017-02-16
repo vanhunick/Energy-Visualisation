@@ -316,7 +316,6 @@ function insertTotalsTable(tableRows, id, regions){
                       }
                   }
             });
-
         });
     }
 
@@ -456,10 +455,13 @@ var rowSelected = "";
 function rowClicked(id){
   if(rowSelected === id){// Clicked on the same row so unselect
     // Remove all selected classes from elements
+    var text = $("#"+id+" .edb-cell").text();
+    highlight(text, true);
     $('.table').find('tr').removeClass('row-selected');
-    d3.selectAll(".bar-selected").classed("bar-selected", false);
+    // d3.selectAll(".bar-selected").classed("bar-selected", false);
     d3.selectAll(".line-selected-table").classed("line-selected", false);
     d3.selectAll(".vec-dot-selected").classed("vec-dot-selected", false);
+
     rowSelected = ""; // Nothing is selected
     return;
   }
@@ -476,10 +478,6 @@ function rowClicked(id){
 
   var edb = $("#"+id+".edb-cell").text();
 
-  // Select all rectangle with the selected class and remove class
-  d3.selectAll(".bar-selected")
-  .classed("bar-selected", false);
-
 // Select all lines with the selected class and remove class
   d3.selectAll(".line-selected-table")
   .classed("line-selected", false);
@@ -488,8 +486,8 @@ function rowClicked(id){
   .classed("vec-dot-selected", false);
 
   // Select all rectangle with the correct EDB and outline bars
-  d3.selectAll("rect."+text.replace(/ /g , ""))
-  .classed("bar-selected", true);
+  // Also removes the highlight of previous selection
+  highlight(text, false);
 
   d3.selectAll("line."+text.replace(/ /g , ""))
   .classed("line-selected-table", true);

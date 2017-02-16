@@ -18,12 +18,40 @@ function GroupedBarData(x0, x1,y,yAxis,svg,id){
 }
 
 
-// Blue
+// Blue color scale
 var z = d3.scaleOrdinal()
     .range(["#BBDEFB", "#64B5F6", "#1976D2", "#1565C0", "#0D47A1", "#d0743c", "#ff8c00"]);
 
-    var zRed = d3.scaleOrdinal()
-        .range(["#FF7373", "#FF4C4C", "#FF2626", "#B20000", "#D90000", "#d0743c", "#ff8c00"]);
+// Red color scale
+var zRed = d3.scaleOrdinal()
+    .range(["#FF7373", "#FF4C4C", "#FF2626", "#B20000", "#D90000", "#d0743c", "#ff8c00"]);
+
+// Green color scale
+var zSelected = d3.scaleOrdinal()
+    .range(["#C1FFC1", "#90EE90", "#5BC85B", "#31A231", "#137B13", "#d0743c", "#ff8c00"]);
+
+function highlight(edb, alreadySelected){ // With spaces
+  // Select all rectangle with the selected class and remove class
+  // Before we remove the class we need to apply the correct color scale
+
+
+  d3.selectAll(".bar-selected").datum(function(d) {return d; })
+  .attr("fill", function(d) {return z(d.key); });
+
+  d3.selectAll(".bar-selected")
+  .classed("bar-selected", false);
+
+  if(alreadySelected){
+        return; // The case where the row is unselected but nothing else is selected
+  }
+
+  // Select all rectangle with the correct EDB and outline bars
+  d3.selectAll("rect."+edb.replace(/ /g , ""))
+  .classed("bar-selected", true);
+
+  d3.selectAll(".bar-selected").datum(function(d) {return d; })
+  .attr("fill", function(d) {return zSelected(d.key); });
+}
 
 function createdGroupedBarGraph(data,keys,yLabel, divID){
     var curBarGraph = null;

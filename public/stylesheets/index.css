@@ -83,21 +83,26 @@ a {
   margin-right: 0.2%;
 }
 
+
+/*The title that says which selection the tab is for*/
 .table-title {
   color: black;
 }
 
+/*A cell in the tables*/
 .cell {
   border: 1px solid lightgray;
   padding: 0px;
 }
 
+/*The rows in the table*/
 .table-row {
   border: 1px solid lightgrey;
   color: black;
   background-color: white;
 }
 
+/*tHe class added and removed from table rows when they are clicked on*/
 .row-selected {
   color: green;
 }
@@ -162,6 +167,7 @@ a {
   font-size: 18px;
   color: black;
   font-weight: bold;
+  background: lightgrey;
 }
 
 
@@ -235,10 +241,10 @@ a {
   stroke-width : 5;
 }
 
-.bar-selected {
+/*.bar-selected {
     stroke-width : 3;
     stroke : green;
-}
+}*/
 
 
 
