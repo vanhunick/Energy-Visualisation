@@ -133,9 +133,9 @@ a {
 }
 
 .vec-dot-selected {
-  fill : green;
-  stroke-width : 3;
+  stroke-width : 2;
   stroke : green;
+  fill : #90EE90;
 }
 
 .box .center {
@@ -240,14 +240,6 @@ a {
 .line-selected-table {
   stroke-width : 5;
 }
-
-/*.bar-selected {
-    stroke-width : 3;
-    stroke : green;
-}*/
-
-
-
 
 
 /*Nav bar css*/

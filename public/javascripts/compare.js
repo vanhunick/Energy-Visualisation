@@ -112,43 +112,47 @@ function loadFromURL(urlSelections){
         dataTables = filterRowsToTables(data.rows); // Filter the rows into their tables
         copyOfDataTables = copyDataTables(dataTables); // Create a copy of data tables
 
-        selectionDataArray = [];
-        selectionTablesArray = [];
-        combinedSelectionDataArray = [];
-
-        // An array of true / false values if a table contains values
-        var selectedRows = [copyOfDataTables.tableA.length > 0,copyOfDataTables.tableB.length > 0,copyOfDataTables.tableC.length > 0,copyOfDataTables.tableD.length > 0];
-
-        // An array with the tables data
-        var tables = [copyOfDataTables.tableA,copyOfDataTables.tableB,copyOfDataTables.tableC,copyOfDataTables.tableD,copyOfDataTables.tableAB,copyOfDataTables.tableCD];
-
-        // Creates the 4 normal tables and the combined tables
-        var ids = ['a','b','c','d','ab','cd'];
-        for(var i = 0; i < selectedRows.length; i++){
-            if(selectedRows[i]){
-                var title = tables[i][0].section + ", " + tables[i][0].category;
-                var subtitle = tables[i][0].sub_category === null ? tables[i][0].description : tables[i][0].sub_category + ", " + tables[i][0].description;
-                selectionTablesArray.push(new SelectedTableData(tables[i],ids[i],title,subtitle, tables[i][0].units)); // TODO add unit for combined
-                selectionDataArray.push(new SelectionData(tables[i], title, subtitle ,tables[i][0].units,ids[i]));
-
-                // Check for combined special case
-                if(ids[i] === 'a' || ids[i] === 'c'){
-                    if(selectedRows[i+1]){ // Check that a selections has been made if so create the combined table
-                        var jump = i === 0 ? 4 : 3;
-                        var titleJump = tables[i+1][0].section + ", " + tables[i+1][0].category;
-                        var subTitleJump = tables[i+1][0].sub_category === null ? tables[i+1][0].description : tables[i+1][0].sub_category + ", " + tables[i+1][0].description;
-                        selectionTablesArray.push(new SelectedTableData(tables[i+jump],ids[i+jump], title + ", " + subtitle, titleJump + ", " + subTitleJump));
-                        combinedSelectionDataArray.push(new SelectionDataCombined(tables[i+jump],tables[i],tables[i+1], title + " " + subtitle, titleJump + " " + subTitleJump,tables[i][0].units,tables[i+1][0].units,ids[i+jump])); // TODO ask how to format titles for combined
-                    }
-                }
-            }
-        }
+        createDataStructuresWithCopy(copyOfDataTables);
 
         showTables(selectionTablesArray); // Show the tables
         showAllRegularGraphs(selectionDataArray, true); // Show all but combined and vector graphs true indicates it should add titles in
         showAllCombinedGraphs(combinedSelectionDataArray, true); // Show the combined and vector graphs
 
     });
+}
+
+function createDataStructuresWithCopy(copyOfDataTables){
+  selectionDataArray = [];
+  selectionTablesArray = [];
+  combinedSelectionDataArray = [];
+
+          // An array of true / false values if a table contains values
+          var selectedRows = [copyOfDataTables.tableA.length > 0,copyOfDataTables.tableB.length > 0,copyOfDataTables.tableC.length > 0,copyOfDataTables.tableD.length > 0];
+
+          // An array with the tables data
+          var tables = [copyOfDataTables.tableA,copyOfDataTables.tableB,copyOfDataTables.tableC,copyOfDataTables.tableD,copyOfDataTables.tableAB,copyOfDataTables.tableCD];
+
+          // Creates the 4 normal tables and the combined tables
+          var ids = ['a','b','c','d','ab','cd'];
+          for(var i = 0; i < selectedRows.length; i++){
+              if(selectedRows[i]){
+                  var title = tables[i][0].section + ", " + tables[i][0].category;
+                  var subtitle = tables[i][0].sub_category === null ? tables[i][0].description : tables[i][0].sub_category + ", " + tables[i][0].description;
+                  selectionTablesArray.push(new SelectedTableData(tables[i],ids[i],title,subtitle, tables[i][0].units)); // TODO add unit for combined
+                  selectionDataArray.push(new SelectionData(tables[i], title, subtitle ,tables[i][0].units,ids[i]));
+
+                  // Check for combined special case
+                  if(ids[i] === 'a' || ids[i] === 'c'){
+                      if(selectedRows[i+1]){ // Check that a selections has been made if so create the combined table
+                          var jump = i === 0 ? 4 : 3;
+                          var titleJump = tables[i+1][0].section + ", " + tables[i+1][0].category;
+                          var subTitleJump = tables[i+1][0].sub_category === null ? tables[i+1][0].description : tables[i+1][0].sub_category + ", " + tables[i+1][0].description;
+                          selectionTablesArray.push(new SelectedTableData(tables[i+jump],ids[i+jump], title + ", " + subtitle, titleJump + ", " + subTitleJump, tables[i+1][0].units));
+                          combinedSelectionDataArray.push(new SelectionDataCombined(tables[i+jump],tables[i],tables[i+1], title + " " + subtitle, titleJump + " " + subTitleJump,tables[i][0].units,tables[i+1][0].units,ids[i+jump])); // TODO ask how to format titles for combined
+                      }
+                  }
+              }
+          }
 }
 
 
@@ -158,7 +162,7 @@ function showTables(selectionTablesArray){
             .append('<h4 class="subTitle">'+tableData.subTitle+'</h4>');
 
         insertTable(tableData.rows,'table'+tableData.id);
-        insertTotalsTable(tableData.rows, 'table-total'+tableData.id, regions);
+        insertTotalsTable(tableData.rows, 'table-total'+tableData.id, regions,false);
     })
 }
 
@@ -275,7 +279,8 @@ function combineTables(table1Rows, table2Rows){
                     section : bt[j].section + "" + bt[j].description + " over ", // Bit of a hack as description is inserted after section, this way both titles are added to table
                     description : at[i].section + " " + at[i].description,
                     unitA : at[i].units,
-                    unitB : bt[j].units
+                    unitB : bt[j].units,
+                    unit : at[i].units +" / " +  bt[j].units
                 });
                 break; // can exit the loop
             }
@@ -284,9 +289,15 @@ function combineTables(table1Rows, table2Rows){
     return combined;
 }
 
+var noCPICellsTotals = [];
 
-function insertTotalsTable(tableRows, id, regions){
-  var totCells = [];
+function insertTotalsTable(tableRows, id, regions, tableExists){
+    var totCells = [];
+
+    // Empty out the table
+    if(tableExists){
+      $("#"+id).html('');
+    }
 
     // First get all the availble years in the rows
     var availableObsYears = [];
@@ -344,8 +355,11 @@ function insertTotalsTable(tableRows, id, regions){
         // Insert name in column and assign an id to the row
         row += "<th class='reg-cell'>" + names[property] + "</th>";
         totals[property].forEach(function(value){
-          row += "<th id='t-total"+id+""+cellCount+"' origValue='"+value+"' class='val-tot-cell'>" + dpFormat(value / regions[property].length) + "</th>";
+          row += "<th id='t-total"+id+""+cellCount+"' origValue='"+ value / regions[property].length +"' class='val-tot-cell'>" + dpFormat(value / regions[property].length) + "</th>";
           totCells.push({id : "#t-total"+id+""+cellCount, value : value / regions[property].length});
+          if(!tableExists){
+              noCPICells.push({id : "t-total"+id+""+cellCount, value : value / regions[property].length});
+          }
           cellCount++;
         });
         $("#"+id).append(row);
@@ -461,7 +475,6 @@ function rowClicked(id){
     // d3.selectAll(".bar-selected").classed("bar-selected", false);
     d3.selectAll(".line-selected-table").classed("line-selected", false);
     d3.selectAll(".vec-dot-selected").classed("vec-dot-selected", false);
-
     rowSelected = ""; // Nothing is selected
     return;
   }
@@ -472,13 +485,11 @@ function rowClicked(id){
 
   $('.table').find('tr').removeClass('row-selected');
 
-
-  // $("#"+id).attr("class","row-selected");
   $("#"+id).addClass("row-selected");
 
   var edb = $("#"+id+".edb-cell").text();
 
-// Select all lines with the selected class and remove class
+  // Select all lines with the selected class and remove class
   d3.selectAll(".line-selected-table")
   .classed("line-selected", false);
 
@@ -995,6 +1006,8 @@ function applyCPI(units){
         if(noCPICells.length > 0){
             revertCPI(); // Reverts cpi before instead of saving values with cpi already applied
             copyOfDataTables = copyDataTables(dataTables); // Use the original data and create a copy of it
+            createDataStructuresWithCopy(copyOfDataTables);
+
         }
         // CPI for 2012 - 2016
         var cpiValues = [{year : 2012, value : +$('#Y2012').val()},{year : 2013, value : +$('#Y2013').val()},{year : 2014, value : +$('#Y2014').val()},{year : 2015, value : +$('#Y2015').val()},{year : 2016, value : +$('#Y2016').val()}];
@@ -1015,14 +1028,17 @@ function applyCPI(units){
             }
         });
 
+        // At this point the rows have been updated so we can update the totals table
+        selectionTablesArray.forEach(function (tableData) {
+            insertTotalsTable(tableData.rows, 'table-total'+tableData.id, regions,true);
+        })
+
+
         showAllRegularGraphs(selectionDataArray, false);
 
-        //TODO check it works
         if(aSelected && bSelected){
             var abRows = combineTables(aRows,bRows);
             combinedSelectionDataArray[0].rows = abRows;
-
-
         }
 
         if(cSelected && dSelected){
@@ -1088,9 +1104,7 @@ function applyCPIToTable(table, cpiValues){
     for(var cur = minYear; cur <=maxYear; cur++){ // Go through each possible year
         $('.cell', table).each(function(index){ // Grab every cell
             var year = +$(this).attr("class").split(' ')[1]; // Grab the year of the cell by checking the class
-
-            var valueOfCell = $(this).attr("origValue");
-
+            var valueOfCell = $(this).attr("origvalue");
             for(var i = 0; i < cpiValues.length; i++){
                 if(cpiValues[i].year === cur){
                     if(year <= cur){
