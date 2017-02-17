@@ -26,7 +26,7 @@ var dpFormat = d3.format(".4r");
 
 // Holds a object that contains the rows of selections that were last searched
 var lastSearch = null;
-var validOptions = [false,false,false]; // Each boolean represents if a sub category should exist in the selection row
+var validOptions = [false,false,false,false]; // Each boolean represents if a sub category should exist in the selection row
 var selectedCompany = "";
 
 // Hold if these tables have been selected
@@ -693,11 +693,10 @@ function setSelectionsFromURL(selection){
         // Add the options to the drop down
         for(var i = 0; i < data.categories.length; i++){
             if(data.categories[i] === selection.category){
-                $('#category-select'+selection.id).append('<option value="' + data.categories[i] + '"selected> ' + data.categories[i] + '</option>');
+                $('#category-select'+selection.id).append('<option value="' + data.categories[i] + '"selected>' + data.categories[i] + '</option>');
             } else {
-                $('#category-select'+selection.id).append('<option value="' + data.categories[i] + '"> ' + data.categories[i] + '</option>');
+                $('#category-select'+selection.id).append('<option value="' + data.categories[i] + '">' + data.categories[i] + '</option>');
             }
-
         }
         // Refresh all drop downs
         $(".selectpicker").selectpicker('refresh');
@@ -708,7 +707,6 @@ function setSelectionsFromURL(selection){
 
         if(data.subCategories.length > 0  &&  data.subCategories[0] !== null){
             $('#subsection-select'+selection.id).html(''); // Empty temp options
-
             validOptions[selection.id] = true; // There are options for this row and sub category
         } else {
             return;
@@ -777,11 +775,11 @@ function loadInSections(fromURL, userSelections){ // if from url false selection
         addSection(3);
 
         if(fromURL){
-            for(var i = 0; i < userSelections.length; i++){
-                selections[i].description = userSelections[i].description;
-                selections[i].category = userSelections[i].category;
-                selections[i].section = userSelections[i].section;
-                selections[i].subCategory = userSelections[i].subCategory;
+          for(var i = 0; i < userSelections.length; i++){
+              selections[i].description = userSelections[i].description;
+              selections[i].category = userSelections[i].category;
+              selections[i].section = userSelections[i].section;
+              selections[i].subCategory = userSelections[i].subCategory;
             }
         }
         sortSections(data);// Sort the sections
@@ -791,9 +789,11 @@ function loadInSections(fromURL, userSelections){ // if from url false selection
             for(var j = 0; j < data.sections.length; j++){
                 if(fromURL && userSelections[i].section === data.sections[j]){
                     $("#section-select"+selections[i].id+"").append('<option selected>' + data.sections[j] + '</option>');
+                    validOptions[selections[i].id] = true;//TODO added
                 } else {
                     $("#section-select"+selections[i].id+"").append('<option>' + data.sections[j] + '</option>');
                 }
+                  // addToSelection(selections[i].id,"section",data.sections[j]); // Record change in the array of selections
             }
             $(".selectpicker").selectpicker('refresh');
         }
@@ -815,6 +815,7 @@ function addSection(numberSections){
     // Add a change listener for when a section is selected
     $("#section-select"+numberSections).on('change', function(event){
         var section = $(this).find("option:selected").text(); // Grab the selection
+
         var idNumb = event.target.id.charAt(event.target.id.length-1); // Grab the last character of the id that generated the event to work out correct id
 
         // First empty out all options for sub selections
@@ -845,18 +846,19 @@ function addSection(numberSections){
     // add category selector
     $("#col"+numberSections).append('<select data-width="190px" class="selectpicker select-compare" title="Category" id="category-select'+numberSections+'"></select>');
     $('#category-select'+numberSections).on('change', function(event){
-        var category = $(this).find("option:selected").text();
+        var categoryNew = $(this).find("option:selected").text();
+
         var idNumb = event.target.id.charAt(event.target.id.length-1);
         $('#description-select'+idNumb).html(''); // Empty temp options
 
         // Find all sub categories for the currently selected category
-        $.post("/sections/sc",{section : selections[idNumb].section, category : category}, function(data){
+        $.post("/sections/sc",{section : selections[idNumb].section, category : categoryNew}, function(data){
             if(data.subCategories.length > 0  &&  data.subCategories[0] !== null){
                 $('#subsection-select'+idNumb).html(''); // Empty temp options
                 validOptions[idNumb] = true; // There are options for this row and sub category
-            } else { //TODO could split into individual functions
+            } else {
                 // Find all descriptions for the currently selected sub category
-                $.post("/sections/desc",{category : selections[idNumb].category,section : selections[idNumb].section, subCategory : ""}, function(data){
+                $.post("/sections/desc",{category : category ,section : selections[idNumb].section, subCategory : ""}, function(data){
                     if(data.descriptions.length > 0 &&  data.descriptions[0] !== null){
                         $('#description-select'+idNumb).html(''); // Empty temp options
                     } else {
@@ -875,8 +877,10 @@ function addSection(numberSections){
                 $('#subsection-select'+idNumb).append('<option>' + data.subCategories[i] + '</option>');
             }
             $(".selectpicker").selectpicker('refresh');
+            $(".selectpicker").selectpicker('refresh');
         });
-        addToSelection(idNumb,"category", category);
+        addToSelection(idNumb,"category", categoryNew);
+        $(".selectpicker").selectpicker('refresh');
     });
 
     // add sub category selector

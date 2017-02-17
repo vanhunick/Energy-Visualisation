@@ -67,7 +67,6 @@ router.post('/sc', function(req, res, next) {
         return;
     }
 
-
     var queryString = squel.select()
         .from("large_strata_energy")
         .field("sub_category").distinct()
@@ -76,9 +75,6 @@ router.post('/sc', function(req, res, next) {
     if(req.body.category !== ""){
         queryString = queryString.where("category = '"+req.body.category+"'");
     }
-
-    console.log(queryString.toString());
-
 
     // Connect to the database
     pg.connect(global.databaseURI, function (err, client, done) {
@@ -93,7 +89,6 @@ router.post('/sc', function(req, res, next) {
 
         client.query(queryString.toString(), function (error, result) {
             done();
-
             var subCategories = [];
 
             if (error) {
@@ -106,6 +101,7 @@ router.post('/sc', function(req, res, next) {
                     subCategories.push(c);
                 }
                 res.send({subCategories: subCategories});
+
                 return;
             }
         })
@@ -116,8 +112,6 @@ router.post('/sc', function(req, res, next) {
 
 // Finds all descriptions
 router.post('/desc', function(req, res, next) {
-    console.log("Searching for descriptions");
-
     // Check valid section
     if(!SQLProtection.validSection(req.body.section)){
         res.send({descriptions: []});
@@ -266,7 +260,6 @@ router.get('/sections', function(req, res) {
 });
 
 router.post('/search', function(req, res, next) {
-    console.log("Here IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII");
     // Check valid section
     if(!SQLProtection.validSection(req.body.section)){
         res.send({rows: []});
@@ -313,8 +306,6 @@ router.post('/search', function(req, res, next) {
 
     queryString = queryString.where("description = '"+ req.body.description + "'").toString();
 
-    console.log(queryString);
-
     // Connect to the database
     pg.connect(global.databaseURI, function (err, client, done) {
         done(); // closes the connection once result has been returned
@@ -337,10 +328,8 @@ router.post('/search', function(req, res, next) {
                 return;
             } else {
                 for (row in result.rows) {
-                    console.log("Pushing " + row);
                     rowsSimplified.push(result.rows[row]);
                 }
-                console.log(rowsSimplified.length);
                 res.send({rows : rowsSimplified});
                 return;
             }
