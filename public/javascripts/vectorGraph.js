@@ -20,6 +20,10 @@ function VectorGraphData(id){
 }
 
 function createVectorGraph(data,xLabel, yLabel, divID){
+  if(divID.includes('cd') ){
+    console.log("CD");
+    console.log(data);
+  }
     var vectorGraph = null;
 
     vectorGraphs.forEach(function (elem) {

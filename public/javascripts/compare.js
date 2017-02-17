@@ -231,6 +231,7 @@ function showAllCombinedGraphs(selectionData, showTitle){
         var tableABData = createDataForGroupedGraph(selection.rows);
         createdGroupedBarGraph(tableABData.data, tableABData.keys, selection.unit1 + " / " + selection.unit2, "#grouped-bar-"+selection.id);
         createBoxPlot(createDataForBoxPlot(selection.rows), "#boxplot"+selection.id+"-div", selection.unit1 + " / " + selection.unit2);
+        console.log("Vec " + selection.id + " 1 " + selection.table1Rows.length  + " 2 " + selection.table2Rows.length);
         createVectorGraph(createDataForVectorGraph(selection.table1Rows,selection.table2Rows),selection.unit1,selection.unit2,"#vector-graph-div-"+selection.id);
         $('#full-table-'+selection.id+'-div').show(); // Show the div now that they have been created
     });
@@ -238,6 +239,7 @@ function showAllCombinedGraphs(selectionData, showTitle){
     // Add in A / B over C / D
     if(selectionData.length === 2){
         $('#title-abcd-vec').append('<h4 class="combined-title">'+selectionData[0].title1+' / '+selectionData[0].title2+'</h4>').append('<h4>Over</h4>').append('<h4 class="combined-title">'+selectionData[1].title1+' / '+selectionData[1].title2+'</h4>');
+        console.log("ABCD")
         createVectorGraph(createDataForVectorGraph(selectionData[0].rows,selectionData[1].rows),selectionData[0].unit1 + " / " + selectionData[1].unit1,selectionData[0].unit2 + " / " + selectionData[1].unit2,"#vector-graph-div-abcd");
         $('#vector-full-div-abcd').show();
     }
@@ -255,7 +257,7 @@ function combineTables(table1Rows, table2Rows){
             if(at[i].edb === bt[j].edb && at[i].obs_yr === bt[j].obs_yr && at[i].disc_yr === bt[j].disc_yr){
                 combined.push({ disc_yr : bt[j].disc_yr ,
                     edb : bt[j].edb,
-                    "obs_yr" : bt[j].obs_yr,
+                    obs_yr : bt[j].obs_yr,
                     value : at[i].value / (bt[j].value === '0' || bt[j].value === 0 ? 1 : bt[j].value), // Divide the value if va if dividing by 0 make it 1
                     section : bt[j].section + "" + bt[j].description + " over ", // Bit of a hack as description is inserted after section, this way both titles are added to table
                     description : at[i].section + " " + at[i].description,
@@ -267,6 +269,7 @@ function combineTables(table1Rows, table2Rows){
             }
         }
     }
+    console.log("combined " + combined.length);
     return combined;
 }
 
@@ -547,6 +550,21 @@ function createDataForVectorGraph(table1Rows,table2Rows) {
     var edbDone = []; // The edbs that have been processed
     var vecData = []; // The final entry in the form { EDB, [ { year1, valueA, valueB }, {year2, valueA, valueB }]}
 
+    var availableObsYears = [];
+    table1Rows.forEach(function (row1) {
+        if(!availableObsYears.includes(row1.obs_yr)){
+
+            // Check if the second set of rows also contains the year
+            for(var i = 0; i < table2Rows.length; i++){
+              if(table2Rows[i].obs_yr === row1.obs_yr){
+                  availableObsYears.push(row1.obs_yr);
+                  break;
+              }
+            }
+        }
+    });
+
+    console.log(availableObsYears);
     // Go through every row
     for (var i = 0; i < at.length; i++) {
 
@@ -570,7 +588,7 @@ function createDataForVectorGraph(table1Rows,table2Rows) {
             for (var j = 0; j < edbRowsAt.length; j++) {
 
                 // Check it has not been processed
-                if (!yearsDone.includes(edbRowsAt[j].disc_yr)) {
+                if (!yearsDone.includes(edbRowsAt[j].disc_yr) && availableObsYears.includes(edbRowsAt[j].disc_yr)) {
                     yearsDone.push(edbRowsAt[j].disc_yr); // Add to processed
 
                     // Here we have to rows for a particular year for a particular edb now we can create the entry
