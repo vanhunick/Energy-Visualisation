@@ -3,6 +3,7 @@
 <head>
     <title>Energy</title>
     <% include ../views/templates/head %>
+    <!--Form validation plugin-->
     <script src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.15.0/jquery.validate.min.js"></script>
     <script src="/javascripts/compare.js"></script>
     <script src="/javascripts/d3-tip.js"></script>
@@ -14,6 +15,7 @@
 <div class="container-fluid" id="compare-container" >
     <h1>Core Metrics</h1>
 
+    <!-- Row for company select -->
     <div class="row">
         <div class="col-md-12">
             <h4>Company</h4>
@@ -23,28 +25,31 @@
         </div>
     </div>
 
-    <!--Div that hold the rows of selections-->
+    <!-- Div that hold the rows of selections -->
     <div id="compare-div"></div>
 
-    <!--Holds the search buttons for selections and a div for errors-->
+    <!-- Holds the search button for selections and a div for errors -->
     <div class="row">
         <div class="col-md-12" id="search-div">
             <button type="button" class="btn btn-primary" id="search-btn-compare">Search</button>
         </div>
-        <div class="row">
-            <div class="col-md-12" id="error-div"></div>
-        </div>
+
     </div>
 
-    <!--CPI Inputs-->
+    <!-- Row for error message when Partial selection made -->
+    <div class="row">
+        <div class="col-md-12" id="error-div"></div>
+    </div>
+
+    <!-- CPI Inputs -->
     <div class="row" style="margin-top: 2%;">
         <div class="col-sm-12">
             <div class="form-group input-horizontal">
                 <h4><b>Set CPI:</b></h4>
             </div>
 
+            <!-- Form for CPI -->
             <form id="cpi-form"  onsubmit="return applyCPI()" >
-
                 <div class="form-group input-horizontal">
                     <label for="inputdefault">2012</label>
                     <input name="Y2012" class="form-control cpi-form" id="Y2012" type="text" value="1.00">
@@ -70,7 +75,7 @@
         </div>
     </div>
 
-    <!--CPI Button-->
+    <!--CPI Buttons apply and revert-->
     <div class="row">
         <div class="col-sm-12">
             <button type ="button" class ="btn btn-primary" onclick="applyCPI()">Apply cpi</button>
@@ -78,7 +83,7 @@
         </div>
     </div>
 
-    <!--Tabs-->
+    <!--Tabs for content-->
     <div class="row text-center" style="margin-top: 2%">
         <div class="col-md-12 text-center">
             <div class="panel with-nav-tabs panel-default">
@@ -96,13 +101,14 @@
 
                 <!--Tab Content-->
                 <div class="panel-body">
-                    <!--Tab content-->
                     <div class="tab-content">
 
                         <!--Table A content-->
                         <div class="tab-pane fade in active" id="tab1default">
                             <!--Wrapped in a div for table A to easily hide it-->
                             <div id="full-table-a-div" class="full-table full">
+
+                                <!-- Row for table -->
                                 <div class="row">
                                     <div class="col-md-2"></div>
                                     <div class="col-md-8 text-center ">
@@ -113,6 +119,7 @@
                                     <div class="col-md-2"></div>
                                 </div>
 
+                                <!-- Row for table totals -->
                                 <div class="row">
                                     <div class="col-md-2"></div>
                                     <div class="col-md-8 text-center ">
@@ -121,11 +128,13 @@
                                     <div class="col-md-2"></div>
                                 </div>
 
+                                <!-- Row for bar graph -->
                                 <div class="row group-row" >
                                     <div id="title-a-bar" class="text-center"></div>
                                     <div class="col-lg-12 text-center" id="grouped-bar-a" ></div>
                                 </div>
 
+                                <!-- Row for box and whisker graph -->
                                 <div class="row text-center whisk-row">
                                     <div id="title-a-box" class="text-center"></div>
                                     <div class="col-lg-12 text-center" id="boxplota-div"></div>
@@ -135,7 +144,6 @@
 
                         <!--Table B Content-->
                         <div class="tab-pane fade" id="tab2default">
-                            <!--Wrapped in a div for table B to easily hide it-->
                             <div id="full-table-b-div" class="full-table full">
                                 <div class="row">
                                     <div class="col-md-2"></div>
@@ -146,7 +154,6 @@
                                     </div>
                                     <div class="col-md-2"></div>
                                 </div>
-
                                 <div class="row">
                                     <div class="col-md-2"></div>
                                     <div class="col-md-8 text-center ">
@@ -154,13 +161,10 @@
                                     </div>
                                     <div class="col-md-2"></div>
                                 </div>
-
-
                                 <div class="row group-row">
                                     <div id="title-b-bar" class="text-center"></div>
                                     <div class="col-lg-12 text-center" id="grouped-bar-b"></div>
                                 </div>
-
                                 <div class="row text-center whisk-row">
                                     <div id="title-b-box" class="text-center"></div>
                                     <div class="col-lg-12 text-center" id="boxplotb-div"></div>
@@ -170,7 +174,6 @@
 
                         <!--Table C content-->
                         <div class="tab-pane fade" id="tab3default">
-                            <!--Wrapped in a div for table C to easily hide it-->
                             <div id="full-table-c-div" class="full-table full">
                                 <div class="row">
                                     <div class="col-md-2"></div>
@@ -181,7 +184,6 @@
                                     </div>
                                     <div class="col-md-2"></div>
                                 </div>
-
                                 <div class="row">
                                     <div class="col-md-2"></div>
                                     <div class="col-md-8 text-center ">
@@ -189,12 +191,10 @@
                                     </div>
                                     <div class="col-md-2"></div>
                                 </div>
-
                                 <div class="row group-row">
                                     <div id="title-c-bar" class="text-center"></div>
                                     <div class="col-lg-12 text-center" id="grouped-bar-c"></div>
                                 </div>
-
                                 <div class="row text-center whisk-row">
                                     <div id="title-c-box" class="text-center"></div>
                                     <div class="col-lg-12 text-center" id="boxplotc-div"></div>
@@ -204,7 +204,6 @@
 
                         <!--Table D Content-->
                         <div class="tab-pane fade" id="tab4default">
-                            <!--Wrapped in a div for table D to easily hide it-->
                             <div id="full-table-d-div" class="full-table full">
                                 <div class="row">
                                     <div class="col-md-2"></div>
@@ -215,7 +214,6 @@
                                     </div>
                                     <div class="col-md-2"></div>
                                 </div>
-
                                 <div class="row">
                                     <div class="col-md-2"></div>
                                     <div class="col-md-8 text-center ">
@@ -223,12 +221,10 @@
                                     </div>
                                     <div class="col-md-2"></div>
                                 </div>
-
                                 <div class="row group-row">
                                     <div id="title-d-bar" class="text-center"></div>
                                     <div class="col-lg-12 text-center" id="grouped-bar-d"></div>
                                 </div>
-
                                 <div class="row whisk-row">
                                     <div id="title-d-box" class="text-center"></div>
                                     <div class="col-lg-12 text-center" id="boxplotd-div"></div>
@@ -249,7 +245,6 @@
                                     </div>
                                     <div class="col-md-2"></div>
                                 </div>
-
                                 <div class="row">
                                     <div class="col-md-2"></div>
                                     <div class="col-md-8 text-center ">
@@ -257,17 +252,16 @@
                                     </div>
                                     <div class="col-md-2"></div>
                                 </div>
-
                                 <div class="row group-row">
                                     <div id="title-ab-bar" class="row text-center graph-title"></div>
                                     <div class="col-lg-12 text-center" id="grouped-bar-ab"></div>
                                 </div>
-
                                 <div class="row whisk-row">
                                     <div class="row text-center  graph-title" id="title-ab-box"></div>
                                     <div class="col-lg-12 text-center" id="boxplotab-div"></div>
                                 </div>
 
+                                <!-- Div for vectorGraph -->
                                 <div class="row text-center" >
                                     <div class="row text-center  graph-title" id="title-ab-vector"></div>
                                     <div class="col-lg-12 text-center" id="vector-graph-div-ab" style="margin-bottom: 2%"></div>
@@ -275,6 +269,7 @@
                             </div>
                         </div>
 
+                        <!-- Table CD content -->
                         <div class="tab-pane fade" id="tab6default">
                             <!--Wrapped in a div for table C/D to easily hide it-->
                             <div id="full-table-cd-div" class="full-table full">
@@ -287,7 +282,6 @@
                                     </div>
                                     <div class="col-md-2"></div>
                                 </div>
-
                                 <div class="row">
                                     <div class="col-md-2"></div>
                                     <div class="col-md-8 text-center ">
@@ -295,18 +289,14 @@
                                     </div>
                                     <div class="col-md-2"></div>
                                 </div>
-
                                 <div class="row group-row">
                                     <div id="title-cd-bar" class="text-center  graph-title"></div>
                                     <div class="col-lg-12 text-center" id="grouped-bar-cd"></div>
                                 </div>
-
                                 <div class="row whisk-row">
-
                                     <div id="title-cd-box" class="text-center  graph-title"></div>
                                     <div class="col-lg-12 text-center" id="boxplotcd-div"></div>
                                 </div>
-
                                 <div class="row text-center" >
                                     <div class="row text-center  graph-title" id="title-cd-vector"></div>
                                     <div class="col-lg-12 text-center" id="vector-graph-div-cd" style="margin-bottom: 2%"></div>
@@ -314,17 +304,15 @@
                             </div>
                         </div>
 
+                        <!-- ABCD Vector Graph content -->
                         <div class="tab-pane fade" id="tab7default">
                             <div id="vector-full-div-abcd" class="full-table full">
                                 <div class="row text-center" >
-                                    <!--<h2 class="table-title"><b>Vector graph (A over B) over (C over D)</b></h2>-->
                                     <div id="title-abcd-vec" class="text-center graph-title"></div>
-
                                     <div class="col-lg-12 text-center" id="vector-graph-div-abcd" style="margin-bottom: 2%"></div>
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -332,6 +320,7 @@
     </div>
 </div>
 </body>
+<!-- Scipts -->
 <script src="https://d3js.org/d3-timer.v1.min.js"></script>
 <script src="/javascripts/barGroup.js"></script>
 <script src="/javascripts/box.js"></script>
@@ -340,7 +329,6 @@
 
 <script>
     var s =  <%- JSON.stringify(selections) %>;
-
     if('<%- selections %>' !== ""){
 
         if(s.length > 0){
