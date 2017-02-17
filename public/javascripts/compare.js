@@ -913,6 +913,22 @@ function addSection(numberSections){
         var data = $(this).find("option:selected").text();
         addToSelection(idNumb,"description", data);
     });
+
+    $("#col"+numberSections).append('<button type="button" id="clear-'+numberSections+'" class="btn btn-danger">Clear</button>').on('click', function(event){
+        var idNumb = event.target.id.charAt(event.target.id.length-1);
+        clearSelection(idNumb);
+    });
+}
+
+// Clears a row of selections
+function clearSelection(idNumb){
+  selections[idNumb] = {id : idNumb, section : "", category : "", subCategory : "", description : ""};
+  validOptions[idNumb] = false;
+  $('#description-select'+idNumb).html('');
+  $('#subsection-select'+idNumb).html('');
+  $('#category-select'+idNumb).html('');
+  $('#section-select'+idNumb).find("option:selected").removeAttr("selected");
+  $(".selectpicker").selectpicker('refresh');
 }
 
 // Adds a section, category, sub category, or descriptions to a particular row in selections
