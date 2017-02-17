@@ -29,7 +29,7 @@ app.use(auth.connect(basic));
 global.databaseURI = "postgres://Admin:admin@localhost:5432/Energy";
 
 // Heroku db
-// global.databaseURI = process.env.DATABASE_URL;
+global.databaseURI = process.env.DATABASE_URL;
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
