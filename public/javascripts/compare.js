@@ -2,6 +2,27 @@
  * Created by Nicky on 23/01/2017.
  */
 
+ // Internet Explorer Compatability
+ if (!String.prototype.includes) {
+   console.log("Does not include the function");
+     String.prototype.includes = function() {
+         'use strict';
+         return String.prototype.indexOf.apply(this, arguments) !== -1;
+     };
+ }
+
+ if (!Array.prototype.includes) {
+   Object.defineProperty(Array.prototype, "includes", {
+     enumerable: false,
+     value: function(obj) {
+         var newArr = this.filter(function(el) {
+           return el == obj;
+         });
+         return newArr.length > 0;
+       }
+   });
+ }
+
 // Object to hold which company belongs to a specific region
 var regions = {
   n : ["Centralines","Counties Power","Eastland Network","Electra","Horizon Energy","Northpower",
@@ -231,7 +252,6 @@ function showAllCombinedGraphs(selectionData, showTitle){
         var tableABData = createDataForGroupedGraph(selection.rows);
         createdGroupedBarGraph(tableABData.data, tableABData.keys, selection.unit1 + " / " + selection.unit2, "#grouped-bar-"+selection.id);
         createBoxPlot(createDataForBoxPlot(selection.rows), "#boxplot"+selection.id+"-div", selection.unit1 + " / " + selection.unit2);
-        console.log("Vec " + selection.id + " 1 " + selection.table1Rows.length  + " 2 " + selection.table2Rows.length);
         createVectorGraph(createDataForVectorGraph(selection.table1Rows,selection.table2Rows),selection.unit1,selection.unit2,"#vector-graph-div-"+selection.id);
         $('#full-table-'+selection.id+'-div').show(); // Show the div now that they have been created
     });
@@ -239,7 +259,6 @@ function showAllCombinedGraphs(selectionData, showTitle){
     // Add in A / B over C / D
     if(selectionData.length === 2){
         $('#title-abcd-vec').append('<h4 class="combined-title">'+selectionData[0].title1+' / '+selectionData[0].title2+'</h4>').append('<h4>Over</h4>').append('<h4 class="combined-title">'+selectionData[1].title1+' / '+selectionData[1].title2+'</h4>');
-        console.log("ABCD")
         createVectorGraph(createDataForVectorGraph(selectionData[0].rows,selectionData[1].rows),selectionData[0].unit1 + " / " + selectionData[1].unit1,selectionData[0].unit2 + " / " + selectionData[1].unit2,"#vector-graph-div-abcd");
         $('#vector-full-div-abcd').show();
     }
@@ -269,7 +288,6 @@ function combineTables(table1Rows, table2Rows){
             }
         }
     }
-    console.log("combined " + combined.length);
     return combined;
 }
 
@@ -564,7 +582,6 @@ function createDataForVectorGraph(table1Rows,table2Rows) {
         }
     });
 
-    console.log(availableObsYears);
     // Go through every row
     for (var i = 0; i < at.length; i++) {
 

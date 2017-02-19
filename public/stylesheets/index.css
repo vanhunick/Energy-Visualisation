@@ -13,20 +13,13 @@ a {
   color: steelblue;
 }
 
-/*The selection for a table Sub category and description*/
-.subTitle {
-
-}
-
-.combined-title {
-  color : steelblue;
-}
-
+/*For span with 'over' in graph titles*/
 .over {
   color: black;
   font-weight: bold;
 }
 
+/*The graph titles inserted*/
 .graph-title {
   margin-left: 15%;
   margin-right: 15%;
@@ -38,51 +31,42 @@ a {
   margin-right: 5%;
 }
 
-
+/*The div that contains the table and the graphs*/
 .full-table{
-  /*background: #FF1A1A;*/
   background:#F0F0F0;
-  /*margin-top: 2%;*/
 }
 
-
-
-
-.bar {
-  fill: steelblue;
-}
-
+/*The titles above selection boxes*/
 .selection-title{
   color: steelblue;
 }
 
+/*Used to align CPI inputs horizontally*/
 .input-horizontal {
   display: inline-block;
   vertical-align: top;
 }
 
+/*The cpi inputs*/
 .cpi-form {
   width: 100%;
 }
 
+/*Holds the rows of selections*/
 #compare-div {
   margin-top: 1%;
   margin-bottom: 1%;
 }
 
+/*CPI title*/
 #cpi-header {
   margin-top: 0.5%;
 }
 
-.compare-row {
-  margin-bottom: 0.5%;
-  margin-top: 0.5%;
-}
-
+/*Each of the selection dropdown menus*/
 .select-compare {
   margin-right: 0.2%;
 }
-
 
 /*The title that says which selection the tab is for*/
 .table-title {
@@ -107,6 +91,7 @@ a {
   color: green;
 }
 
+/*Div that holds all the tab content*/
 .full {
   display: none;
 }
@@ -115,23 +100,23 @@ a {
 .box {
   font: 10px sans-serif;
 }
+
 /*.box circle*/
 .box line,
-.box rect
- {
+.box rect {
   fill: #64B5F6;
   stroke: #000; /* circle stroke*/
   stroke-width: 1px;
 }
 
-
+/*Dot for scatter plot*/
 .dot {
   fill : #FFFF66;
-  /*fill: #64B5F6;*/
-  stroke: #000; /* circle stroke*/
+  stroke: #000;
   stroke-width: 1px;
 }
 
+/*A selected point on the vector graph*/
 .vec-dot-selected {
   stroke-width : 2;
   stroke : green;
