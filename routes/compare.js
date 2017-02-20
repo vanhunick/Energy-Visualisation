@@ -15,43 +15,108 @@ router.get('/', function(req, res, next) {
 
 
 function search(req, res){
-    var row0 = {
-        id : req.query.i0,
-        section  : req.query.s0,
-        category : req.query.c0,
-        subCategory : req.query.sc0,
-        description :req.query.d0
-    };
+  console.log("UNDEF " + req.query.i1);
+  selections = [];
 
-    var row1 = {
-        id : req.query.i1,
-        section  : req.query.s1,
-        category : req.query.c1,
-        subCategory : req.query.sc1,
-        description :req.query.d1
-    };
+  if(req.query.s0 !== undefined){
+    console.log("Pushing 0");
+    selections.push({id : 0,
+    section  : req.query.s0,
+    category : req.query.c0,
+    subCategory : req.query.sc0,
+    description :req.query.d0})
+  } else {
+    selections.push({id : 0,
+    section  : "",
+    category : "",
+    subCategory : "",
+    description :""});
+  }
 
-    var row2 = {
-        id : req.query.i2,
-        section  : req.query.s2,
-        category : req.query.c2,
-        subCategory : req.query.sc2,
-        description :req.query.d2
-    };
+  if(req.query.s1 !== undefined){
+    console.log("Pushing 1");
+    selections.push({id : 1,
+    section  : req.query.s1,
+    category : req.query.c1,
+    subCategory : req.query.sc1,
+    description :req.query.d1})
+  } else {
+    selections.push({id : 1,
+    section  : "",
+    category : "",
+    subCategory : "",
+    description :""});
+  }
 
-    var row3 = {
-        id : req.query.i3,
-        section  : req.query.s3,
-        category : req.query.c3,
-        subCategory : req.query.sc3,
-        description :req.query.d3
-    };
+  if(req.query.s2 !== undefined){
+    console.log("Pushing 2");
+    selections.push({id : 2,
+    section  : req.query.s2,
+    category : req.query.c2,
+    subCategory : req.query.sc2,
+    description :req.query.d2})
+  } else {
+    selections.push({id : 2,
+    section  : "",
+    category : "",
+    subCategory : "",
+    description :""});
+  }
 
-    selections = [];
-    selections.push(row0);
-    selections.push(row1);
-    selections.push(row2);
-    selections.push(row3);
+  if(req.query.s3 !== undefined){
+    console.log("Pushing 3");
+    selections.push({id : 3,
+    section  : req.query.s3,
+    category : req.query.c3,
+    subCategory : req.query.sc3,
+    description :req.query.d3})
+  } else {
+    selections.push({
+      id : 3,
+      section  : "",
+      category : "",
+      subCategory : "",
+      description :""
+    });
+  }
+
+    //
+    // var row0 = {
+    //     id : req.query.i0,
+    //     section  : req.query.s0,
+    //     category : req.query.c0,
+    //     subCategory : req.query.sc0,
+    //     description :req.query.d0
+    // };
+    //
+    // var row1 = {
+    //     id : req.query.i1,
+    //     section  : req.query.s1,
+    //     category : req.query.c1,
+    //     subCategory : req.query.sc1,
+    //     description :req.query.d1
+    // };
+    //
+    // var row2 = {
+    //     id : req.query.i2,
+    //     section  : req.query.s2,
+    //     category : req.query.c2,
+    //     subCategory : req.query.sc2,
+    //     description :req.query.d2
+    // };
+    //
+    // var row3 = {
+    //     id : req.query.i3,
+    //     section  : req.query.s3,
+    //     category : req.query.c3,
+    //     subCategory : req.query.sc3,
+    //     description :req.query.d3
+    // };
+    //
+    // selections.push(row0);
+    // selections.push(row1);
+    // selections.push(row2);
+    // selections.push(row3);
 
     //res.render('compare', {selections : JSON.stringify(selections)}); // Send the search results and render index
     res.render('compare', {selections : selections}); // Send the search results and render index

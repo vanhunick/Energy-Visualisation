@@ -77,7 +77,7 @@ $(document).ready( function() {
         selectedCompany = $(this).find("option:selected").text();
     });
     $('#search-btn-compare').click(function(){ // Listener to search button
-        search(); // Search encodes the selections into the url and sends to server
+        search2(); // Search encodes the selections into the url and sends to server
     });
     cpiValidationSetup(); // Set up cpi validation rules
 });
@@ -91,10 +91,14 @@ function loadFromURL(urlSelections){
     // Send array of selected sections to server and the company
     $.post("/compare/search",{company : selectedCompany, selections : JSON.stringify(urlSelections)}, function(data){
         // Queries the db for each of the secions and finds and inserts the sub sections as options
-        setSelectionsFromURL(urlSelections[0]);
-        setSelectionsFromURL(urlSelections[1]);
-        setSelectionsFromURL(urlSelections[2]);
-        setSelectionsFromURL(urlSelections[3]);
+        console.log(urlSelections);
+        urlSelections.forEach(function(s){
+          setSelectionsFromURL(s);
+        });
+        // setSelectionsFromURL(urlSelections[0]);
+        // setSelectionsFromURL(urlSelections[1]);
+        // setSelectionsFromURL(urlSelections[2]);
+        // setSelectionsFromURL(urlSelections[3]);
 
         dataTables = filterRowsToTables(data.rows); // Filter the rows into their tables
         copyOfDataTables = copyDataTables(dataTables); // Create a copy of data tables
@@ -548,6 +552,25 @@ function search(){
     };
     params = serialise(rows); // Escape chracters for url
     window.location.replace("compare?" + params); // Replace the url with the selections url
+}
+
+function search2(){
+  if(!validateSearchParams())return; // First check if the selection is valid
+
+  var rows= {};
+
+  selections.forEach(function(selection){
+    if(selection.section !== ""){
+        rows["s"+selection.id] = selection.section;
+        rows["c"+selection.id] = selection.category;
+        rows["sc"+selection.id] = selection.subCategory;
+        rows["d"+selection.id] = selection.description;
+    }
+  });
+  console.log(rows);
+
+  params = serialise(rows); // Escape chracters for url
+  window.location.replace("compare?" + params); // Replace the url with the selections url
 }
 
 // Turns object in url string
