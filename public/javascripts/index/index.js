@@ -298,4 +298,3 @@ function insertCompanies(){
 
 
 // New potentially for changing the url when search is clicked
-
