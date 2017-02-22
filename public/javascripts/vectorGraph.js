@@ -20,10 +20,6 @@ function VectorGraphData(id){
 }
 
 function createVectorGraph(data,xLabel, yLabel, divID){
-  if(divID.includes('cd') ){
-    console.log("CD");
-    console.log(data);
-  }
     var vectorGraph = null;
 
     vectorGraphs.forEach(function (elem) {
@@ -91,7 +87,7 @@ function createVectorGraph(data,xLabel, yLabel, divID){
     vectorGraph.svg.append("g")
         .attr("class","xAxis")
         .attr("transform", "translate(0," + vHeight + ")")
-        .attr("stroke", "#black")
+        .attr("stroke", "black")
         .call(vectorGraph.xAxis.scale(vectorGraph.x));
 
         var dpFormat = d3.format(".2f");
