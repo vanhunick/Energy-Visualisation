@@ -5,7 +5,7 @@
     <% include ../views/templates/head %>
     <!--Form validation plugin-->
     <script src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.15.0/jquery.validate.min.js"></script>
-    <script src="/javascripts/compare.js"></script>
+    <!-- <script src="/javascripts/compare.js"></script> -->
     <script src="/javascripts/d3-tip.js"></script>
 </head>
 <body>
@@ -322,10 +322,13 @@
 </body>
 <!-- Scipts -->
 <script src="https://d3js.org/d3-timer.v1.min.js"></script>
-<script src="/javascripts/barGroup.js"></script>
+<!-- <script src="/javascripts/barGroup.js"></script>
 <script src="/javascripts/box.js"></script>
 <script src="/javascripts/boxPlot.js"></script>
-<script src="/javascripts/vectorGraph.js"></script>
+<script src="/javascripts/vectorGraph.js"></script> -->
+<script src="/dist/scripts.min.js"></script>
+<script src="/dist/compare.min.js"></script>
+
 
 <script>
     var s =  <%- JSON.stringify(selections) %>;
