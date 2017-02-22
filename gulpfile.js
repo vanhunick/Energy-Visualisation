@@ -24,4 +24,23 @@ gulp.task('min-scripts', function() {
         .pipe(gulp.dest('public/dist'));
 });
 
-gulp.task('default', ['minify-css', 'min-scripts']);
+gulp.task('min-compare', function() {
+    return gulp.src('public/javascripts/compare/*.js')
+        .pipe(concat('compare.js'))
+        .pipe(gulp.dest('public/dist'))
+        .pipe(rename('compare.min.js'))
+        .pipe(uglify())
+        .pipe(gulp.dest('public/dist'));
+});
+
+gulp.task('min-index', function() {
+    return gulp.src('public/javascripts/index/*.js')
+        .pipe(concat('index.js'))
+        .pipe(gulp.dest('public/dist'))
+        .pipe(rename('index.min.js'))
+        .pipe(uglify())
+        .pipe(gulp.dest('public/dist'));
+});
+
+
+gulp.task('default', ['minify-css', 'min-scripts','min-index','min-compare']);
