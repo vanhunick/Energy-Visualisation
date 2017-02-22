@@ -15,15 +15,13 @@ gulp.task('minify-css', function() {
     .pipe(gulp.dest('public/dist'));
 });
 
-gulp.task('compress', function (cb) {
-  pump([
-        gulp.src('public/javascripts/*.js'),
-        uglify(),rename({
-                suffix: '.min'
-            }),
-        gulp.dest('public/dist')
-    ],
-    cb
-  );
-  });
-gulp.task('default', ['minify-css', 'compress']);
+gulp.task('min-scripts', function() {
+    return gulp.src('public/javascripts/*.js')
+        .pipe(concat('scripts.js'))
+        .pipe(gulp.dest('public/dist'))
+        .pipe(rename('scripts.min.js'))
+        .pipe(uglify())
+        .pipe(gulp.dest('public/dist'));
+});
+
+gulp.task('default', ['minify-css', 'min-scripts']);
