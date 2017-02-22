@@ -13,12 +13,12 @@
 <% include ../views/templates/nav %>
 
 <div class="container-fluid" id="compare-container" >
-    <h1>Core Metrics</h1>
+    <h1 class="text-center page-title">Core Metrics</h1>
 
     <!-- Row for company select -->
     <div class="row">
         <div class="col-md-12">
-            <h4>Company</h4>
+            <h4 class="selection-title">Company</h4>
             <select class="selectpicker" title="EDB" id="company-select">
             <option>No data</option>
             </select>
@@ -86,7 +86,7 @@
     <!--Tabs for content-->
     <div class="row text-center" style="margin-top: 2%">
         <div class="col-md-12 text-center">
-            <div class="panel with-nav-tabs panel-default">
+            <div class="panel with-nav-tabs panel-default tab-background">
                 <div class="panel-heading">
                     <ul class="nav nav-tabs">
                         <li class="active"><a href="#tab1default" data-toggle="tab">Selection A</a></li>
@@ -100,7 +100,7 @@
                 </div>
 
                 <!--Tab Content-->
-                <div class="panel-body">
+                <div class="panel-body tab-background">
                     <div class="tab-content">
 
                         <!--Table A content-->
@@ -111,7 +111,7 @@
                                 <!-- Row for table -->
                                 <div class="row">
                                     <div class="col-md-2"></div>
-                                    <div class="col-md-8 text-center ">
+                                    <div class="col-sm-8 text-center ">
                                         <h2 class="table-title"><b>Selection A</b></h2>
                                         <div id="title-a" class="text-left"></div>
                                         <table class="table table-nonfluid" id="tablea"></table>

@@ -15,11 +15,9 @@ router.get('/', function(req, res, next) {
 
 
 function search(req, res){
-  console.log("UNDEF " + req.query.i1);
   selections = [];
 
   if(req.query.s0 !== undefined){
-    console.log("Pushing 0");
     selections.push({id : 0,
     section  : req.query.s0,
     category : req.query.c0,
@@ -34,7 +32,6 @@ function search(req, res){
   }
 
   if(req.query.s1 !== undefined){
-    console.log("Pushing 1");
     selections.push({id : 1,
     section  : req.query.s1,
     category : req.query.c1,
@@ -49,7 +46,6 @@ function search(req, res){
   }
 
   if(req.query.s2 !== undefined){
-    console.log("Pushing 2");
     selections.push({id : 2,
     section  : req.query.s2,
     category : req.query.c2,
@@ -64,7 +60,6 @@ function search(req, res){
   }
 
   if(req.query.s3 !== undefined){
-    console.log("Pushing 3");
     selections.push({id : 3,
     section  : req.query.s3,
     category : req.query.c3,
@@ -209,9 +204,7 @@ router.post('/search', function(req, res, next) {
     }
 
     q.where(expr);
-    console.log("SEARCHING HERE");
-    console.log(q.toString());
-    console.log(q.toString().replace(/'/g , "''"));
+
 
     // Connect to the database
     pg.connect(global.databaseURI, function(err, client, done) {
@@ -219,7 +212,6 @@ router.post('/search', function(req, res, next) {
 
         // Check whether the connection to the database was successful
         if(err){
-            console.error('Could not connect to the database');
             console.error(err);
             return;
         }
