@@ -171,7 +171,7 @@ var whiskBoxWidth = 1;
 
                 outlier.enter().insert("circle", "text")
                     .attr("class", "outlier")
-                    .attr("r", 5)
+                    .attr("r", 2)
                     .attr("cx", whiskBoxWidth / 2)
                     .attr("cy", function(i) { return x0(d[i]); })
                     .style("opacity", 1e-6)

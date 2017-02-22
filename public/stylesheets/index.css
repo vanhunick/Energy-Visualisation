@@ -1,8 +1,24 @@
 body {
   padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
-  background: #F0F0F0;
+  /*font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;*/
+  font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+  background: #F6F7F8;
 }
+
+/*The div that contains the table and the graphs*/
+.full-table{
+  background:#F0F0F0;
+  background: #F6F4F3;
+}
+
+.page-title {
+  font-size: 400%;
+  color: #376996;
+  font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+
 
 a {
   color: #00B7FF;
@@ -11,6 +27,12 @@ a {
 /*The selection for a table Section and category*/
 .title {
   color: steelblue;
+  font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+/*The text for graph axis*/
+.axis-text {
+  fill : black;
 }
 
 /*For span with 'over' in graph titles*/
@@ -25,20 +47,21 @@ a {
   margin-right: 15%;
 }
 
-/*Container that holds all content on the compare page*/
-#compare-container {
-  margin-left: 5%;
-  margin-right: 5%;
+.subTitle {
+  margin-bottom: 2px;
+  color: black;
+  font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
-/*The div that contains the table and the graphs*/
-.full-table{
-  background:#F0F0F0;
+/*Container that holds all content on the compare page*/
+#compare-container {
+  margin-left: 0.5%;
+  margin-right: 0.5%;
 }
 
 /*The titles above selection boxes*/
 .selection-title{
-  color: steelblue;
+  color: #20A4F3;
 }
 
 /*Used to align CPI inputs horizontally*/
@@ -75,8 +98,10 @@ a {
 
 /*A cell in the tables*/
 .cell {
-  border: 1px solid lightgray;
-  padding: 0px;
+  border: 1px solid darkgrey;
+  padding-right: 0px;
+  margin-right: 200px;
+
 }
 
 /*The rows in the table*/
@@ -98,7 +123,7 @@ a {
 
 /*Box plot CSS*/
 .box {
-  font: 10px sans-serif;
+  /*font: 10px sans-serif;*/
 }
 
 /*.box circle*/
@@ -149,17 +174,16 @@ a {
 
 /*The top row of each table with EBD header and years*/
 .table-head {
-  font-size: 18px;
+  font-size: 16px;
   color: black;
-  font-weight: bold;
+  /*font-weight: bold;*/
   background: lightgrey;
 }
 
 
 .axis {
-  font: 12px sans-serif;
+  font: 8px sans-serif;
   shape-rendering: crispEdges;
-
 }
 
 .axis path,
@@ -175,6 +199,9 @@ a {
   shape-rendering: crispEdges;
 }
 
+.tab-background {
+  background: #376996;
+}
 
 .g-text {
   stroke: none;
@@ -226,6 +253,32 @@ a {
   stroke-width : 5;
 }
 
+.y-group {
+  font: 8px sans-serif;
+  fill : #fff;
+}
+
+/*Used to make svg responsive*/
+.svg-container {
+	display: inline-block;
+	position: relative;
+  text-align: center;
+	width: 85%;
+	padding-bottom: 0.5%;
+	vertical-align: middle;
+	overflow: hidden;
+}
+
+/*Used to make svg responsive*/
+.svg-container-box {
+	display: inline-block;
+  text-align: center;
+	position: relative;
+	width: 65%;
+	padding-bottom: 2%;
+	vertical-align: middle;
+	overflow: hidden;
+}
 
 /*Nav bar css*/
 /*https://work.smarchal.com/twbscolor/css/e74c3cc0392becf0f1ffbbbc0*/

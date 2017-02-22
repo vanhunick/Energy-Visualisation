@@ -4,9 +4,9 @@
 var labels = false; // show the text labels beside individual boxplots?
 
 // Margins and graph width / height
-var boxMargin = {top: 30, right: 50, bottom: 100, left: 100},
-    boxWidth = 1000 - boxMargin.left - boxMargin.right,
-    boxHeight = 800  - boxMargin.top  - boxMargin.bottom;
+var boxMargin = {top: 0, right: 0, bottom: 80, left: 100},
+    boxWidth = 700 - boxMargin.left - boxMargin.right,
+    boxHeight = 550  - boxMargin.top  - boxMargin.bottom;
 
 
 // Encapsulate all properties of graph
@@ -60,12 +60,29 @@ function createBoxPlot(dataObject,divID,unit){
         .domain(boxPlotObjects.y.domain())
         .showLabels(labels);
 
-    boxPlotObjects.svg = d3.select(divID).append("svg")
-            .attr("width", boxWidth + boxMargin.left + boxMargin.right)
-            .attr("height", boxHeight + boxMargin.top + boxMargin.bottom)
-            .attr("class", "box")
-            .append("g")
-            .attr("transform", "translate(" + boxMargin.left + "," + boxMargin.top + ")");
+        // Create the responsive SVG
+        boxPlotObjects.svg =  d3.select(divID)
+         .append("div")
+         .classed("svg-container-box", true) //container class to make it responsive
+         .append("svg")
+         //responsive SVG needs these 2 attributes and no width and height attr
+         .attr("preserveAspectRatio", "xMinYMin meet")
+        //  .attr("viewBox", "0 0 600 400")
+         .attr("viewBox", "0 0 "+ (boxWidth + boxMargin.left + boxMargin.right) +" "+ (boxHeight + boxMargin.top + boxMargin.bottom) + "")
+         .attr("class", "box")
+         .append("g") // group allows us to move everything together
+         .attr("transform",
+             "translate(" + margin.left + "," + margin.top + ")") // moves by a x and y value in this c
+         //class to make it responsive
+         .classed("svg-content-responsive", true);
+
+    //
+    // boxPlotObjects.svg = d3.select(divID).append("svg")
+    //         .attr("width", boxWidth + boxMargin.left + boxMargin.right)
+    //         .attr("height", boxHeight + boxMargin.top + boxMargin.bottom)
+    //         .attr("class", "box")
+    //         .append("g")
+    //         .attr("transform", "translate(" + boxMargin.left + "," + boxMargin.top + ")");
 
     boxPlotObjects.x.domain( data.map(function(d) {return d[0] } ) );
     boxPlotObjects.xAxis = d3.axisBottom(boxPlotObjects.x);
@@ -101,7 +118,7 @@ function createBoxPlot(dataObject,divID,unit){
             .data(scatterData)
             .enter().append("circle")
             .attr("class",function(d){return "dot "+d.edb.replace(/ /g , "");})
-            .attr("r", 3.5)
+            .attr("r", 1.75)
             .attr("cx", function(d) { return boxPlotObjects.x(d.year) + whiskBoxWidth/2; })
             .attr("cy", function(d) { return boxPlotObjects.y(d.value); })
             .on('mouseover', tip.show)
@@ -116,7 +133,7 @@ function createBoxPlot(dataObject,divID,unit){
         .attr("y", 6)
         .attr("dy", ".71em")
         .style("text-anchor", "end")
-        .style("font-size", "16px");
+        .style("font-size", "8px");
 
     // draw x axis
     boxPlotObjects.svg.append("g")
@@ -128,14 +145,14 @@ function createBoxPlot(dataObject,divID,unit){
         .attr("y",  10 )
         .attr("dy", ".71em")
         .style("text-anchor", "middle")
-        .style("font-size", "16px")
+        .style("font-size", "8px")
         .text("Quarter");
 
     // Add the y axis unit
     boxPlotObjects.svg.append("text")
         .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-        .attr("transform", "translate("+ -(boxMargin.left/2) +","+( boxMargin.top*2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
-        .style("font-size", "18px")
+        .attr("transform", "translate("+ -(boxMargin.left/2-10) +","+( boxMargin.top*2+10)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
+        .style("font-size", "12px")
         .attr("class", "unit-text")
         .text(unit);
 
@@ -143,7 +160,7 @@ function createBoxPlot(dataObject,divID,unit){
     boxPlotObjects.svg.append("text")
         .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
         .attr("transform", "translate("+ +(boxWidth/2) +","+( boxMargin.top + 40 + boxHeight)+")")  // text is drawn off the screen top left, move down and out and rotate
-        .style("font-size", "18px")
+        .style("font-size", "12px")
         .attr("class", "unit-text")
         .text("Year");
 

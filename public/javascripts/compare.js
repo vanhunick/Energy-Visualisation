@@ -4,7 +4,6 @@
 
  // Internet Explorer Compatability
  if (!String.prototype.includes) {
-   console.log("Does not include the function");
      String.prototype.includes = function() {
          'use strict';
          return String.prototype.indexOf.apply(this, arguments) !== -1;
@@ -50,11 +49,6 @@ var lastSearch = null;
 var validOptions = [false,false,false,false]; // Each boolean represents if a sub category should exist in the selection row
 var selectedCompany = "";
 
-// Hold if these tables have been selected
-var aSelected = false;
-var bSelected = false;
-var cSelected = false;
-var dSelected = false;
 
 // Holds the rows for each table separately
 var dataTables; // Should never be modified
@@ -91,14 +85,9 @@ function loadFromURL(urlSelections){
     // Send array of selected sections to server and the company
     $.post("/compare/search",{company : selectedCompany, selections : JSON.stringify(urlSelections)}, function(data){
         // Queries the db for each of the secions and finds and inserts the sub sections as options
-        console.log(urlSelections);
         urlSelections.forEach(function(s){
           setSelectionsFromURL(s);
         });
-        // setSelectionsFromURL(urlSelections[0]);
-        // setSelectionsFromURL(urlSelections[1]);
-        // setSelectionsFromURL(urlSelections[2]);
-        // setSelectionsFromURL(urlSelections[3]);
 
         dataTables = filterRowsToTables(data.rows); // Filter the rows into their tables
         copyOfDataTables = copyDataTables(dataTables); // Create a copy of data tables
@@ -109,8 +98,9 @@ function loadFromURL(urlSelections){
     });
 }
 
+//TODO test and remove html
 // Checks that if there is a value selected in a row the others must be selected too before searching
-function validateSearchParams(){
+function validateSearchParams(selections){
     var returnVal = true;
     selections.forEach(function (elem, i) {
         if(elem.subCategory === "" && validOptions[i]){ // Valid options holds if there is a possible option to choosefrom in the select drop down
@@ -130,7 +120,7 @@ function validateSearchParams(){
     return returnVal;
 }
 
-
+//TODO test
 // Returns a copy of the dataTables object
 function copyDataTables(dataTables){
     var origTables = [dataTables.tableA,dataTables.tableB,dataTables.tableC,dataTables.tableD,dataTables.tableAB,dataTables.tableCD]; // Add tables to array to iterate over them
@@ -228,8 +218,8 @@ function showAllRegularGraphs(selectionData, addTitles){
     selectionData.forEach(function (selection) {
         // Insert the titles for the graphs
         if(addTitles){
-            $('#title-'+selection.id+'-bar').append('<h2 class="title">'+selection.title+'</h2>').append('<h4 class="subTitle">'+selection.subTitle+'</h4>');
-            $('#title-'+selection.id+'-box').append('<h2 class="title">'+selection.title+'</h2>').append('<h4 class="subTitle">'+selection.subTitle+'</h4>');
+            $('#title-'+selection.id+'-bar').append('<h3 class="title">'+selection.title+'</h3>').append('<h4 class="subTitle">'+selection.subTitle+'</h4>');
+            $('#title-'+selection.id+'-box').append('<h3 class="title">'+selection.title+'</h3>').append('<h4 class="subTitle">'+selection.subTitle+'</h4>');
         }
 
         // Create the data needed for bar grahs and create and insert the graph
@@ -522,7 +512,7 @@ function applyGradientCSS(cellValues, percent){
     for(var i = 0; i < cellValues.length; i++){
         var value = (percent ? value : ((+cellValues[i].value / maxCellValue)*100)); // If percentage metric just use valud
         $(cellValues[i].id).css({
-                "background" : "-webkit-gradient(linear, left top, right top, color-stop(" + value +"%,#64B5F6), color-stop(" + value +"%,#FFF))",
+                "background" : "-webkit-gradient(linear, left top, right top, color-stop(" + value +"%,#7bbfd6), color-stop(" + value +"%,#FFF))",
             }
         );
     }
@@ -543,7 +533,7 @@ function matchDBRow(DBRow, selection){
 
 // Creates search parameters and creates url
 function search(){
-    if(!validateSearchParams())return; // First check if the selection is valid
+    if(!validateSearchParams(selections))return; // First check if the selection is valid
     var rows = {
         i0 : selections[0].id,s0  : selections[0].section,c0 : selections[0].category,sc0 : selections[0].subCategory,d0 : selections[0].description,
         i1 : selections[1].id,s1  : selections[1].section,c1 : selections[1].category,sc1 : selections[1].subCategory,d1 : selections[1].description,
@@ -555,7 +545,7 @@ function search(){
 }
 
 function search2(){
-  if(!validateSearchParams())return; // First check if the selection is valid
+  if(!validateSearchParams(selections))return; // First check if the selection is valid
 
   var rows= {};
 
@@ -567,7 +557,6 @@ function search2(){
         rows["d"+selection.id] = selection.description;
     }
   });
-  console.log(rows);
 
   params = serialise(rows); // Escape chracters for url
   window.location.replace("compare?" + params); // Replace the url with the selections url
@@ -1072,15 +1061,18 @@ function applyCPI(units){
 
         showAllRegularGraphs(selectionDataArray, false);
 
-        if(aSelected && bSelected){
-            var abRows = combineTables(aRows,bRows);
-            combinedSelectionDataArray[0].rows = abRows;
-        }
-
-        if(cSelected && dSelected){
-            var cdRows = combineTables(dataTables.cRows,dataTables.dRows);
-            combinedSelectionDataArray[1].rows = cdRows;
-        }
+        //TODO I think this code is never executed
+        // if(aSelected && bSelected){
+        //   console.log("A and B selected");
+        //     var abRows = combineTables(aRows,bRows);
+        //     combinedSelectionDataArray[0].rows = abRows;
+        // }
+        //
+        // //TODO I think this code is never executed
+        // if(cSelected && dSelected){
+        //     var cdRows = combineTables(dataTables.cRows,dataTables.dRows);
+        //     combinedSelectionDataArray[1].rows = cdRows;
+        // }
         showAllCombinedGraphs(combinedSelectionDataArray, false);
     }
 }

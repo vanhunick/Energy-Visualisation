@@ -1,7 +1,7 @@
 //  Margins and width / height for the graph
 var margin = { top: 35, right: 85, bottom: 150, left: 50 },
-    width = 1200 - margin.left - margin.right,
-    height = 800 - margin.top - margin.bottom;
+    width = 850 - margin.left - margin.right,
+    height = 550 - margin.top - margin.bottom;
 
 // The array that holds the GroupedBarData objects for every graph on the page
 var barGraphs = [];
@@ -62,12 +62,15 @@ function createdGroupedBarGraph(data,keys,yLabel, divID){
 
     // Only add svg if it is not created yet
     if(!curBarGraph.created){
-        curBarGraph.svg =  d3.select(divID).append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g") // group allows us to move everything together
-            .attr("transform",
-                "translate(" + margin.left + "," + margin.top + ")"); // moves by a x and y value in this case the margins
+      curBarGraph.svg =  d3.select(divID)
+       .append("div")
+       .classed("svg-container", true) //container class to make it responsive
+       .append("svg")
+       .attr("preserveAspectRatio", "xMinYMin meet")
+       .attr("viewBox", "0 0 "+ (width + margin.left + margin.right) +" "+ (height + margin.top + margin.bottom) + "")
+       .append("g")
+       .attr("transform","translate(" + margin.left + "," + margin.top + ")") // moves by a x and y value in this c
+       .classed("svg-content-responsive", true);
     }
 
     // Set the domains
@@ -139,8 +142,9 @@ function createdGroupedBarGraph(data,keys,yLabel, divID){
         .attr("y", 0)
         .attr("x", 9)
         .attr("dy", ".35em")
-        .style("font-size", "14px")
+        .attr("class", "axis-text")
         .attr("transform", "rotate(55)")
+        .style("font-size", "8px")
         .style("text-anchor", "start");
 
     // Update y axis or create it
@@ -148,47 +152,44 @@ function createdGroupedBarGraph(data,keys,yLabel, divID){
         curBarGraph.svg.select('.yAxis').call(curBarGraph.yAxis);
     } else {
         g.append("g")
-            .attr("class", "axis")
-            .attr("class", "yAxis")
+            .attr("class", "axis yAxis y-group")
             .call(curBarGraph.yAxis.scale(curBarGraph.y).ticks(null, "s"))
             .append("text")
             .attr("x", 2)
             .attr("y", curBarGraph.y(curBarGraph.y.ticks().pop()) + 0.5)
             .attr("dy", "0.32em")
-            .attr("fill", "#000")
-            .attr("font-weight", "bold")
-            .attr("text-anchor", "start");
+            .attr("text-anchor", "start")
     }
 
     curBarGraph.svg.append("text")
         .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-        .attr("transform", "translate("+ (margin.left/2-35) +","+( margin.top*2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
-        .style("font-size", "18px")
+        .attr("transform", "translate("+ (margin.left/2-5) +","+( margin.top+8)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
+        .style("font-size", "10px")
         .attr("class", "unit-text")
         .text(yLabel);
 
     // Create the legend
     var legend = g.append("g")
         .attr("font-family", "sans-serif")
-        .attr("font-size", 10)
+        .attr("font-size", 8)
         .attr("text-anchor", "end")
         .selectAll("g")
         .data(keys.slice().reverse())
         .enter().append("g")
-        .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+        .attr("transform", function(d, i) { return "translate(0," + i * 10 + ")"; });
 
     legend.append("rect")
         .attr("x", width - 100)
-        .attr("width", 19)
-        .attr("height", 19)
+        .attr("width", 8.5)
+        .attr("height", 8.5)
         .attr("fill", z);
 
     legend.append("text")
-        .attr("x", width - 120)
-        .attr("y", 9.5)
+        .attr("x", width - 110)
+        .attr("y", 4)
         .attr("dy", "0.32em")
         .attr("class", "g-text")
-        .style("font-size", "14px")
+        .style("font-size", "8px")
         .text(function(d) { return d; });
 
     curBarGraph.created = true; // Set the graph with the ID divID to created
