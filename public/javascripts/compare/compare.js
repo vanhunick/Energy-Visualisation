@@ -101,6 +101,7 @@ function loadFromURL(urlSelections){
 //TODO test and remove html
 // Checks that if there is a value selected in a row the others must be selected too before searching
 function validateSearchParams(selections){
+  console.log(selections);
     var returnVal = true;
     selections.forEach(function (elem, i) {
         if(elem.subCategory === "" && validOptions[i]){ // Valid options holds if there is a possible option to choosefrom in the select drop down
