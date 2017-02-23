@@ -110,13 +110,14 @@
 
                                 <!-- Row for table -->
                                 <div class="row">
-                                    <div class="col-md-2"></div>
-                                    <div class="col-sm-8 text-center ">
-                                        <h2 class="table-title"><b>Selection A</b></h2>
-                                        <div id="title-a" class="text-left"></div>
-                                        <table class="table table-nonfluid" id="tablea"></table>
+                                    <!-- <div class="col-md-2"></div> -->
+                                    <h2 class="table-title"><b>Selection A</b></h2>
+                                    <div id="title-a" class="text-center"></div>
+                                    <div class="col-sm-6 text-center ">
+
+                                        <table class="table table-nonfluid" style="margin-left: 20px;" id="tablea"></table>
                                     </div>
-                                    <div class="col-md-2"></div>
+                                    <div class="col-md-6" id="bar-a"></div>
                                 </div>
 
                                 <!-- Row for table totals -->
@@ -322,6 +323,7 @@
 </body>
 <!-- Scipts -->
 <script src="https://d3js.org/d3-timer.v1.min.js"></script>
+<script src="/javascripts/bar.js"></script>
 <script src="/javascripts/barGroup.js"></script>
 <script src="/javascripts/box.js"></script>
 <script src="/javascripts/boxPlot.js"></script>

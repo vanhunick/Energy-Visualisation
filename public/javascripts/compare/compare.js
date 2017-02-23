@@ -101,7 +101,6 @@ function loadFromURL(urlSelections){
 //TODO test and remove html
 // Checks that if there is a value selected in a row the others must be selected too before searching
 function validateSearchParams(selections){
-  console.log(selections);
     var returnVal = true;
     selections.forEach(function (elem, i) {
         if(elem.subCategory === "" && validOptions[i]){ // Valid options holds if there is a possible option to choosefrom in the select drop down
@@ -498,6 +497,35 @@ function rowClicked(id){
 
   d3.selectAll(".dot."+text.replace(/ /g , ""))
   .classed("vec-dot-selected", true);
+
+  showBarWithRowElem(id,text);
+}
+
+function showBarWithRowElem(rowID, edb){
+    var data = [];
+
+    $('#head-row').find('th').each(function (index, element) {
+        if(index != 0){ // 0 is not a year
+            data.push({category : $(element).text(), value : 0}); // 0 is temp
+        }
+    });
+
+
+    $('#'+rowID).find('th').each(function (index, element) {
+        if(index != 0){
+            data[index-1].value = $(element).text();
+        } else {
+            title = data[index].value = $(element).text();
+        }
+    });
+
+    var max = -Infinity;
+    $('.cell', "#tablea").each(function(){ //cell or th
+        var val = +$(this).attr("origValue");
+        max = val > max ? val : max;
+    });
+
+    createBarGraph("#bar-a", max, data, edb);
 }
 
 

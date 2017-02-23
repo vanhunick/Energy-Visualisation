@@ -18,7 +18,9 @@ body {
   font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
-
+.single-bar {
+  fill : lightgreen;
+}
 
 a {
   color: #00B7FF;
@@ -48,7 +50,7 @@ a {
 }
 
 .subTitle {
-  margin-bottom: 2px;
+  margin-bottom: 20px;
   color: black;
   font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
