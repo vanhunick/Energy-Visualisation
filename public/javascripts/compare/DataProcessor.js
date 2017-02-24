@@ -19,8 +19,9 @@ DataProcessor.prototype.copyOfDataTables = function(dataTables) {
 }
 
 
+//TODO pass in valid options in compare js
 // Checks that if there is a value selected in a row the others must be selected too before searching
-DataProcessor.prototype.validateSearchParams = function (selections){
+DataProcessor.prototype.validateSearchParams = function (selections, validOptions){
     var returnVal = true;
     selections.forEach(function (elem, i) {
         if(elem.subCategory === "" && validOptions[i]){ // Valid options holds if there is a possible option to choosefrom in the select drop down
@@ -38,12 +39,24 @@ DataProcessor.prototype.validateSearchParams = function (selections){
     return returnVal;
 }
 
+// Returns if a row from the DB matches one of the specified rows by the user
+DataProcessor.prototype.matchDBRow = function (DBRow, selection) {
+  if(DBRow.section === selection.section && DBRow.category === selection.category && DBRow.description === selection.description){
+      if(DBRow.sub_category !== null){
+          return selection.subCategory === DBRow.sub_category; // Sub cat could be null but would still match
+      }
+      return selection.subCategory === ""; // Has to also be empty
+  }
+  return false;
+}
+
+// TODO pass search in in compate .js
 // Takes all rows and filers into corresponding tables
-DataProcessor.prototype.filterRowsToTables = function (rows) {
-  var aRows = rows.filter(function(e){return matchDBRow(e,lastSearch.aTable);});
-  var bRows = rows.filter(function(e){return matchDBRow(e,lastSearch.bTable);});
-  var cRows = rows.filter(function(e){return matchDBRow(e,lastSearch.cTable);});
-  var dRows = rows.filter(function(e){return matchDBRow(e,lastSearch.dTable);});
+DataProcessor.prototype.filterRowsToTables = function (rows, search) {
+  var aRows = rows.filter(function(e){return dp.matchDBRow(e,search.aTable);});
+  var bRows = rows.filter(function(e){return dp.matchDBRow(e,search.bTable);});
+  var cRows = rows.filter(function(e){return dp.matchDBRow(e,search.cTable);});
+  var dRows = rows.filter(function(e){return dp.matchDBRow(e,search.dTable);});
 
   // Set all null values in rows to 0
   aRows.forEach(function(e){if(e.value === null){e.value = 0;}});
@@ -53,11 +66,11 @@ DataProcessor.prototype.filterRowsToTables = function (rows) {
 
   // Create combined tables if possible
   if(aRows.length > 0 && bRows.length > 0){
-      var abRows = combineTables(aRows,bRows);
+      var abRows = dp.combineTables(aRows,bRows);
   }
 
   if(cRows.length > 0 && dRows.length > 0){
-      var cdRows = combineTables(cRows,dRows);
+      var cdRows = dp.combineTables(cRows,dRows);
   }
   return new DataTables(aRows,bRows,cRows,dRows, abRows, cdRows);
 }
@@ -88,16 +101,7 @@ DataProcessor.prototype.combineTables = function(table1Rows, table2Rows) {
   return combined;
 }
 
-// Returns if a row from the DB matches one of the specified rows by the user
-DataProcessor.prototype.matchDBRow = function (DBRow, selection) {
-  if(DBRow.section === selection.section && DBRow.category === selection.category && DBRow.description === selection.description){
-      if(DBRow.sub_category !== null){
-          return selection.subCategory === DBRow.sub_category; // Sub cat could be null but would still match
-      }
-      return true;
-  }
-  return false;
-}
+
 
 
 

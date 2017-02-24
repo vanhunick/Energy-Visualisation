@@ -190,6 +190,7 @@ function showTables(selectionTablesArray){
 
 // Takes all rows and filers into corresponding tables
 function filterRowsToTables(rows){
+  console.log(lastSearch);
     var aRows = rows.filter(function(e){return matchDBRow(e,lastSearch.aTable);});
     var bRows = rows.filter(function(e){return matchDBRow(e,lastSearch.bTable);});
     var cRows = rows.filter(function(e){return matchDBRow(e,lastSearch.cTable);});
@@ -363,6 +364,7 @@ function insertTotalsTable(tableRows, id, regions, tableExists){
         $("#"+id).append(row);
       }
     }
+    console.log(totals); // TODO insert group graph for regions
     applyGradientCSS(totCells,false);
 }
 
