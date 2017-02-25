@@ -284,30 +284,17 @@ DataProcessor.prototype.sortSections = function(data) {
 // Applies the CPI to rows of data
 DataProcessor.prototype.applyCPIToTableRows = function(rows, cpiValues){
     // Find the min and max year from the data
-    var minYear = rows.reduce(function(prev, curr) {
-        return prev.disc_yr < curr.disc_yr ? prev : curr;
-    }).obs_yr;
+    rows.forEach(function(elem, index){ // Grab every Row
+        var year = rows[index].obs_yr; // Grab the year of the cell by checking the class
+        var valueOfCell = rows[index].value;
 
-    var maxYear = rows.reduce(function(prev, curr) {
-        return prev.disc_yr > curr.disc_yr ? prev : curr;
-    }).obs_yr;
-
-    for(var cur = minYear; cur <=maxYear; cur++){ // Go through each possible year
-        rows.forEach(function(elem, index){ // Grab every Row
-            var year = rows[index].obs_yr; // Grab the year of the cell by checking the class
-
-            var valueOfCell = rows[index].value;
-
-            for(var i = 0; i < cpiValues.length; i++){
-                if(cpiValues[i].year === cur){
-                    if(year <= cur){
-                        valueOfCell = valueOfCell * (1 + (cpiValues[i].value / 100));
-                    }
-                }
+        for(var i = 0; i < cpiValues.length; i++){
+            if(year <= cpiValues[i].year){
+                valueOfCell = valueOfCell * (1 + (cpiValues[i].value / 100));
             }
-            rows[index].value = valueOfCell; // CPI Applied value
-        });
-    }
+        }
+        rows[index].value = valueOfCell; // CPI Applied value
+    });
 }
 
 

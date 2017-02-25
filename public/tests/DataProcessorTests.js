@@ -338,30 +338,85 @@ describe('Filter rows to table function tests', function() {
       assert.isTrue(tablesData.tableAB.length === 2);
       assert.isTrue(tablesData.tableCD.length === 2);
     });
+
+  it('Any null values should be changed to 0', function() {
+    var search = {
+      aTable : {id : 0, section : "a", category : "s", subCategory : "s", description : "s"},
+      bTable : {id : 1, section : "b", category : "s", subCategory : "s", description : "s"},
+      cTable : {id : 2, section : "c", category : "s", subCategory : "s", description : "s"},
+      dTable : {id : 3, section : "d", category : "s", subCategory : "s", description : "s"}
+    };
+
+    var rows = [
+      {section : "a", category : "s", sub_category : "s", description : "s", value : null},
+      {section : "a", category : "s", sub_category : "s", description : "s", value : null },
+      {section : "b", category : "s", sub_category : "s", description : "s", value : null},
+      {section : "b", category : "s", sub_category : "s", description : "s", value : null},
+      {section : "c", category : "s", sub_category : "s", description : "s", value : null},
+      {section : "c", category : "s", sub_category : "s", description : "s", value : null},
+      {section : "d", category : "s", sub_category : "s", description : "s", value : null},
+      {section : "d", category : "s", sub_category : "s", description : "s", value : null}
+    ];
+
+    var tablesData = dp.filterRowsToTables(rows,search);
+
+    assert.isTrue(tablesData.tableA[0].value === 0);
+    assert.isTrue(tablesData.tableB[0].value === 0);
+  });
+
+
+  it('Any  not null values should not change changed to 0', function() {
+    var search = {
+      aTable : {id : 0, section : "a", category : "s", subCategory : "s", description : "s"},
+      bTable : {id : 1, section : "b", category : "s", subCategory : "s", description : "s"},
+      cTable : {id : 2, section : "c", category : "s", subCategory : "s", description : "s"},
+      dTable : {id : 3, section : "d", category : "s", subCategory : "s", description : "s"}
+    };
+
+    var rows = [
+      {section : "a", category : "s", sub_category : "s", description : "s", value : null},
+      {section : "a", category : "s", sub_category : "s", description : "s", value : null },
+      {section : "b", category : "s", sub_category : "s", description : "s", value : 10},
+      {section : "b", category : "s", sub_category : "s", description : "s", value : null},
+      {section : "c", category : "s", sub_category : "s", description : "s", value : 10},
+      {section : "c", category : "s", sub_category : "s", description : "s", value : null},
+      {section : "d", category : "s", sub_category : "s", description : "s", value : null},
+      {section : "d", category : "s", sub_category : "s", description : "s", value : null}
+    ];
+
+    var tablesData = dp.filterRowsToTables(rows,search);
+
+    assert.isTrue(tablesData.tableB[0].value === 10);
+    assert.isTrue(tablesData.tableC[0].value === 10);
+    assert.isTrue(tablesData.tableA[0].value === 0);
+  });
+
 });
 
 
 
+// 
 describe('Copy of table data function tests', function() {
-  it('Length of copy should all one', function() {
+  it('Length of copy should all one', function () {
 
     var search = {
-      aTable : {id : 0, section : "i0", category : "a0", subCategory : "j0", description : "b0"},
-      bTable : {id : 1, section : "i1", category : "a1", subCategory : "j1", description : "b1"},
-      cTable : {id : 2, section : "i2", category : "a2", subCategory : "j2", description : "b2"},
-      dTable : {id : 3, section : "i3", category : "a3", subCategory : "j3", description : "b3"}
+      aTable: {id: 0, section: "i0", category: "a0", subCategory: "j0", description: "b0"},
+      bTable: {id: 1, section: "i1", category: "a1", subCategory: "j1", description: "b1"},
+      cTable: {id: 2, section: "i2", category: "a2", subCategory: "j2", description: "b2"},
+      dTable: {id: 3, section: "i3", category: "a3", subCategory: "j3", description: "b3"}
     };
     var rows = [];
-    for(var i = 0; i < 4; i++){
-        rows.push(
-          {category : "a"+i, description : "b"+i,disc_yr: 1+i, edb: "c"+i,
-              fcast_yr: 10+i, network: "d"+i, note: "e"+i, obs_yr: "f"+i , p_key: 20+i,sch_ref: "g"+i,
-              schedule: "h"+i,section: "i"+i, sub_category: "j"+i, units: "h"+i, value: 30+i}
-
-        );
+    for (var i = 0; i < 4; i++) {
+      rows.push(
+          {
+            category: "a" + i, description: "b" + i, disc_yr: 1 + i, edb: "c" + i,
+            fcast_yr: 10 + i, network: "d" + i, note: "e" + i, obs_yr: "f" + i, p_key: 20 + i, sch_ref: "g" + i,
+            schedule: "h" + i, section: "i" + i, sub_category: "j" + i, units: "h" + i, value: 30 + i
+          }
+      );
     }
 
-    var tablesData = dp.filterRowsToTables(rows,search);
+    var tablesData = dp.filterRowsToTables(rows, search);
 
     var copyOfDataTables = dp.copyOfDataTables(tablesData);
 
@@ -371,25 +426,26 @@ describe('Copy of table data function tests', function() {
     assert.isTrue(copyOfDataTables.tableD.length === 1);
   });
 
-  it('Values should be 30 plus the table id', function() {
+  it('Values should be 30 plus the table id', function () {
 
     var search = {
-      aTable : {id : 0, section : "i0", category : "a0", subCategory : "j0", description : "b0"},
-      bTable : {id : 1, section : "i1", category : "a1", subCategory : "j1", description : "b1"},
-      cTable : {id : 2, section : "i2", category : "a2", subCategory : "j2", description : "b2"},
-      dTable : {id : 3, section : "i3", category : "a3", subCategory : "j3", description : "b3"}
+      aTable: {id: 0, section: "i0", category: "a0", subCategory: "j0", description: "b0"},
+      bTable: {id: 1, section: "i1", category: "a1", subCategory: "j1", description: "b1"},
+      cTable: {id: 2, section: "i2", category: "a2", subCategory: "j2", description: "b2"},
+      dTable: {id: 3, section: "i3", category: "a3", subCategory: "j3", description: "b3"}
     };
     var rows = [];
-    for(var i = 0; i < 4; i++){
-        rows.push(
-          {category : "a"+i, description : "b"+i,disc_yr: 1+i, edb: "c"+i,
-              fcast_yr: 10+i, network: "d"+i, note: "e"+i, obs_yr: "f"+i , p_key: 20+i,sch_ref: "g"+i,
-              schedule: "h"+i,section: "i"+i, sub_category: "j"+i, units: "h"+i, value: 30+i}
-
-        );
+    for (var i = 0; i < 4; i++) {
+      rows.push(
+          {
+            category: "a" + i, description: "b" + i, disc_yr: 1 + i, edb: "c" + i,
+            fcast_yr: 10 + i, network: "d" + i, note: "e" + i, obs_yr: "f" + i, p_key: 20 + i, sch_ref: "g" + i,
+            schedule: "h" + i, section: "i" + i, sub_category: "j" + i, units: "h" + i, value: 30 + i
+          }
+      );
     }
 
-    var tablesData = dp.filterRowsToTables(rows,search);
+    var tablesData = dp.filterRowsToTables(rows, search);
 
     var copyOfDataTables = dp.copyOfDataTables(tablesData);
 
@@ -399,25 +455,26 @@ describe('Copy of table data function tests', function() {
     assert.isTrue(copyOfDataTables.tableD[0].value === 33);
   });
 
-  it('Values should still be the same after modifying original', function() {
+  it('Values should still be the same after modifying original', function () {
 
     var search = {
-      aTable : {id : 0, section : "i0", category : "a0", subCategory : "j0", description : "b0"},
-      bTable : {id : 1, section : "i1", category : "a1", subCategory : "j1", description : "b1"},
-      cTable : {id : 2, section : "i2", category : "a2", subCategory : "j2", description : "b2"},
-      dTable : {id : 3, section : "i3", category : "a3", subCategory : "j3", description : "b3"}
+      aTable: {id: 0, section: "i0", category: "a0", subCategory: "j0", description: "b0"},
+      bTable: {id: 1, section: "i1", category: "a1", subCategory: "j1", description: "b1"},
+      cTable: {id: 2, section: "i2", category: "a2", subCategory: "j2", description: "b2"},
+      dTable: {id: 3, section: "i3", category: "a3", subCategory: "j3", description: "b3"}
     };
     var rows = [];
-    for(var i = 0; i < 4; i++){
-        rows.push(
-          {category : "a"+i, description : "b"+i,disc_yr: 1+i, edb: "c"+i,
-              fcast_yr: 10+i, network: "d"+i, note: "e"+i, obs_yr: "f"+i , p_key: 20+i,sch_ref: "g"+i,
-              schedule: "h"+i,section: "i"+i, sub_category: "j"+i, units: "h"+i, value: 30+i}
-
-        );
+    for (var i = 0; i < 4; i++) {
+      rows.push(
+          {
+            category: "a" + i, description: "b" + i, disc_yr: 1 + i, edb: "c" + i,
+            fcast_yr: 10 + i, network: "d" + i, note: "e" + i, obs_yr: "f" + i, p_key: 20 + i, sch_ref: "g" + i,
+            schedule: "h" + i, section: "i" + i, sub_category: "j" + i, units: "h" + i, value: 30 + i
+          }
+      );
     }
 
-    var tablesData = dp.filterRowsToTables(rows,search);
+    var tablesData = dp.filterRowsToTables(rows, search);
 
     var copyOfDataTables = dp.copyOfDataTables(tablesData);
 
@@ -433,25 +490,26 @@ describe('Copy of table data function tests', function() {
   });
 
 
-  it('Values should be the same as original', function() {
+  it('Values should be the same as original', function () {
 
     var search = {
-      aTable : {id : 0, section : "i0", category : "a0", subCategory : "j0", description : "b0"},
-      bTable : {id : 1, section : "i1", category : "a1", subCategory : "j1", description : "b1"},
-      cTable : {id : 2, section : "i2", category : "a2", subCategory : "j2", description : "b2"},
-      dTable : {id : 3, section : "i3", category : "a3", subCategory : "j3", description : "b3"}
+      aTable: {id: 0, section: "i0", category: "a0", subCategory: "j0", description: "b0"},
+      bTable: {id: 1, section: "i1", category: "a1", subCategory: "j1", description: "b1"},
+      cTable: {id: 2, section: "i2", category: "a2", subCategory: "j2", description: "b2"},
+      dTable: {id: 3, section: "i3", category: "a3", subCategory: "j3", description: "b3"}
     };
     var rows = [];
-    for(var i = 0; i < 4; i++){
-        rows.push(
-          {category : "a"+i, description : "b"+i,disc_yr: 1+i, edb: "c"+i,
-              fcast_yr: 10+i, network: "d"+i, note: "e"+i, obs_yr: "f"+i , p_key: 20+i,sch_ref: "g"+i,
-              schedule: "h"+i,section: "i"+i, sub_category: "j"+i, units: "h"+i, value: 30+i}
-
-        );
+    for (var i = 0; i < 4; i++) {
+      rows.push(
+          {
+            category: "a" + i, description: "b" + i, disc_yr: 1 + i, edb: "c" + i,
+            fcast_yr: 10 + i, network: "d" + i, note: "e" + i, obs_yr: "f" + i, p_key: 20 + i, sch_ref: "g" + i,
+            schedule: "h" + i, section: "i" + i, sub_category: "j" + i, units: "h" + i, value: 30 + i
+          }
+      );
     }
 
-    var tablesData = dp.filterRowsToTables(rows,search);
+    var tablesData = dp.filterRowsToTables(rows, search);
 
     var copyOfDataTables = dp.copyOfDataTables(tablesData);
 
@@ -487,7 +545,338 @@ describe('Copy of table data function tests', function() {
 
     assert.isTrue(copyOfDataTables.tableA[0].value === 30);
     assert.isTrue(copyOfDataTables.tableB[0].value === 31);
-    assert.isTrue(copyOfDataTables.tableC[0].value === 32);
-    assert.isTrue(copyOfDataTables.tableD[0].value === 33);
   });
 });
+
+function getTestRowsForCombineTableTests(){
+  return {t1 :[
+    {edb : "bob", units : "u", obs_yr : 2010,disc_yr : 2010,section : "a", category : "s", sub_category : "s", description : "s", value : 100},
+    {edb : "bob", units : "u",obs_yr : 2011,disc_yr : 2011,section : "a", category : "s", sub_category : "s", description : "s", value : 80 },
+    {edb : "bob", units : "u",obs_yr : 2012,disc_yr : 2012,section : "a", category : "s", sub_category : "s", description : "s", value : 40},
+    {edb : "bob", units : "u",obs_yr : 2013,disc_yr : 2013,section : "a", category : "s", sub_category : "s", description : "s", value : 20},
+  ] , t2 :[
+    {edb : "bob", units : "v",obs_yr : 2010,disc_yr : 2010,section : "a", category : "s", sub_category : "s", description : "s", value : 10},
+    {edb : "bob", units : "v",obs_yr : 2011,disc_yr : 2011,section : "a", category : "s", sub_category : "s", description : "s", value : 10},
+    {edb : "bob", units : "v",obs_yr : 2012,disc_yr : 2012,section : "a", category : "s", sub_category : "s", description : "s", value : 10},
+    {edb : "bob", units : "v",obs_yr : 2013,disc_yr : 2013,section : "a", category : "s", sub_category : "s", description : "s", value : 10},
+  ] };
+}
+describe('Combine Tables tests', function() {
+  it('Length should be the same as the individual table', function () {
+
+    var testRows = getTestRowsForCombineTableTests();
+    var combined = dp.combineTables(testRows.t1,testRows.t2);
+
+    assert.isTrue(combined.length === testRows.t1.length);
+  });
+
+  it('The value of each row should be the first table divided by the second', function () {
+
+    var testRows = getTestRowsForCombineTableTests();
+    var combined = dp.combineTables(testRows.t1,testRows.t2);
+
+    assert.isTrue(combined[0].value === 10);
+    assert.isTrue(combined[1].value === 8);
+    assert.isTrue(combined[2].value === 4);
+    assert.isTrue(combined[3].value === 2);
+  });
+
+  it('The combined row should have "u" for unit a', function () {
+
+    var testRows = getTestRowsForCombineTableTests();
+    var combined = dp.combineTables(testRows.t1,testRows.t2);
+
+    assert.isTrue(combined[0].unitA === "u");
+    assert.isTrue(combined[1].unitA === "u");
+    assert.isTrue(combined[2].unitA === "u");
+    assert.isTrue(combined[3].unitA === "u");
+  });
+
+  it('The combined row should have "v" for unit b', function () {
+
+    var testRows = getTestRowsForCombineTableTests();
+    var combined = dp.combineTables(testRows.t1,testRows.t2);
+
+    assert.isTrue(combined[0].unitB === "v");
+    assert.isTrue(combined[1].unitB === "v");
+    assert.isTrue(combined[2].unitB === "v");
+    assert.isTrue(combined[3].unitB === "v");
+  });
+
+  it('The combined row should have "u / v" for combined unit', function () {
+
+    var testRows = getTestRowsForCombineTableTests();
+    var combined = dp.combineTables(testRows.t1,testRows.t2);
+
+    assert.isTrue(combined[0].unit === "u / v");
+    assert.isTrue(combined[1].unit === "u / v");
+    assert.isTrue(combined[2].unit === "u / v");
+    assert.isTrue(combined[3].unit === "u / v");
+  });
+
+
+  it('The values should be the same for the years after combining', function () {
+
+    var testRows = getTestRowsForCombineTableTests();
+    var combined = dp.combineTables(testRows.t1,testRows.t2);
+
+    combined.forEach(function (row) {
+      if(row.obs_yr === 2010){
+        assert.isTrue(row.value === 10);
+      }
+      if(row.obs_yr === 2011){
+        assert.isTrue(row.value === 8);
+      }
+      if(row.obs_yr === 2012){
+        assert.isTrue(row.value === 4);
+      }
+      if(row.obs_yr === 2013){
+        assert.isTrue(row.value === 2);
+      }
+    })
+  });
+
+
+  it('Should handle 0 values by changing to 1 and doing division', function () {
+
+    var testRows = getTestRowsForCombineTableTests();
+    testRows.t2[0].value = 0;
+    var combined = dp.combineTables(testRows.t1,testRows.t2);
+
+
+    combined.forEach(function (row) {
+      if(row.obs_yr === 2010){
+        assert.isTrue(row.value === 100); // 100 because divided by 1
+      }
+      if(row.obs_yr === 2011){
+        assert.isTrue(row.value === 8);
+      }
+      if(row.obs_yr === 2012){
+        assert.isTrue(row.value === 4);
+      }
+      if(row.obs_yr === 2013){
+        assert.isTrue(row.value === 2);
+      }
+    });
+  });
+});
+
+describe('Testing function that applied cpi to all table rows', function() {
+  it('Test one years worth of cpi applied', function () {
+    var cpiValues = [ {year : 2012, value : 1},{year : 2013, value : 5},{year : 2013, value : 10},{year : 2014, value : 25}];
+
+    var rows = [
+      {disc_yr : 2014, obs_yr : 2014, value : 100}
+    ];
+
+    dp.applyCPIToTableRows(rows,cpiValues);
+    assert.isTrue(rows[0].value === 125);
+  });
+
+  it('Test last year not affected by cpi value stays the same', function () {
+    var cpiValues = [ {year : 2012, value : 1},{year : 2013, value : 5},{year : 2013, value : 10},{year : 2014, value : 25}];
+
+    var rows = [
+      {disc_yr : 2016, obs_yr : 2016, value : 100},
+    ];
+
+    dp.applyCPIToTableRows(rows,cpiValues);
+
+    assert.isTrue(rows[0].value === 100);
+  });
+
+  it('Test cpi is compounded over two year', function () {
+    var cpiValues = [ {year : 2011, value : 1},{year : 2012, value : 5},{year : 2013, value : 10},{year : 2014, value : 25}];
+
+    var rows = [
+      {disc_yr : 2013, obs_yr : 2013, value : 100}
+    ];
+
+    dp.applyCPIToTableRows(rows,cpiValues);
+    assert.equal(rows[0].value.toFixed(2), "137.50");
+  });
+
+
+  it('Test cpi is compounded over three year', function () {
+    var cpiValues = [ {year : 2011, value : 1},{year : 2012, value : 5},{year : 2013, value : 10},{year : 2014, value : 25}];
+
+    var rows = [
+      {disc_yr : 2012, obs_yr : 2012, value : 100}
+    ];
+
+    dp.applyCPIToTableRows(rows,cpiValues);
+    assert.equal(rows[0].value.toFixed(3), "144.375");
+  });
+
+  it('Test different years compounded differently', function () {
+    var cpiValues = [ {year : 2011, value : 1},{year : 2012, value : 5},{year : 2013, value : 10},{year : 2014, value : 25}];
+
+    var rows = [
+      {disc_yr : 2012, obs_yr : 2012, value : 100},
+      {disc_yr : 2013, obs_yr : 2013, value : 100}
+    ];
+
+    dp.applyCPIToTableRows(rows,cpiValues);
+    assert.equal(rows[0].value.toFixed(3), "144.375");
+    assert.equal(rows[1].value.toFixed(2), "137.50");
+  });
+
+  it('Test different years compounded differently out of order', function () {
+    var cpiValues = [ {year : 2011, value : 1},{year : 2012, value : 5},{year : 2013, value : 10},{year : 2014, value : 25}];
+
+    var rows = [
+      {disc_yr : 2013, obs_yr : 2013, value : 100},
+      {disc_yr : 2012, obs_yr : 2012, value : 100}
+    ];
+
+    dp.applyCPIToTableRows(rows,cpiValues);
+    assert.equal(rows[1].value.toFixed(3), "144.375");
+    assert.equal(rows[0].value.toFixed(2), "137.50");
+  });
+});
+
+describe('Testing creating data for grouped bar graphs', function() {
+  it('Simple test to check both EDBs exist in data', function () {
+    var rows = [
+      {edb : "a", disc_yr : 2012, obs_yr : 2012, value : 100},
+      {edb : "b", disc_yr : 2012, obs_yr : 2012, value : 100},
+      {edb : "a", disc_yr : 2013, obs_yr : 2013, value : 200},
+      {edb : "b", disc_yr : 2013, obs_yr : 2013, value : 200}
+    ];
+
+    var barData = dp.createDataForGroupedGraph(rows);
+    console.log(barData)
+
+    var containsA = false;
+    var containsB = false;
+
+    barData.data.forEach(function(d){
+      if(d.edb === "a"){
+        containsA = true;
+      }
+
+      if(d.edb === "b"){
+        containsB = true;
+      }
+    });
+
+    assert.isTrue(containsA);
+    assert.isTrue(containsB);
+  });
+
+  it('Simple test to keys contain all years and no duplicates', function () {
+    var rows = [
+      {edb : "a", disc_yr : 2012, obs_yr : 2012, value : 100},
+      {edb : "b", disc_yr : 2012, obs_yr : 2012, value : 100},
+      {edb : "a", disc_yr : 2013, obs_yr : 2013, value : 200},
+      {edb : "b", disc_yr : 2013, obs_yr : 2013, value : 200}
+    ];
+
+    var barData = dp.createDataForGroupedGraph(rows);
+
+    assert.equal(barData.keys[0],2012);
+    assert.equal(barData.keys[1],2013);
+    assert.equal(barData.keys.length, 2);
+  });
+
+
+  it('Checks values for EDBs', function () {
+    var rows = [
+      {edb : "a", disc_yr : 2012, obs_yr : 2012, value : 100},
+      {edb : "b", disc_yr : 2012, obs_yr : 2012, value : 200},
+      {edb : "a", disc_yr : 2013, obs_yr : 2013, value : 300},
+      {edb : "b", disc_yr : 2013, obs_yr : 2013, value : 400}
+    ];
+
+    var barData = dp.createDataForGroupedGraph(rows);
+
+    barData.data.forEach(function(d){
+      if(d.edb === "a"){
+        assert.equal(d["2012"],100);
+        assert.equal(d["2013"],300);
+      }
+
+      if(d.edb === "b"){
+        assert.equal(d["2012"],200);
+        assert.equal(d["2013"],400);
+      }
+    });
+  });
+
+  it('Checks keys are ordered', function () {
+    var rows = [
+      {edb : "a", disc_yr : 2013, obs_yr : 2013, value : 300},
+      {edb : "b", disc_yr : 2013, obs_yr : 2013, value : 400},
+      {edb : "a", disc_yr : 2012, obs_yr : 2012, value : 100},
+      {edb : "b", disc_yr : 2012, obs_yr : 2012, value : 200}
+    ];
+
+    var barData = dp.createDataForGroupedGraph(rows);
+
+    // First entry should be 2012
+    assert.equal(barData.keys[0], 2012);
+    assert.equal(barData.keys[1], 2013);
+  });
+
+  it('Test edge case one edb', function () {
+    var rows = [
+      {edb : "a", disc_yr : 2013, obs_yr : 2013, value : 300},
+      {edb : "a", disc_yr : 2012, obs_yr : 2012, value : 100},
+    ];
+
+    var barData = dp.createDataForGroupedGraph(rows);
+
+    assert.equal(barData.data[0]["2012"], 100);
+    assert.equal(barData.data[0]["2013"], 300);
+
+    assert.equal(barData.keys[0], 2012);
+    assert.equal(barData.keys[1], 2013);
+    assert.equal(barData.keys.length, 2);
+  });
+
+  it('Test many edbs one year', function () {
+    var rows = [
+      {edb : "a", disc_yr : 2013, obs_yr : 2012, value : 100},
+      {edb : "b", disc_yr : 2012, obs_yr : 2012, value : 100},
+      {edb : "c", disc_yr : 2012, obs_yr : 2012, value : 100},
+      {edb : "d", disc_yr : 2012, obs_yr : 2012, value : 100},
+      {edb : "e", disc_yr : 2012, obs_yr : 2012, value : 100},
+    ];
+
+    var barData = dp.createDataForGroupedGraph(rows);
+
+    assert.equal(barData.data.length, 5);
+    assert.equal(barData.keys.length, 1);
+  });
+});
+
+describe('Testing creating data for box plots', function() {
+  it('Test min and max positive', function () {
+    var rows = [
+      {edb : "a", disc_yr : 2013, obs_yr : 2013, value : 300},
+      {edb : "b", disc_yr : 2013, obs_yr : 2013, value : 400},
+      {edb : "a", disc_yr : 2012, obs_yr : 2012, value : 100},
+      {edb : "b", disc_yr : 2012, obs_yr : 2012, value : 200}
+    ];
+
+    var boxPlotData = dp.createDataForBoxPlot(rows);
+
+    assert.equal(boxPlotData.min, 100);
+    assert.equal(boxPlotData.max, 400);
+  });
+
+  it('Test negative max and min', function () {
+    var rows = [
+      {edb : "a", disc_yr : 2013, obs_yr : 2013, value : -300},
+      {edb : "b", disc_yr : 2013, obs_yr : 2013, value : -400},
+      {edb : "a", disc_yr : 2012, obs_yr : 2012, value : -100},
+      {edb : "b", disc_yr : 2012, obs_yr : 2012, value : -200}
+    ];
+
+    var boxPlotData = dp.createDataForBoxPlot(rows);
+
+    assert.equal(boxPlotData.min, -400);
+    assert.equal(boxPlotData.max, -100);
+  });
+});
+
