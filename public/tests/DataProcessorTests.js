@@ -874,9 +874,53 @@ describe('Testing creating data for box plots', function() {
     ];
 
     var boxPlotData = dp.createDataForBoxPlot(rows);
+    console.log(boxPlotData);
 
     assert.equal(boxPlotData.min, -400);
     assert.equal(boxPlotData.max, -100);
   });
+
+
+  it('Test data contains multiple EDBs', function () {
+    var rows = [
+      {edb : "a", disc_yr : 2013, obs_yr : 2013, value : -300},
+      {edb : "b", disc_yr : 2013, obs_yr : 2013, value : -400},
+      {edb : "c", disc_yr : 2012, obs_yr : 2012, value : -100},
+      {edb : "d", disc_yr : 2012, obs_yr : 2012, value : -200}
+    ];
+
+    var boxPlotData = dp.createDataForBoxPlot(rows);
+    console.log(boxPlotData);
+
+    var containsA = false, containsB = false, containsC = false, containsD = false;
+
+    boxPlotData.scatterData.forEach(function(d){
+      if(d.edb === "a"){
+        containsA =true;
+      }
+      if(d.edb === "b"){
+        containsB =true;
+      }
+      if(d.edb === "c"){
+        containsC =true;
+      }
+      if(d.edb === "d"){
+        containsD =true;
+      }
+    });
+
+    assert.isTrue(containsA);
+    assert.isTrue(containsB);
+    assert.isTrue(containsC);
+    assert.isTrue(containsD);
+  });
 });
+
+describe('Testing creating data for vector Graph', function() {
+  it('Test min and max positive', function () {
+
+  });
+});
+
+
 
