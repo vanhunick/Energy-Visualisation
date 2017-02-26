@@ -1,26 +1,42 @@
 /**
  * Created by Nicky on 23/01/2017.
  */
+// Internet Explorer compatibility
+if (!String.prototype.includes) {
+    String.prototype.includes = function() {
+        'use strict';
+        return String.prototype.indexOf.apply(this, arguments) !== -1;
+    };
+}
 
- // Internet Explorer Compatability
- if (!String.prototype.includes) {
-     String.prototype.includes = function() {
-         'use strict';
-         return String.prototype.indexOf.apply(this, arguments) !== -1;
-     };
- }
+if (!Array.prototype.includes) {
+    Object.defineProperty(Array.prototype, "includes", {
+        enumerable: false,
+        value: function(obj) {
+            var newArr = this.filter(function(el) {
+                return el == obj;
+            });
+            return newArr.length > 0;
+        }
+    });
+}
+// End Internet explorer compatibility
 
- if (!Array.prototype.includes) {
-   Object.defineProperty(Array.prototype, "includes", {
-     enumerable: false,
-     value: function(obj) {
-         var newArr = this.filter(function(el) {
-           return el == obj;
-         });
-         return newArr.length > 0;
-       }
-   });
- }
+
+var dp = new DataProcessor();
+
+function Data(){
+    this.rows = [];
+    this.selections = []; // The selected sections
+    this.tables = null;
+    this.copyOfTables = null;
+    this.validOptions = [false,false,false,false];
+    this.dpFormat = d3.format(".4r");
+}
+
+var searchData; // An instance of the Data object
+var dataStructure; // Contains arrays for tables, graphs and combined graphs
+
 
 // Object to hold which company belongs to a specific region
 var regions = {
@@ -38,27 +54,6 @@ var regions = {
   nz : ["","","","","","","","","","","","","","","","","","","","","","","","","","","","",""]
 };
 
-// Holds the currently selected items in the filter rows
-var selections = [];
-
-// Format to use for all values displayed
-var dpFormat = d3.format(".4r");
-
-// Holds a object that contains the rows of selections that were last searched
-var lastSearch = null;
-var validOptions = [false,false,false,false]; // Each boolean represents if a sub category should exist in the selection row
-var selectedCompany = "";
-
-
-// Holds the rows for each table separately
-var dataTables; // Should never be modified
-var copyOfDataTables; // Can be modified to apply CPI
-
-// Three different ones created to hold ids for the divs the data is inserted into. This allows looping over the tables
-var selectionDataArray;// Contains the rows, id, title, subtitle amd init for each selection
-var selectionTablesArray; // Contains the rows, id, title, subtitle amd init for each table
-var combinedSelectionDataArray; // Contains combined rows along with titles and units
-
 
 // Called when the document is loaded
 $(document).ready( function() {
@@ -71,7 +66,7 @@ $(document).ready( function() {
         selectedCompany = $(this).find("option:selected").text();
     });
     $('#search-btn-compare').click(function(){ // Listener to search button
-        search2(); // Search encodes the selections into the url and sends to server
+        search(); // Search encodes the selections into the url and sends to server
     });
     cpiValidationSetup(); // Set up cpi validation rules
 });
@@ -79,102 +74,32 @@ $(document).ready( function() {
 
 // Uses the url to find what was searches and asks server for rows relating to that search
 function loadFromURL(urlSelections){
+    searchData = new Data();
     loadInSections(true,urlSelections); // First load in the section rows and set the searched selections
 
-    lastSearch = new Selection(urlSelections[0],urlSelections[1],urlSelections[2],urlSelections[3]); // Set the last search
     // Send array of selected sections to server and the company
-    $.post("/compare/search",{company : selectedCompany, selections : JSON.stringify(urlSelections)}, function(data){
+    $.post("/compare/search",{company : "", selections : JSON.stringify(urlSelections)}, function(data){
         // Queries the db for each of the secions and finds and inserts the sub sections as options
+        var lastSearch = new Selection(urlSelections[0],urlSelections[1],urlSelections[2],urlSelections[3]); // Set the last search
+
+        var dataTables = dp.filterRowsToTables(data.rows, lastSearch); // Filter the rows into their tables
+        //searchData = new Data(data.rows, lastSearch, dataTables);
+        searchData.rows = data.rows;
+        searchData.tables = dataTables;
+        searchData.copyOfTables = dp.copyDataTables(dataTables);
+        searchData.selections = [];
+
         urlSelections.forEach(function(s){
-          setSelectionsFromURL(s);
+          setSelectionsFromURL(s, searchData.validOptions); // Modifies valid options
         });
 
-        dataTables = filterRowsToTables(data.rows); // Filter the rows into their tables
-        copyOfDataTables = copyDataTables(dataTables); // Create a copy of data tables
-        createDataStructuresWithCopy(copyOfDataTables); // Sets up the data so it can easily be iterated over to create the tables and graphs
-        showTables(selectionTablesArray); // Show the tables
-        showAllRegularGraphs(selectionDataArray, true); // Show all but combined and vector graphs true indicates it should add titles in
-        showAllCombinedGraphs(combinedSelectionDataArray, true); // Show the combined and vector graphs
+        dataStructure = dp.createDataStructuresWithCopy(searchData.copyOfTables); // Sets up the data so it can easily be iterated over to create the tables and graphs
+
+        showTables(dataStructure.selectionTable); // Show the tables
+        showAllRegularGraphs(dataStructure.selectionData, true); // Show all but combined and vector graphs true indicates it should add titles in
+        showAllCombinedGraphs(dataStructure.combineData, true); // Show the combined and vector graphs
     });
 }
-
-//TODO test and remove html
-// Checks that if there is a value selected in a row the others must be selected too before searching
-function validateSearchParams(selections){
-    var returnVal = true;
-    selections.forEach(function (elem, i) {
-        if(elem.subCategory === "" && validOptions[i]){ // Valid options holds if there is a possible option to choosefrom in the select drop down
-            returnVal = false; // There is a possible sub category so it has to be chosen from
-        }
-
-        // Checks if one of the selections is empty
-        if(elem.section === "" || elem.category === "" || elem.description === ""){
-            // Now check if one of the selections is not empty
-            if(elem.section !== "" || elem.category !== "" || elem.description !== ""){
-                $('#error-div').append('<h4 style="color : red;">Partial Row Selected</h4>');
-                returnVal = false; // A row cannot have one item selected and another empty
-            }
-        }
-    });
-    if(returnVal)$('#error-div').html(''); // It is valid so romve error element
-    return returnVal;
-}
-
-//TODO test
-// Returns a copy of the dataTables object
-function copyDataTables(dataTables){
-    var origTables = [dataTables.tableA,dataTables.tableB,dataTables.tableC,dataTables.tableD,dataTables.tableAB,dataTables.tableCD]; // Add tables to array to iterate over them
-    var tables = [[],[],[],[],[],[]]; // Empty arras to insert new rows with values copies of the original
-
-    for(var j = 0; j < origTables.length; j++){
-        var a = origTables[j]; // Grab the current table with index i
-        if(a !== undefined){ // It might not exist due to it not being selected
-            for(var i = 0; i < a.length; i++){ // For every row copy all the fields
-                tables[j].push({category :a[i].category, description : a[i].description,disc_yr: a[i].disc_yr,edb: a[i].edb,
-                    fcast_yr: a[i].fcast_yr,network:a[i].network,note:a[i].note,obs_yr:a[i].obs_yr,p_key: a[i].p_key,sch_ref:a[i].sch_ref,
-                    schedule:a[i].schedule,section:a[i].section,sub_category: a[i].sub_category,units:a[i].units,value:a[i].value})
-            }
-        }
-    }
-    return new DataTables(tables[0],tables[1],tables[2],tables[3],tables[4],tables[5]); // Return the copy
-}
-
-
-// Creates the data structures and assigns to the global variables
-function createDataStructuresWithCopy(copyOfDataTables){
-  selectionDataArray = [];
-  selectionTablesArray = [];
-  combinedSelectionDataArray = [];
-
-  // An array of true / false values if a table contains values
-  var selectedRows = [copyOfDataTables.tableA.length > 0,copyOfDataTables.tableB.length > 0,copyOfDataTables.tableC.length > 0,copyOfDataTables.tableD.length > 0];
-
-  // An array with the tables data
-  var tables = [copyOfDataTables.tableA,copyOfDataTables.tableB,copyOfDataTables.tableC,copyOfDataTables.tableD,copyOfDataTables.tableAB,copyOfDataTables.tableCD];
-
-  // Creates the 4 normal tables and the combined tables
-  var ids = ['a','b','c','d','ab','cd'];
-  for(var i = 0; i < selectedRows.length; i++){
-    if(selectedRows[i]){
-      var title = tables[i][0].section + ", " + tables[i][0].category;
-      var subtitle = tables[i][0].sub_category === null ? tables[i][0].description : tables[i][0].sub_category + ", " + tables[i][0].description;
-      selectionTablesArray.push(new SelectedTableData(tables[i],ids[i],title,subtitle, tables[i][0].units)); // TODO add unit for combined
-      selectionDataArray.push(new SelectionData(tables[i], title, subtitle ,tables[i][0].units,ids[i]));
-
-      // Check for combined special case
-      if(ids[i] === 'a' || ids[i] === 'c'){
-        if(selectedRows[i+1]){ // Check that a selections has been made if so create the combined table
-          var jump = i === 0 ? 4 : 3;
-          var titleJump = tables[i+1][0].section + ", " + tables[i+1][0].category;
-          var subTitleJump = tables[i+1][0].sub_category === null ? tables[i+1][0].description : tables[i+1][0].sub_category + ", " + tables[i+1][0].description;
-          selectionTablesArray.push(new SelectedTableData(tables[i+jump],ids[i+jump], title + ", " + subtitle, titleJump + ", " + subTitleJump, tables[i+1][0].units));
-          combinedSelectionDataArray.push(new SelectionDataCombined(tables[i+jump],tables[i],tables[i+1], title + " " + subtitle, titleJump + " " + subTitleJump,tables[i][0].units,tables[i+1][0].units,ids[i+jump])); // TODO ask how to format titles for combined
-        }
-      }
-    }
-  }
-}
-
 
 // Shows the tables on the page givin the data in the selection table array
 function showTables(selectionTablesArray){
@@ -188,32 +113,6 @@ function showTables(selectionTablesArray){
 }
 
 
-// Takes all rows and filers into corresponding tables
-function filterRowsToTables(rows){
-  console.log(lastSearch);
-    var aRows = rows.filter(function(e){return matchDBRow(e,lastSearch.aTable);});
-    var bRows = rows.filter(function(e){return matchDBRow(e,lastSearch.bTable);});
-    var cRows = rows.filter(function(e){return matchDBRow(e,lastSearch.cTable);});
-    var dRows = rows.filter(function(e){return matchDBRow(e,lastSearch.dTable);});
-
-    // Set all null values in rows to 0
-    aRows.forEach(function(e){if(e.value === null){e.value = 0;}});
-    bRows.forEach(function(e){if(e.value === null){e.value = 0;}});
-    cRows.forEach(function(e){if(e.value === null){e.value = 0;}});
-    dRows.forEach(function(e){if(e.value === null){e.value = 0;}});
-
-    // Create combined tables if possible
-    if(aRows.length > 0 && bRows.length > 0){
-        var abRows = combineTables(aRows,bRows);
-    }
-
-    if(cRows.length > 0 && dRows.length > 0){
-        var cdRows = combineTables(cRows,dRows);
-    }
-    return new DataTables(aRows,bRows,cRows,dRows, abRows, cdRows);
-}
-
-
 // Shows graphs for A,B,C,D
 function showAllRegularGraphs(selectionData, addTitles){
     selectionData.forEach(function (selection) {
@@ -224,11 +123,11 @@ function showAllRegularGraphs(selectionData, addTitles){
         }
 
         // Create the data needed for bar grahs and create and insert the graph
-        var table1Data = createDataForGroupedGraph(selection.rows);
+        var table1Data = dp.createDataForGroupedGraph(selection.rows);
         createdGroupedBarGraph(table1Data.data, table1Data.keys,selection.unit,"#grouped-bar-"+selection.id);
 
         // Create the data needed for box plot and create and insert the plot
-        createBoxPlot(createDataForBoxPlot(selection.rows), "#boxplot"+selection.id+"-div", selection.unit);
+        createBoxPlot(dp.createDataForBoxPlot(selection.rows), "#boxplot"+selection.id+"-div", selection.unit);
         $('#full-table-'+selection.id+'-div').show();
     });
 }
@@ -244,50 +143,21 @@ function showAllCombinedGraphs(selectionData, showTitle){
             $('#title-'+selection.id+'-vector').append('<h4 class="combined-title">'+selection.title1+'<br><span class="over">over</span><br>'+selection.title2+'</h4>');
         }
         // Create data for bar, box and vector graphs and isert into divs
-        var tableABData = createDataForGroupedGraph(selection.rows);
+        var tableABData = dp.createDataForGroupedGraph(selection.rows);
         createdGroupedBarGraph(tableABData.data, tableABData.keys, selection.unit1 + " / " + selection.unit2, "#grouped-bar-"+selection.id);
-        createBoxPlot(createDataForBoxPlot(selection.rows), "#boxplot"+selection.id+"-div", selection.unit1 + " / " + selection.unit2);
-        createVectorGraph(createDataForVectorGraph(selection.table1Rows,selection.table2Rows),selection.unit1,selection.unit2,"#vector-graph-div-"+selection.id);
+        createBoxPlot(dp.createDataForBoxPlot(selection.rows), "#boxplot"+selection.id+"-div", selection.unit1 + " / " + selection.unit2);
+        createVectorGraph(dp.createDataForVectorGraph(selection.table1Rows,selection.table2Rows),selection.unit1,selection.unit2,"#vector-graph-div-"+selection.id);
         $('#full-table-'+selection.id+'-div').show(); // Show the div now that they have been created
     });
 
     // Add in A / B over C / D
     if(selectionData.length === 2){
         $('#title-abcd-vec').append('<h4 class="combined-title">'+selectionData[0].title1+' / '+selectionData[0].title2+'</h4>').append('<h4>Over</h4>').append('<h4 class="combined-title">'+selectionData[1].title1+' / '+selectionData[1].title2+'</h4>');
-        createVectorGraph(createDataForVectorGraph(selectionData[0].rows,selectionData[1].rows),selectionData[0].unit1 + " / " + selectionData[1].unit1,selectionData[0].unit2 + " / " + selectionData[1].unit2,"#vector-graph-div-abcd");
+        createVectorGraph(dp.createDataForVectorGraph(selectionData[0].rows,selectionData[1].rows),selectionData[0].unit1 + " / " + selectionData[1].unit1,selectionData[0].unit2 + " / " + selectionData[1].unit2,"#vector-graph-div-abcd");
         $('#vector-full-div-abcd').show();
     }
 }
 
-
-// Combine two tables and return the results
-function combineTables(table1Rows, table2Rows){
-    var combined = [];
-    var at = table1Rows;
-    var bt = table2Rows;
-
-    for(var i = 0; i < at.length; i++){
-        for(var j = 0; j < bt.length; j++){
-            if(at[i].edb === bt[j].edb && at[i].obs_yr === bt[j].obs_yr && at[i].disc_yr === bt[j].disc_yr){
-                combined.push({ disc_yr : bt[j].disc_yr ,
-                    edb : bt[j].edb,
-                    obs_yr : bt[j].obs_yr,
-                    value : at[i].value / (bt[j].value === '0' || bt[j].value === 0 ? 1 : bt[j].value), // Divide the value if va if dividing by 0 make it 1
-                    section : bt[j].section + "" + bt[j].description + " over ", // Bit of a hack as description is inserted after section, this way both titles are added to table
-                    description : at[i].section + " " + at[i].description,
-                    unitA : at[i].units,
-                    unitB : bt[j].units,
-                    unit : at[i].units +" / " +  bt[j].units
-                });
-                break; // can exit the loop
-            }
-        }
-    }
-    return combined;
-}
-
-// Hold the original cells before cpi was applied in the for id, value
-var noCPICellsTotals = [];
 
 // Creates and inserts a total table for each reqion
 function insertTotalsTable(tableRows, id, regions, tableExists){
@@ -354,7 +224,7 @@ function insertTotalsTable(tableRows, id, regions, tableExists){
         // Insert name in column and assign an id to the row
         row += "<th class='reg-cell'>" + names[property] + "</th>";
         totals[property].forEach(function(value){
-          row += "<th id='t-total"+id+""+cellCount+"' origValue='"+ value / regions[property].length +"' class='val-tot-cell'>" + dpFormat(value / regions[property].length) + "</th>";
+          row += "<th id='t-total"+id+""+cellCount+"' origValue='"+ value / regions[property].length +"' class='val-tot-cell'>" + searchData.dpFormat(value / regions[property].length) + "</th>";
           totCells.push({id : "#t-total"+id+""+cellCount, value : value / regions[property].length});
           if(!tableExists){
               noCPICells.push({id : "t-total"+id+""+cellCount, value : value / regions[property].length});
@@ -428,7 +298,7 @@ function insertTable(tableRows,id){
                     // Check it matches edb and year inserting into
                     if(tableRows[j].edb === tableRows[i].edb && tableRows[j].obs_yr === availableObsYears[k] && (!yearDone.includes(tableRows[j].obs_yr))){
                         yearDone.push(tableRows[j].obs_yr);
-                        row += "<th origValue='"+ tableRows[j].value +"' class='cell "+availableObsYears[k]+"' id='t"+id+""+cellCount+"'>" + dpFormat(tableRows[j].value) + "</th>";
+                        row += "<th origValue='"+ tableRows[j].value +"' class='cell "+availableObsYears[k]+"' id='t"+id+""+cellCount+"'>" + searchData.dpFormat(tableRows[j].value) + "</th>";
                         // Save the value and the id of the cell to display percentage
                         cellValues.push({ id : "#t"+id+""+cellCount, value : tableRows[j].value });
                         cellCount++;
@@ -549,38 +419,14 @@ function applyGradientCSS(cellValues, percent){
     }
 }
 
-
-// Returns if a row from the DB matches one of the specified rows by the user
-function matchDBRow(DBRow, selection){
-    if(DBRow.section === selection.section && DBRow.category === selection.category && DBRow.description === selection.description){
-        if(DBRow.sub_category !== null){
-            return selection.subCategory === DBRow.sub_category; // Sub cat could be null but would still match
-        }
-        return true;
-    }
-    return false;
-}
-
-
-// Creates search parameters and creates url
 function search(){
-    if(!validateSearchParams(selections))return; // First check if the selection is valid
-    var rows = {
-        i0 : selections[0].id,s0  : selections[0].section,c0 : selections[0].category,sc0 : selections[0].subCategory,d0 : selections[0].description,
-        i1 : selections[1].id,s1  : selections[1].section,c1 : selections[1].category,sc1 : selections[1].subCategory,d1 : selections[1].description,
-        i2 : selections[2].id,s2  : selections[2].section,c2 : selections[2].category,sc2 : selections[2].subCategory,d2 : selections[2].description,
-        i3 : selections[3].id,s3  : selections[3].section,c3 : selections[3].category,sc3 : selections[3].subCategory,d3 : selections[3].description
-    };
-    params = serialise(rows); // Escape chracters for url
-    window.location.replace("compare?" + params); // Replace the url with the selections url
-}
-
-function search2(){
-  if(!validateSearchParams(selections))return; // First check if the selection is valid
+  if(!dp.validateSearchParams(searchData.selections,searchData.validOptions)){
+      $('#error-div').append('<h4 style="color : red;">Partial Row Selected</h4>');
+      return; // First check if the selection is valid
+  }
 
   var rows= {};
-
-  selections.forEach(function(selection){
+  searchData.selections.forEach(function(selection){
     if(selection.section !== ""){
         rows["s"+selection.id] = selection.section;
         rows["c"+selection.id] = selection.category;
@@ -589,8 +435,7 @@ function search2(){
     }
   });
 
-  params = serialise(rows); // Escape chracters for url
-  window.location.replace("compare?" + params); // Replace the url with the selections url
+  window.location.replace("compare?" + serialise(rows)); // Replace the url with the selections url
 }
 
 // Turns object in url string
@@ -603,166 +448,8 @@ function serialise(obj) {
     return str.join("&");
 }
 
-
-// table 1 can be A and table two C or table 1 is A / B and table two is
-function createDataForVectorGraph(table1Rows,table2Rows) {
-    var at = table1Rows;
-    var bt = table2Rows;
-    var edbDone = []; // The edbs that have been processed
-    var vecData = []; // The final entry in the form { EDB, [ { year1, valueA, valueB }, {year2, valueA, valueB }]}
-
-    var availableObsYears = [];
-    table1Rows.forEach(function (row1) {
-        if(!availableObsYears.includes(row1.obs_yr)){
-
-            // Check if the second set of rows also contains the year
-            for(var i = 0; i < table2Rows.length; i++){
-              if(table2Rows[i].obs_yr === row1.obs_yr){
-                  availableObsYears.push(row1.obs_yr);
-                  break;
-              }
-            }
-        }
-    });
-
-    // Go through every row
-    for (var i = 0; i < at.length; i++) {
-
-        // Check if the EDB has already been processed
-        if (!edbDone.includes(at[i].edb)) {
-
-            // Grab all the rows for the current edb in both tables
-            var edbRowsAt = at.filter(function (d) {
-                return d.edb === at[i].edb
-            });
-            var edbRowsBt = bt.filter(function (d) {
-                return d.edb === at[i].edb
-            });
-
-            edbDone.push(at[i].edb); // Add year to done so it is not repeated
-
-            var yearsDone = []; // Processed years
-            var edbYearArray = [];
-
-            // Iterate through rows in edb
-            for (var j = 0; j < edbRowsAt.length; j++) {
-
-                // Check it has not been processed
-                if (!yearsDone.includes(edbRowsAt[j].disc_yr) && availableObsYears.includes(edbRowsAt[j].disc_yr)) {
-                    yearsDone.push(edbRowsAt[j].disc_yr); // Add to processed
-
-                    // Here we have to rows for a particular year for a particular edb now we can create the entry
-                    var yearRowsAt = edbRowsAt.filter(function (d) {
-                        return d.disc_yr === edbRowsAt[j].disc_yr
-                    });
-                    var yearRowsBt = edbRowsBt.filter(function (d) {
-                        return d.disc_yr === edbRowsAt[j].disc_yr
-                    });
-
-                    if(!(yearRowsAt.length == yearRowsBt.length )){
-                        return [];
-                    }
-
-                    for (var k = 0; k < yearRowsAt.length; k++) {
-                        edbYearArray.push({
-                            year: +yearRowsAt[k].disc_yr,
-                            valueA: +yearRowsAt[k].value,
-                            valueB: +yearRowsBt[k].value
-                        });
-                    }
-                }
-            }
-            edbYearArray.sort(function (a,b) {
-                return a.year - b.year;
-            });
-            vecData.push({edb: at[i].edb, years: edbYearArray});
-        }
-    }
-    return vecData;
-}
-
-
-// Creates the data needed to create box plots for one table
-function createDataForBoxPlot(tableRows){
-    var yearsDone = []; // Years processed
-    var years = []; // Will contain an array of rows for each year
-
-    for(var i = 0; i < tableRows.length; i++){
-        if(!yearsDone.includes(tableRows[i].obs_yr)){
-            years.push(tableRows.filter(function(e){return e.obs_yr === tableRows[i].obs_yr}));
-            yearsDone.push(tableRows[i].obs_yr);
-        }
-    }
-
-    var data = []; // Each entry will be an array where array[0] = year and array[1] = values for that year
-    var sValues = []; // Data for the scatter plot on top of box plot
-    var min = Infinity;
-    var max = -Infinity;
-
-    for(var i = 0; i < years.length; i++){
-        var entry = [];
-        entry[0] = ""+years[i][0].obs_yr; // Name of the box plot convert year to string
-        var year = ""+years[i][0].obs_yr;
-        var values = [];
-
-        for(var j = 0; j < years[i].length; j++){
-            var curValue = +years[i][j].value;
-            var edb = years[i][j].edb;
-
-            if (curValue > max){
-                max = curValue;
-            }
-            if (curValue < min){
-                min = curValue;
-            }
-            values.push(curValue);
-            sValues.push({year : year ,edb : edb, value : curValue});
-        }
-        entry[1] = values;
-        data.push(entry);
-    }
-    data.sort(function(a,b){
-        return a[0] - b[0];
-    });
-    return {min : min, max : max, data : data, scatterData : sValues};
-}
-
-// Creates the data for the bar graphs from the rows used in D3
-function createDataForGroupedGraph(rows){
-    var availableObsYears = [];
-
-    rows.forEach(function (elem) {
-        if(!availableObsYears.includes(elem.obs_yr))availableObsYears.push(elem.obs_yr);
-    });
-    availableObsYears.sort(function (a, b) {
-        return +a - +b;
-    });
-
-    var data = [];
-    var edbDone = [];
-
-    for(var i = 0; i < rows.length; i++){
-        if(!edbDone.includes(rows[i].edb)){
-            edbDone.push(rows[i].edb);
-
-            var entry = { "edb" : rows[i].edb};
-
-            entry[rows[i].obs_yr] = +rows[i].value;
-            data.push(entry);
-        } else {
-            for(var j = 0; j < data.length; j++){
-                if(data[j].edb === rows[i].edb){
-                    //var value = +rows[i].value;
-                    data[j][rows[i].obs_yr] = +rows[i].value;
-                }
-            }
-        }
-    }
-    return {data : data, keys : availableObsYears};
-}
-
 // Loads in a selection from the user by grabbing the possible sections, categories, sub categories and descriptions from the DB
-function setSelectionsFromURL(selection){
+function setSelectionsFromURL(selection, validOptions){
     // Find all the categories associated with this section
     $.post("/sections/s",{selected : selection.section }, function(data){
         if(data.categories.length > 0  &&  data.categories[0] !== null){
@@ -821,28 +508,11 @@ function setSelectionsFromURL(selection){
 }
 
 
-// Sort the sections
-function sortSections(data){
-    data.sections.sort(function(a,b){
-        // First check simple case of number difference
-        var i = 0;
-        while(!isNaN(a.charAt(i))){i++}
-        var numberA = a.substring(0,i); // Gets the number from the section
-
-        i = 0;
-        while(!isNaN(b.charAt(i))){i++}
-        var numberB = b.substring(0,i);
-
-        if(numberA !== numberB) {
-            return numberA - numberB;
-        }
-        return [a,b].sort()[0] === a ? -1 : 1; // Sort two names and return the first
-    });
-}
-
-
 // Loads in sections along with the rows of selection boxes
 function loadInSections(fromURL, userSelections){ // if from url false selections is null
+    if(!fromURL){
+        searchData = new Data([],[],[]); // Need to add empty array to put selections in
+    }
     // Grab all the sections
     /// Query for all sections
     $.get("/sections/sections", function(data){
@@ -854,24 +524,23 @@ function loadInSections(fromURL, userSelections){ // if from url false selection
 
         if(fromURL){
           for(var i = 0; i < userSelections.length; i++){
-              selections[i].description = userSelections[i].description;
-              selections[i].category = userSelections[i].category;
-              selections[i].section = userSelections[i].section;
-              selections[i].subCategory = userSelections[i].subCategory;
+              searchData.selections[i].description = userSelections[i].description;
+              searchData.selections[i].category = userSelections[i].category;
+              searchData.selections[i].section = userSelections[i].section;
+              searchData.selections[i].subCategory = userSelections[i].subCategory;
             }
         }
-        sortSections(data);// Sort the sections
+        dp.sortSections(data); // Sort the sections
 
         // Go through each row and add the sections in
-        for(var i = 0; i < selections.length; i++){
+        for(var i = 0; i < searchData.selections.length; i++){
             for(var j = 0; j < data.sections.length; j++){
                 if(fromURL && userSelections[i].section === data.sections[j]){
-                    $("#section-select"+selections[i].id+"").append('<option selected>' + data.sections[j] + '</option>');
-                    validOptions[selections[i].id] = true;//TODO added
+                    $("#section-select"+searchData.selections[i].id+"").append('<option selected>' + data.sections[j] + '</option>');
+                    searchData.validOptions[searchData.selections[i].id] = true;
                 } else {
-                    $("#section-select"+selections[i].id+"").append('<option>' + data.sections[j] + '</option>');
+                    $("#section-select"+searchData.selections[i].id+"").append('<option>' + data.sections[j] + '</option>');
                 }
-                  // addToSelection(selections[i].id,"section",data.sections[j]); // Record change in the array of selections
             }
             $(".selectpicker").selectpicker('refresh');
         }
@@ -888,7 +557,7 @@ function addSection(numberSections){
     $("#row"+numberSections).append('<div class="col-md-12 compare-col" id="col'+numberSections+'">');
     $("#col"+numberSections).append('<select data-width="250px" class="selectpicker select-compare"  title="Section" id="section-select'+numberSections+'"></select>');// add section selector with the number section as the dynamic id
 
-    selections.push({id : numberSections, section : "", category : "", subCategory : "", description : ""});// Push the information for the new row into the selections array
+    searchData.selections.push({id : numberSections, section : "", category : "", subCategory : "", description : ""});// Push the information for the new row into the selections array
 
     // Add a change listener for when a section is selected
     $("#section-select"+numberSections).on('change', function(event){
@@ -900,8 +569,8 @@ function addSection(numberSections){
         $('#category-select'+idNumb).html(''); // Empty temp options
         $('#subsection-select'+idNumb).html(''); // Empty temp options
         $('#description-select'+idNumb).html(''); // Empty temp options
-        selections[idNumb] = {id : numberSections, section : "", category : "", subCategory : "", description : ""};
-        validOptions[idNumb] = false;
+        searchData.selections[idNumb] = {id : numberSections, section : "", category : "", subCategory : "", description : ""};
+        searchData.validOptions[idNumb] = false;
 
         // Find all the categories associated with this section
         $.post("/sections/s",{selected : section }, function(data){
@@ -918,7 +587,7 @@ function addSection(numberSections){
             // Refresh all drop downs
             $(".selectpicker").selectpicker('refresh');
         });
-        addToSelection(idNumb,"section",section); // Record change in the array of selections
+        dp.addToSelection(idNumb,"section",section, searchData.selections); // Record change in the array of selections
     });
 
     // add category selector
@@ -930,10 +599,10 @@ function addSection(numberSections){
         $('#description-select'+idNumb).html(''); // Empty temp options
 
         // Find all sub categories for the currently selected category
-        $.post("/sections/sc",{section : selections[idNumb].section, category : categoryNew}, function(data){
+        $.post("/sections/sc",{section : searchData.selections[idNumb].section, category : categoryNew}, function(data){
             if(data.subCategories.length > 0  &&  data.subCategories[0] !== null){
                 $('#subsection-select'+idNumb).html(''); // Empty temp options
-                validOptions[idNumb] = true; // There are options for this row and sub category
+                searchData.validOptions[idNumb] = true; // There are options for this row and sub category
             } else {
                 // Find all descriptions for the currently selected sub category
                 $.post("/sections/desc",{category : category ,section : selections[idNumb].section, subCategory : ""}, function(data){
@@ -957,7 +626,7 @@ function addSection(numberSections){
             $(".selectpicker").selectpicker('refresh');
             $(".selectpicker").selectpicker('refresh');
         });
-        addToSelection(idNumb,"category", categoryNew);
+        dp.addToSelection(idNumb,"category", categoryNew, searchData.selections);
         $(".selectpicker").selectpicker('refresh');
     });
 
@@ -968,7 +637,7 @@ function addSection(numberSections){
         var subCat = $(this).find("option:selected").text();
 
         // Find all descriptions for the currently selected sub category
-        $.post("/sections/desc",{category : selections[idNumb].category,section : selections[idNumb].section, subCategory : subCat}, function(data){
+        $.post("/sections/desc",{category : searchData.selections[idNumb].category,section : searchData.selections[idNumb].section, subCategory : subCat}, function(data){
             if(data.descriptions.length > 0 &&  data.descriptions[0] !== null){
                 $('#description-select'+idNumb).html(''); // Empty temp options
             } else {
@@ -981,7 +650,7 @@ function addSection(numberSections){
             }
             $(".selectpicker").selectpicker('refresh');
         });
-        addToSelection(idNumb,"subcategory", subCat);
+        dp.addToSelection(idNumb,"subcategory", subCat, searchData.selections);
     });
 
     // add description selector
@@ -989,7 +658,7 @@ function addSection(numberSections){
     $('#description-select'+numberSections).on('change', function(event){
         var idNumb = event.target.id.charAt(event.target.id.length-1);
         var data = $(this).find("option:selected").text();
-        addToSelection(idNumb,"description", data);
+        dp.addToSelection(idNumb,"description", data, searchData.selections);
     });
 
     $("#col"+numberSections).append('<button type="button" id="clear-'+numberSections+'" class="btn btn-danger">Clear</button>').on('click', function(event){
@@ -998,10 +667,11 @@ function addSection(numberSections){
     });
 }
 
+
 // Clears a row of selections
 function clearSelection(idNumb){
-  selections[idNumb] = {id : idNumb, section : "", category : "", subCategory : "", description : ""};
-  validOptions[idNumb] = false;
+  searchData.selections[idNumb] = {id : idNumb, section : "", category : "", subCategory : "", description : ""};
+    searchData.validOptions[idNumb] = false;
   $('#description-select'+idNumb).html('');
   $('#subsection-select'+idNumb).html('');
   $('#category-select'+idNumb).html('');
@@ -1009,44 +679,16 @@ function clearSelection(idNumb){
   $(".selectpicker").selectpicker('refresh');
 }
 
-// Adds a section, category, sub category, or descriptions to a particular row in selections
-function addToSelection(id, type, data){
-    for(var i = 0; i < selections.length; i++){
-        if(selections[i].id+"" === id+""){ // Convert them both to strings
-            if(type === "section"){
-                selections[i].section = data;
-            } else if(type === "category"){
-                selections[i].category = data;
-            } else if(type === "subcategory"){
-                selections[i].subCategory = data;
-            } else if(type === "description"){
-                selections[i].description = data;
-            }
-        }
-    }
-}
-
 
 // Set up rules for validating the CPI fields
 function cpiValidationSetup(){
     $.validator.setDefaults({
             errorClass : 'help-block',
-            highlight: function (element) {
-                $(element).closest('.form-group').addClass('has-error')
-            },
-            unhighlight :function (element) {
-                $(element).closest('.form-group').removeClass('has-error')
-            }
+            highlight: function (element) {$(element).closest('.form-group').addClass('has-error')},
+            unhighlight :function (element) {$(element).closest('.form-group').removeClass('has-error')}
         }
     );
-
-    var cpiRules = {
-        required : true,
-        number : true,
-        min : 0,
-        max : 100
-    };
-
+    var cpiRules = {required : true, number : true, min : 0, max : 100};
     var messageSet = {
         required : "Please enter a percentage",
         number : "Please enter a valid number",
@@ -1055,56 +697,42 @@ function cpiValidationSetup(){
     };
 
     $('#cpi-form').validate({
-        rules : {Y2012 : cpiRules,Y2013 : cpiRules,Y2014 : cpiRules,Y2015 : cpiRules,Y2016 : cpiRules
-        },
+        rules : {Y2012 : cpiRules,Y2013 : cpiRules,Y2014 : cpiRules,Y2015 : cpiRules,Y2016 : cpiRules},
         messages : {Y2012 : messageSet,Y2013 : messageSet,Y2014 : messageSet,Y2015 : messageSet,Y2016 : messageSet}
     });
 }
 
-function applyCPI(units){
+function applyCPI(){
     if($('#cpi-form').valid()){
         if(noCPICells.length > 0){
             revertCPI(); // Reverts cpi before instead of saving values with cpi already applied
-            copyOfDataTables = copyDataTables(dataTables); // Use the original data and create a copy of it
-            createDataStructuresWithCopy(copyOfDataTables);
+            var copyOfDataTables = dp.copyDataTables(searchData.tables); // Use the original data and create a copy of it
+            dataStructure = dp.createDataStructuresWithCopy(copyOfDataTables);
         }
         // CPI for 2012 - 2016
         var cpiValues = [{year : 2012, value : +$('#Y2012').val()},{year : 2013, value : +$('#Y2013').val()},{year : 2014, value : +$('#Y2014').val()},{year : 2015, value : +$('#Y2015').val()},{year : 2016, value : +$('#Y2016').val()}];
 
         // Applies CPI to all selected tables
-        selectionTablesArray.forEach(function (table) {
+        dataStructure.selectionTable.forEach(function (table) {
           if(table.unit.includes('$')){
             applyCPIToTable('#table'+table.id,cpiValues);
           }
         });
 
         // Go through each table and check if is should have cpi applied if so modify the rows
-        selectionDataArray.forEach(function (table) {
+        dataStructure.selectionData.forEach(function (table) {
             if(table.unit.includes('$')){
                 applyCPIToTableRows(table.rows, cpiValues);
             }
         });
 
         // At this point the rows have been updated so we can update the totals table
-        selectionTablesArray.forEach(function (tableData) {
+        dataStructure.selectionTable.forEach(function (tableData) {
             insertTotalsTable(tableData.rows, 'table-total'+tableData.id, regions,true);
         });
 
-        showAllRegularGraphs(selectionDataArray, false);
-
-        //TODO I think this code is never executed
-        // if(aSelected && bSelected){
-        //   console.log("A and B selected");
-        //     var abRows = combineTables(aRows,bRows);
-        //     combinedSelectionDataArray[0].rows = abRows;
-        // }
-        //
-        // //TODO I think this code is never executed
-        // if(cSelected && dSelected){
-        //     var cdRows = combineTables(dataTables.cRows,dataTables.dRows);
-        //     combinedSelectionDataArray[1].rows = cdRows;
-        // }
-        showAllCombinedGraphs(combinedSelectionDataArray, false);
+        showAllRegularGraphs(dataStructure.selectionData, false);
+        showAllCombinedGraphs(dataStructure.combineData, false);
     }
 }
 
@@ -1162,7 +790,7 @@ function applyCPIToTable(table, cpiValues){
                 if(cpiValues[i].year === cur){
                     if(year <= cur){
                         valueOfCell = valueOfCell * (1 + (cpiValues[i].value / 100));
-                        valueOfCell = dpFormat(valueOfCell);
+                        valueOfCell = searchData.dpFormat(valueOfCell);
 
                     }
                 }
@@ -1178,52 +806,4 @@ function revertCPI(){
         $('#'+e.id).text(e.value);
     });
     applyGradientCSS(noCPICells);
-}
-
-// Object for holder the users selection
-function Selection(a,b,c,d){
-    this.aTable = a;
-    this.bTable = b;
-    this.cTable = c;
-    this.dTable = d;
-}
-
-// Object for holder rows for all tables
-function DataTables(tableA,tableB,tableC,tableD,tableAB,tableCD){
-    this.tableA = tableA;
-    this.tableB = tableB;
-    this.tableC = tableC;
-    this.tableD = tableD;
-    this.tableAB = tableAB;
-    this.tableCD = tableCD;
-}
-
-// Data object for each section, used for graphs
-function SelectionData(rows,title,subTitle,unit,id){
-    this.rows = rows;
-    this.title = title;
-    this.subTitle = subTitle;
-    this.id = id;
-    this.unit = unit;
-}
-
-// Data object for Rows combined
-function SelectionDataCombined(rows, table1Rows,table2Rows,title1,title2,unit1,unit2,id){
-    this.rows = rows; // Combined rows
-    this.title1 = title1;
-    this.title2 = title2;
-    this.unit1 = unit1;
-    this.unit2 = unit2;
-    this.id = id;
-    this.table1Rows = table1Rows;
-    this.table2Rows = table2Rows;
-}
-
-// Data object for each table
-function SelectedTableData(rows,id, title, subTitle, unit){
-    this.rows = rows;
-    this.id = id;
-    this.title = title;
-    this.subTitle = subTitle;
-    this.unit = unit;
 }

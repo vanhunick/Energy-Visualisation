@@ -1,7 +1,7 @@
 function DataProcessor(){}
 
 // Function that returns a copy of the dataTables objects
-DataProcessor.prototype.copyOfDataTables = function(dataTables) {
+DataProcessor.prototype.copyDataTables = function(dataTables) {
   var origTables = [dataTables.tableA,dataTables.tableB,dataTables.tableC,dataTables.tableD,dataTables.tableAB,dataTables.tableCD]; // Add tables to array to iterate over them
   var tables = [[],[],[],[],[],[]]; // Empty arras to insert new rows with values copies of the original
 
@@ -18,8 +18,42 @@ DataProcessor.prototype.copyOfDataTables = function(dataTables) {
   return new DataTables(tables[0],tables[1],tables[2],tables[3],tables[4],tables[5]); // Return the copy
 }
 
+DataProcessor.prototype.createDataStructuresWithCopy = function (copyOfDataTables){
+    var selectionDataArray = [];
+    var selectionTablesArray = [];
+    var combinedSelectionDataArray = [];
 
-//TODO pass in valid options in compare js
+    // An array of true / false values if a table contains values
+    var selectedRows = [copyOfDataTables.tableA.length > 0,copyOfDataTables.tableB.length > 0,copyOfDataTables.tableC.length > 0,copyOfDataTables.tableD.length > 0];
+
+    // An array with the tables data
+    var tables = [copyOfDataTables.tableA,copyOfDataTables.tableB,copyOfDataTables.tableC,copyOfDataTables.tableD,copyOfDataTables.tableAB,copyOfDataTables.tableCD];
+
+    // Creates the 4 normal tables and the combined tables
+    var ids = ['a','b','c','d','ab','cd'];
+    for(var i = 0; i < selectedRows.length; i++){
+        if(selectedRows[i]){
+            var title = tables[i][0].section + ", " + tables[i][0].category;
+            var subtitle = tables[i][0].sub_category === null ? tables[i][0].description : tables[i][0].sub_category + ", " + tables[i][0].description;
+            selectionTablesArray.push(new SelectedTableData(tables[i],ids[i],title,subtitle, tables[i][0].units)); // TODO add unit for combined
+            selectionDataArray.push(new SelectionData(tables[i], title, subtitle ,tables[i][0].units,ids[i]));
+
+            // Check for combined special case
+            if(ids[i] === 'a' || ids[i] === 'c'){
+                if(selectedRows[i+1]){ // Check that a selections has been made if so create the combined table
+                    var jump = i === 0 ? 4 : 3;
+                    var titleJump = tables[i+1][0].section + ", " + tables[i+1][0].category;
+                    var subTitleJump = tables[i+1][0].sub_category === null ? tables[i+1][0].description : tables[i+1][0].sub_category + ", " + tables[i+1][0].description;
+                    selectionTablesArray.push(new SelectedTableData(tables[i+jump],ids[i+jump], title + ", " + subtitle, titleJump + ", " + subTitleJump, tables[i+1][0].units));
+                    combinedSelectionDataArray.push(new SelectionDataCombined(tables[i+jump],tables[i],tables[i+1], title + " " + subtitle, titleJump + " " + subTitleJump,tables[i][0].units,tables[i+1][0].units,ids[i+jump])); // TODO ask how to format titles for combined
+                }
+            }
+        }
+    }
+    return new DataStructure(selectionDataArray,selectionTablesArray,combinedSelectionDataArray);
+}
+
+
 // Checks that if there is a value selected in a row the others must be selected too before searching
 DataProcessor.prototype.validateSearchParams = function (selections, validOptions){
     var returnVal = true;
@@ -50,7 +84,7 @@ DataProcessor.prototype.matchDBRow = function (DBRow, selection) {
   return false;
 }
 
-// TODO pass search in in compate .js
+
 // Takes all rows and filers into corresponding tables
 DataProcessor.prototype.filterRowsToTables = function (rows, search) {
   var aRows = rows.filter(function(e){return dp.matchDBRow(e,search.aTable);});
@@ -297,6 +331,29 @@ DataProcessor.prototype.applyCPIToTableRows = function(rows, cpiValues){
     });
 }
 
+// Adds a section, category, sub category, or descriptions to a particular row in selections
+DataProcessor.prototype.addToSelection = function (id,type,data,selections) {
+    for(var i = 0; i < selections.length; i++){
+        if(selections[i].id+"" === id+""){ // Convert them both to strings
+            if(type === "section"){
+                selections[i].section = data;
+            } else if(type === "category"){
+                selections[i].category = data;
+            } else if(type === "subcategory"){
+                selections[i].subCategory = data;
+            } else if(type === "description"){
+                selections[i].description = data;
+            }
+        }
+    }
+}
+
+
+function DataStructure(selectionData, selectionTable, combineData){
+    this.selectionData = selectionData; // Contains the rows, id, title, subtitle amd init for each selection
+    this.selectionTable = selectionTable; // Contains the rows, id, title, subtitle amd init for each table
+    this.combineData = combineData; // Contains combined rows along with titles and units
+}
 
 // Object for holder the users selection
 function Selection(a,b,c,d){

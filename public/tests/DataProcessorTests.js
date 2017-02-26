@@ -418,7 +418,7 @@ describe('Copy of table data function tests', function() {
 
     var tablesData = dp.filterRowsToTables(rows, search);
 
-    var copyOfDataTables = dp.copyOfDataTables(tablesData);
+    var copyOfDataTables = dp.copyDataTables(tablesData);
 
     assert.isTrue(copyOfDataTables.tableA.length === 1);
     assert.isTrue(copyOfDataTables.tableB.length === 1);
@@ -447,7 +447,7 @@ describe('Copy of table data function tests', function() {
 
     var tablesData = dp.filterRowsToTables(rows, search);
 
-    var copyOfDataTables = dp.copyOfDataTables(tablesData);
+    var copyOfDataTables = dp.copyDataTables(tablesData);
 
     assert.isTrue(copyOfDataTables.tableA[0].value === 30);
     assert.isTrue(copyOfDataTables.tableB[0].value === 31);
@@ -476,7 +476,7 @@ describe('Copy of table data function tests', function() {
 
     var tablesData = dp.filterRowsToTables(rows, search);
 
-    var copyOfDataTables = dp.copyOfDataTables(tablesData);
+    var copyOfDataTables = dp.copyDataTables(tablesData);
 
     tablesData.tableA[0].value = 0;
     tablesData.tableB[0].value = 0;
@@ -511,7 +511,7 @@ describe('Copy of table data function tests', function() {
 
     var tablesData = dp.filterRowsToTables(rows, search);
 
-    var copyOfDataTables = dp.copyOfDataTables(tablesData);
+    var copyOfDataTables = dp.copyDataTables(tablesData);
 
     assert.isTrue(copyOfDataTables.tableA[0].category === "a0");
     assert.isTrue(copyOfDataTables.tableB[0].category === "a1");
@@ -923,4 +923,44 @@ describe('Testing creating data for vector Graph', function() {
 });
 
 
+describe('Testing adding a selection to the selections array', function() {
+  it('Test add a section', function () {
+    var selections = [{id : 0, section : "", category : "", subCategory : "", description : ""}];
+    dp.addToSelection(0,"section", "a", selections);
+    assert.equal(selections[0].section,"a");
+  });
 
+  it('Test add a category', function () {
+    var selections = [{id : 0, section : "", category : "", subCategory : "", description : ""}];
+    dp.addToSelection(0,"category", "a", selections);
+    assert.equal(selections[0].category,"a");
+  });
+
+  it('Test add a subCategory', function () {
+    var selections = [{id : 0, section : "", category : "", subCategory : "", description : ""}];
+    dp.addToSelection(0,"subcategory", "a", selections);
+    assert.equal(selections[0].subCategory,"a");
+  });
+
+  it('Test add a description', function () {
+    var selections = [{id : 0, section : "", category : "", subCategory : "", description : ""}];
+    dp.addToSelection(0,"description","a", selections);
+    assert.equal(selections[0].description,"a");
+  });
+
+  it('Test multiple sections', function () {
+    var selections = [{id : 0, section : "", category : "", subCategory : "", description : ""},{id : 1, section : "", category : "", subCategory : "", description : ""}];
+    dp.addToSelection(0,"section","a", selections);
+    dp.addToSelection(1,"section","b", selections);
+    assert.equal(selections[0].section,"a");
+    assert.equal(selections[1].section,"b");
+  });
+
+  it('Test multiple sections different order', function () {
+    var selections = [{id : 0, section : "", category : "", subCategory : "", description : ""},{id : 1, section : "", category : "", subCategory : "", description : ""}];
+    dp.addToSelection(1,"section","b", selections);
+    dp.addToSelection(0,"section","a", selections);
+    assert.equal(selections[0].section,"a");
+    assert.equal(selections[1].section,"b");
+  });
+});
