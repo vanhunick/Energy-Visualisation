@@ -62,7 +62,7 @@ $(document).ready( function() {
     $("#benchmarks-link").addClass('active');
 
     // On click listener for company selector
-    $('#company-select').on('change', function(event){
+    $('#company-select').on('change', function(){
         selectedCompany = $(this).find("option:selected").text();
     });
     $('#search-btn-compare').click(function(){ // Listener to search button
@@ -98,7 +98,15 @@ function loadFromURL(urlSelections){
         showTables(dataStructure.selectionTable); // Show the tables
         showAllRegularGraphs(dataStructure.selectionData, true); // Show all but combined and vector graphs true indicates it should add titles in
         showAllCombinedGraphs(dataStructure.combineData, true); // Show the combined and vector graphs
+        highlightGraphsOnLoad(dataStructure.selectionTable);
     });
+}
+
+function highlightGraphsOnLoad(selectionsTables){
+    for(var i = 0; i < selectionsTables.length; i++){
+        rowClicked("rowtable"+selectionsTables[i].id+"0");
+        totalsRowClicked("row-tot-"+selectionsTables[i].id+"0");
+    }
 }
 
 // Shows the tables on the page givin the data in the selection table array
@@ -158,13 +166,11 @@ function showAllCombinedGraphs(selectionData, showTitle){
     }
 }
 
-
-// Creates and inserts a total table for each reqion
+// Creates and inserts a total table for each region
 function insertTotalsTable(tableRows, id, regions, tableExists){
+    var tableID = (!(id.slice(-2).indexOf("l") > -1) ? id.slice(-2) : id.slice(-1));
+    var names = {n : "North Island", uni : "Upper North Island", eni : "Eastern North Island", swni : "South-West North Island", s : "South Island", usi : "Upper South Island", lsi : "Lower South Island", nz : "New Zealand"};
     var totCells = []; // Hold the totals for each region
-
-    // Empty out the table if it already exists
-    if(tableExists){$("#"+id).html('');}
 
     // First get all the availble years in the rows
     var availableObsYears = [];
@@ -175,68 +181,44 @@ function insertTotalsTable(tableRows, id, regions, tableExists){
         return +a - +b;
     });
 
-    var regionStrings = ["n","uni","eni", "swni", "s", "usi", "lsi"]; // All the regions
-    var names = {n : "North Island", uni : "Upper North Island", eni : "Eastern North Island", swni : "South-West North Island", s : "South Island", usi : "Upper South Island", lsi : "Lower South Island", nz : "New Zealand"};
-    var totals = {}; // reg : "" , years : []
-
-    // Go through every year
-    for(var i = 0; i < availableObsYears.length; i++){
-        // Get the rows for the current year
-        tableRows.filter(function(e){return e.obs_yr === availableObsYears[i];}).forEach(function(row){
-
-            // Go through each of the regions
-            regionStrings.forEach(function(regionString){
-                  // If the current row edb is inside the current reqion grab the value from the row and add it in the array for the current year
-                  if(regions[regionString].includes(row.edb)){
-                      if(totals[regionString] === undefined){
-                        totals[regionString] = [+row.value]; // First time this reqion has been found so have to create the property
-                      } else {
-                        if(i === totals[regionString].length){ // This means we have moved onto a new year so have to create a new slot
-                          totals[regionString].push(+row.value);
-                        } else {
-                            totals[regionString] [i] += + (+row.value); // Still in the first year with a different edb in the same region so just add the values
-                        }
-                      }
-                  }
-            });
-        });
-    }
-
-    var nz = []; // To find the totals of NZ add north and south tegether
-    for(var i = 0; i < availableObsYears.length; i++){
-      nz.push(totals["n"][i] + totals["s"][i]);
-    }
-    totals["nz"] = nz; // Add the NZ property to totals // TODO change array at the top
+    var totals = dp.createTableTotals(tableRows,regions, availableObsYears);
 
     // Insert Caption for table
     var years = "";
     availableObsYears.forEach(function (year) {
-       years += "<th>" + year + "</th>";
+        years += "<th>" + year + "</th>";
     });
 
-    var cellCount = 0; // Used for id
-    $("#"+id).append('<tr id="head-row-totals-"'+id+' class="table-row table-head"> <th>Region</th>'+ years + '</tr>');
+    var cellCount = 0; // Used for id cells
+    var rowCount = 0; // Used for id rows
+    $("#"+id).append('<tr id="head-row-totals-'+tableID+'" class="table-row table-head"> <th>Region</th>'+ years + '</tr>');
 
     for (var property in totals) {
-      if (totals.hasOwnProperty(property)) {
-        var row= "<tr class='table-row' id=row-tot-"+id+i+">";
+        if (totals.hasOwnProperty(property)) {
+            var row= "<tr class='table-row' id=row-tot-"+tableID+rowCount+">";
 
-        // Insert name in column and assign an id to the row
-        row += "<th class='reg-cell'>" + names[property] + "</th>";
-        totals[property].forEach(function(value){
-          row += "<th id='t-total"+id+""+cellCount+"' origValue='"+ value / regions[property].length +"' class='val-tot-cell'>" + searchData.dpFormat(value / regions[property].length) + "</th>";
-          totCells.push({id : "#t-total"+id+""+cellCount, value : value / regions[property].length});
-          if(!tableExists){
-              noCPICells.push({id : "t-total"+id+""+cellCount, value : value / regions[property].length});
-          }
-          cellCount++;
-        });
-        $("#"+id).append(row);
-      }
+            // Insert name in column and assign an id to the row
+            row += "<th class='reg-cell'>" + names[property] + "</th>";
+            totals[property].forEach(function(value){
+                row += "<th id='t-total"+tableID+""+cellCount+"' origValue='"+ value / regions[property].length +"' class='cell'>" + searchData.dpFormat(value / regions[property].length) + "</th>";
+                totCells.push({id : "#t-total"+tableID+""+cellCount, value : value / regions[property].length});
+                if(!tableExists){
+                    noCPICells.push({id : "t-total"+tableID+""+cellCount, value : value / regions[property].length});
+                }
+                cellCount++;
+
+            });
+            $("#"+id).append(row + '</tr>');
+            $("#row-tot-"+tableID+rowCount).click(function() {
+                totalsRowClicked(this.id); // Call the function to highlight the data in all graphs for the edb
+            });
+            rowCount++;
+        }
     }
-    console.log(totals); // TODO insert group graph for regions
     applyGradientCSS(totCells,false);
 }
+
+
 
 
 // Here every row belongs to the specific table
@@ -258,13 +240,6 @@ function insertTable(tableRows,id){
         return +a - +b;
     });
 
-    var min = tableRows.reduce(function(prev, curr) {
-        return prev.obs_yr < curr.obs_yr ? prev : curr;
-    }).obs_yr;
-
-    var max = tableRows.reduce(function(prev, curr) {
-        return prev.obs_yr > curr.obs_yr ? prev : curr;
-    }).obs_yr; //TODO this line might need to be disc_yr
 
     // Create cells for each of the years to use as header
     var years = "";
@@ -272,7 +247,7 @@ function insertTable(tableRows,id){
        years += "<th>" + year + "</th>";
     });
 
-    $("#"+id).append('<tr id="head-row" class="table-row table-head"> <th>EDB</th>'+ years + '</tr>');
+    $("#"+id).append('<tr id="head-row-'+id+'" class="table-row table-head"> <th>EDB</th>'+ years + '</tr>');
 
     // An array of companies already processed
     var done = [];
@@ -329,31 +304,45 @@ var rowSelected = ""; // Holds the id of the currently selected row
 
 // Called when a row is clicked on a table
 function rowClicked(id){
+
   if(rowSelected === id){// Clicked on the same row so unselect
     // Remove all selected classes from elements
     var text = $("#"+id+" .edb-cell").text();
     highlight(text, true); // highlight and removehighliting from bar graph
-    $('.table').find('tr').removeClass('row-selected');
-    // d3.selectAll(".bar-selected").classed("bar-selected", false);
+    //$('.table').find('tr').removeClass('row-selected');
+      $('.table-row').find(".edb-cell:contains('"+text+"')").parent().removeClass("row-selected"); // Selects edb row in all tables
+
+      // d3.selectAll(".bar-selected").classed("bar-selected", false);
     d3.selectAll(".line-selected-table").classed("line-selected", false);
     d3.selectAll(".vec-dot-selected").classed("vec-dot-selected", false);
     rowSelected = ""; // Nothing is selected
     return;
   }
+
+
+    // Remove the selected class from all rows
+    if(rowSelected !== ""){
+        var text = $("#"+rowSelected+" .edb-cell").text();
+        $('.table-row').find(".edb-cell:contains('"+text+"')").parent().removeClass("row-selected"); // Selects edb row in all tables
+    }
+    var text = $("#"+id+" .edb-cell").text();
   rowSelected = id; // Set the lelected row
 
   // Grab the text using the id
-  var text = $("#"+id+" .edb-cell").text();
-  // Remove the selected class from all rows
-  $('.table').find('tr').removeClass('row-selected');
+
+
 
   // Add the row selected class to the only one selected
-  $("#"+id).addClass("row-selected");
+  //$("#"+id).addClass("row-selected");
 
   // Get the edb from the selected row
   var edb = $("#"+id+".edb-cell").text();
 
-  // Select all lines with the selected class and remove class
+    $('.table-row').find(".edb-cell:contains('"+text+"')").parent().addClass("row-selected"); // Selects edb row in all tables
+
+
+
+    // Select all lines with the selected class and remove class
   d3.selectAll(".line-selected-table")
   .classed("line-selected", false);
 
@@ -370,13 +359,70 @@ function rowClicked(id){
   d3.selectAll(".dot."+text.replace(/ /g , ""))
   .classed("vec-dot-selected", true);
 
-  showBarWithRowElem(id,text);
+  //showBarWithRowElem(id,text,"#bar-a","#head-row-tablea","#tablea");
+
+    $('.table-edb').each(function(){
+        var idTable = (!(this.id.slice(-2).indexOf("e") > -1) ? this.id.slice(-2) : this.id.slice(-1));
+        var rowNumb = rowSelected.slice(-1);
+
+        var id = "rowtable"+idTable+rowNumb;
+        showBarWithRowElem(id,text,"#bar-"+idTable,"#head-row-table"+idTable,"#table"+idTable);
+    });
 }
 
-function showBarWithRowElem(rowID, edb){
+var totalsRowSelectedID = "";
+
+function totalsRowClicked (id){
+    var reg = $("#"+id+" .reg-cell").text();
+    if(totalsRowSelectedID === id){// Clicked on the same row so unselect
+        //$("#"+id).removeClass("row-selected");
+        reg = $("#"+totalsRowSelectedID+" .reg-cell").text();
+
+        $('.table-row').find(".reg-cell:contains('"+reg+"')").filter(function() {
+            return $(this).text() === reg;
+        }).parent().removeClass("row-selected"); // Selects edb row in all tables
+        totalsRowSelectedID = "";
+        return;
+    }
+
+    if(totalsRowSelectedID !== ""){
+        var oldReg = $("#"+totalsRowSelectedID+" .reg-cell").text();
+        $('.table-row').find(".reg-cell:contains('"+oldReg+"')").filter(function() {
+            return $(this).text() === oldReg;
+        }).parent().removeClass("row-selected"); // Selects edb row in all tables
+    }
+
+
+
+    //$("#"+id).addClass("row-selected");
+    $('.table-row').find(".reg-cell:contains('"+reg+"')").filter(function() {
+        return $(this).text() === reg;
+    }).parent().addClass("row-selected"); // Selects edb row in all tables
+
+
+
+
+    // if id ends with letter set to id
+    totalsRowSelectedID = id;
+
+    $('.table-tot').each(function(){
+        //var idTable = this.id.slice(-1);
+        var idTable = (!(this.id.slice(-2).indexOf("l") > -1) ? this.id.slice(-2) : this.id.slice(-1));
+
+        var rowNumb = totalsRowSelectedID.slice(-1);
+
+        var id = "row-tot-"+idTable+rowNumb;
+
+        showBarWithRowElem(id,reg,"#tot-bar-"+idTable,"#head-row-totals-"+idTable,"#table-total"+idTable);
+    });
+
+    //showBarWithRowElem(id,reg,"#tot-bar-a","#head-row-totals-a","#table-totala");
+}
+
+function showBarWithRowElem(rowID, edb, div, headRow, tableID){
     var data = [];
 
-    $('#head-row').find('th').each(function (index, element) {
+    $(headRow).find('th').each(function (index, element) {
         if(index != 0){ // 0 is not a year
             data.push({category : $(element).text(), value : 0}); // 0 is temp
         }
@@ -392,12 +438,12 @@ function showBarWithRowElem(rowID, edb){
     });
 
     var max = -Infinity;
-    $('.cell', "#tablea").each(function(){ //cell or th
+    $('.cell', tableID).each(function(){ //cell or th
         var val = +$(this).attr("origValue");
         max = val > max ? val : max;
     });
 
-    createBarGraph("#bar-a", max, data, edb);
+    createBarGraph(div, max, data, edb);
 }
 
 

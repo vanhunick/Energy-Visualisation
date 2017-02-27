@@ -5,6 +5,7 @@
     <% include ../views/templates/head %>
     <!--Form validation plugin-->
     <script src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.15.0/jquery.validate.min.js"></script>
+    <script src="/javascripts/compare/DataProcessor.js"></script>
     <script src="/javascripts/compare/compare.js"></script>
     <script src="/javascripts/d3-tip.js"></script>
 </head>
@@ -110,23 +111,20 @@
 
                                 <!-- Row for table -->
                                 <div class="row">
-                                    <!-- <div class="col-md-2"></div> -->
                                     <h2 class="table-title"><b>Selection A</b></h2>
                                     <div id="title-a" class="text-center"></div>
                                     <div class="col-sm-6 text-center ">
-
-                                        <table class="table table-nonfluid" style="margin-left: 20px;" id="tablea"></table>
+                                        <table class="table table-edb" id="tablea"></table>
                                     </div>
-                                    <div class="col-md-6" id="bar-a"></div>
+                                    <div class="col-md-6 text-left" id="bar-a"></div>
                                 </div>
 
                                 <!-- Row for table totals -->
                                 <div class="row">
-                                    <div class="col-md-2"></div>
-                                    <div class="col-md-8 text-center ">
-                                        <table class="table table-nonfluid" id="table-totala"></table>
+                                    <div class="col-md-6 text-center ">
+                                        <table class="table table-tot" id="table-totala"></table>
                                     </div>
-                                    <div class="col-md-2"></div>
+                                    <div class="col-md-6 text-left" id="tot-bar-a"></div>
                                 </div>
 
                                 <!-- Row for bar graph -->
@@ -146,21 +144,23 @@
                         <!--Table B Content-->
                         <div class="tab-pane fade" id="tab2default">
                             <div id="full-table-b-div" class="full-table full">
+
+                                <!--Row for table-->
                                 <div class="row">
-                                    <div class="col-md-2"></div>
-                                    <div class="col-md-8 text-center">
-                                        <h2 class="table-title"><b>Selection B</b></h2>
-                                        <div id="title-b" class="text-left"></div>
-                                        <table class="table" id="tableb"></table>
+                                    <h2 class="table-title"><b>Selection B</b></h2>
+                                    <div id="title-b" class="text-center"></div>
+                                    <div class="col-md-6 text-center">
+                                        <table class="table table-edb" id="tableb"></table>
                                     </div>
-                                    <div class="col-md-2"></div>
+                                    <div class="col-md-6 text-left" id="bar-b"></div>
+
                                 </div>
+                                <!-- Row for table totals -->
                                 <div class="row">
-                                    <div class="col-md-2"></div>
-                                    <div class="col-md-8 text-center ">
-                                        <table class="table table-nonfluid" id="table-totalb"></table>
+                                    <div class="col-md-6 text-center ">
+                                        <table class="table table-tot" id="table-totalb"></table>
                                     </div>
-                                    <div class="col-md-2"></div>
+                                    <div class="col-md-6 text-left" id="tot-bar-b"></div>
                                 </div>
                                 <div class="row group-row">
                                     <div id="title-b-bar" class="text-center"></div>
@@ -176,21 +176,22 @@
                         <!--Table C content-->
                         <div class="tab-pane fade" id="tab3default">
                             <div id="full-table-c-div" class="full-table full">
+
+                                <!--Row for table C-->
                                 <div class="row">
-                                    <div class="col-md-2"></div>
-                                    <div class="col-md-8 text-center">
-                                        <h2 class="table-title"><b>Selection C</b></h2>
-                                        <div id="title-c" class="text-left"></div>
-                                        <table class="table" id="tablec"></table>
+                                    <h2 class="table-title"><b>Selection C</b></h2>
+                                    <div id="title-c" class="text-center"></div>
+                                    <div class="col-md-6 text-center">
+                                        <table class="table table-edb" id="tablec"></table>
                                     </div>
-                                    <div class="col-md-2"></div>
+                                    <div class="col-md-6 text-left" id="bar-c"></div>
                                 </div>
+                                <!-- Row for table totals -->
                                 <div class="row">
-                                    <div class="col-md-2"></div>
-                                    <div class="col-md-8 text-center ">
-                                        <table class="table table-nonfluid" id="table-totalc"></table>
+                                    <div class="col-md-6 text-center ">
+                                        <table class="table table-tot" id="table-totalc"></table>
                                     </div>
-                                    <div class="col-md-2"></div>
+                                    <div class="col-md-6 text-left" id="tot-bar-c"></div>
                                 </div>
                                 <div class="row group-row">
                                     <div id="title-c-bar" class="text-center"></div>
@@ -206,21 +207,22 @@
                         <!--Table D Content-->
                         <div class="tab-pane fade" id="tab4default">
                             <div id="full-table-d-div" class="full-table full">
+
+                                <!--Row for table-->
                                 <div class="row">
-                                    <div class="col-md-2"></div>
-                                    <div class="col-md-8 text-center">
-                                        <h2 class="table-title"><b>Selection D</b></h2>
-                                        <div id="title-d" class="text-left"></div>
-                                        <table class="table" id="tabled"></table>
+                                    <h2 class="table-title"><b>Selection D</b></h2>
+                                    <div id="title-d" class="text-center"></div>
+                                    <div class="col-md-6 text-center">
+                                        <table class="table table-edb" id="tabled"></table>
                                     </div>
-                                    <div class="col-md-2"></div>
+                                    <div class="col-md-6 text-left" id="bar-d"></div>
                                 </div>
+                                <!-- Row for table totals -->
                                 <div class="row">
-                                    <div class="col-md-2"></div>
-                                    <div class="col-md-8 text-center ">
-                                        <table class="table table-nonfluid" id="table-totald"></table>
+                                    <div class="col-md-6 text-center ">
+                                        <table class="table table-tot" id="table-totald"></table>
                                     </div>
-                                    <div class="col-md-2"></div>
+                                    <div class="col-md-6 text-left" id="tot-bar-d"></div>
                                 </div>
                                 <div class="row group-row">
                                     <div id="title-d-bar" class="text-center"></div>
@@ -237,21 +239,22 @@
                         <div class="tab-pane fade" id="tab5default">
                             <!--Wrapped in a div for table A/B to easily hide it-->
                             <div class="full-table full" id="full-table-ab-div">
+
+                                <!--Row for table-->
                                 <div class="row">
-                                    <div class="col-md-2"></div>
-                                    <div class="col-md-8 text-center">
-                                        <h2 class="table-title"><b>Table selection  A over  selection B</b></h2>
-                                        <div id="title-ab" class="text-left"></div>
-                                        <table class="table" id="tableab"></table>
+                                    <h2 class="table-title"><b>Table selection  A over  selection B</b></h2>
+                                    <div id="title-ab" class="text-center"></div>
+                                    <div class="col-md-6 text-center">
+                                        <table class="table table-edb" id="tableab"></table>
                                     </div>
-                                    <div class="col-md-2"></div>
+                                    <div class="col-md-6 text-left" id="bar-ab"></div>
                                 </div>
+                                <!-- Row for table totals -->
                                 <div class="row">
-                                    <div class="col-md-2"></div>
-                                    <div class="col-md-8 text-center ">
-                                        <table class="table table-nonfluid" id="table-totalab"></table>
+                                    <div class="col-md-6 text-center ">
+                                        <table class="table table-tot" id="table-totalab"></table>
                                     </div>
-                                    <div class="col-md-2"></div>
+                                    <div class="col-md-6 text-left" id="tot-bar-ab"></div>
                                 </div>
                                 <div class="row group-row">
                                     <div id="title-ab-bar" class="row text-center graph-title"></div>
@@ -274,21 +277,23 @@
                         <div class="tab-pane fade" id="tab6default">
                             <!--Wrapped in a div for table C/D to easily hide it-->
                             <div id="full-table-cd-div" class="full-table full">
+
+                                <!--Row for table-->
                                 <div class="row">
-                                    <div class="col-md-2"></div>
-                                    <div class="col-md-8 text-center">
-                                        <h2 class="table-title "><b>Table selection  C over selection D</b></h2>
-                                        <div id="title-cd" class="text-left"></div>
-                                        <table class="table" id="tablecd"></table>
+                                    <h2 class="table-title "><b>Table selection  C over selection D</b></h2>
+                                    <div id="title-cd" class="text-center"></div>
+                                    <div class="col-md-6 text-center">
+                                        <table class="table table-edb" id="tablecd"></table>
                                     </div>
-                                    <div class="col-md-2"></div>
+                                    <div class="col-md-6 text-left" id="bar-cd"></div>
+                                    <!--<div class="col-md-2"></div>-->
                                 </div>
+                                <!-- Row for table totals -->
                                 <div class="row">
-                                    <div class="col-md-2"></div>
-                                    <div class="col-md-8 text-center ">
-                                        <table class="table table-nonfluid" id="table-totalcd"></table>
+                                    <div class="col-md-6 text-center ">
+                                        <table class="table table-tot" id="table-totalcd"></table>
                                     </div>
-                                    <div class="col-md-2"></div>
+                                    <div class="col-md-6 text-left" id="tot-bar-cd"></div>
                                 </div>
                                 <div class="row group-row">
                                     <div id="title-cd-bar" class="text-center  graph-title"></div>

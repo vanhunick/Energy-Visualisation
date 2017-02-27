@@ -75,44 +75,6 @@ function search(req, res){
     });
   }
 
-    //
-    // var row0 = {
-    //     id : req.query.i0,
-    //     section  : req.query.s0,
-    //     category : req.query.c0,
-    //     subCategory : req.query.sc0,
-    //     description :req.query.d0
-    // };
-    //
-    // var row1 = {
-    //     id : req.query.i1,
-    //     section  : req.query.s1,
-    //     category : req.query.c1,
-    //     subCategory : req.query.sc1,
-    //     description :req.query.d1
-    // };
-    //
-    // var row2 = {
-    //     id : req.query.i2,
-    //     section  : req.query.s2,
-    //     category : req.query.c2,
-    //     subCategory : req.query.sc2,
-    //     description :req.query.d2
-    // };
-    //
-    // var row3 = {
-    //     id : req.query.i3,
-    //     section  : req.query.s3,
-    //     category : req.query.c3,
-    //     subCategory : req.query.sc3,
-    //     description :req.query.d3
-    // };
-    //
-    // selections.push(row0);
-    // selections.push(row1);
-    // selections.push(row2);
-    // selections.push(row3);
-
     //res.render('compare', {selections : JSON.stringify(selections)}); // Send the search results and render index
     res.render('compare', {selections : selections}); // Send the search results and render index
 

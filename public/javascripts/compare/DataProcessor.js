@@ -18,9 +18,10 @@ DataProcessor.prototype.copyDataTables = function(dataTables) {
   return new DataTables(tables[0],tables[1],tables[2],tables[3],tables[4],tables[5]); // Return the copy
 }
 
+// Creates a data structure that can be used to display the data inside html elements
 DataProcessor.prototype.createDataStructuresWithCopy = function (copyOfDataTables){
     var selectionDataArray = [];
-    var selectionTablesArray = [];
+    var selectionTablesArray = []; // Tables also contains combined data
     var combinedSelectionDataArray = [];
 
     // An array of true / false values if a table contains values
@@ -333,6 +334,7 @@ DataProcessor.prototype.applyCPIToTableRows = function(rows, cpiValues){
 
 // Adds a section, category, sub category, or descriptions to a particular row in selections
 DataProcessor.prototype.addToSelection = function (id,type,data,selections) {
+    console.log("S " + selections.length);
     for(var i = 0; i < selections.length; i++){
         if(selections[i].id+"" === id+""){ // Convert them both to strings
             if(type === "section"){
@@ -347,6 +349,43 @@ DataProcessor.prototype.addToSelection = function (id,type,data,selections) {
         }
     }
 }
+
+DataProcessor.prototype.createTableTotals = function (tableRows, regions, availableObsYears) {
+    var regionStrings = ["n","uni","eni", "swni", "s", "usi", "lsi"]; // All the regions
+    var totals = {}; // reg : "" , years : []
+
+    // Go through every year
+    for(var i = 0; i < availableObsYears.length; i++){
+        // Get the rows for the current year
+        tableRows.filter(function(e){return e.obs_yr === availableObsYears[i];}).forEach(function(row){
+
+            // Go through each of the regions
+            regionStrings.forEach(function(regionString){
+                // If the current row edb is inside the current reqion grab the value from the row and add it in the array for the current year
+                if(regions[regionString].includes(row.edb)){
+                    if(totals[regionString] === undefined){
+                        totals[regionString] = [+row.value]; // First time this reqion has been found so have to create the property
+                    } else {
+                        if(i === totals[regionString].length){ // This means we have moved onto a new year so have to create a new slot
+                            totals[regionString].push(+row.value);
+                        } else {
+                            totals[regionString] [i] += + (+row.value); // Still in the first year with a different edb in the same region so just add the values
+                        }
+                    }
+                }
+            });
+        });
+    }
+
+    var nz = []; // To find the totals of NZ add north and south tegether
+    for(var i = 0; i < availableObsYears.length; i++){
+        nz.push(totals["n"][i] + totals["s"][i]);
+    }
+    totals["nz"] = nz; // Add the NZ property to totals // TODO change array at the top
+
+    return totals;
+}
+
 
 
 function DataStructure(selectionData, selectionTable, combineData){

@@ -18,6 +18,12 @@ body {
   font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
+/*Used to give all tables a small margin to the right*/
+.table-all {
+  margin-left: 20px;
+  margin-top: 20px;
+}
+
 .single-bar {
   fill : lightgreen;
 }

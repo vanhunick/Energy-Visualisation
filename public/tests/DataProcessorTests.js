@@ -964,3 +964,9 @@ describe('Testing adding a selection to the selections array', function() {
     assert.equal(selections[1].section,"b");
   });
 });
+
+describe('Data Structure creation tests', function() {
+  it('Test min and max positive', function () {
+
+  });
+});
