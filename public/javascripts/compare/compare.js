@@ -728,7 +728,7 @@ function addSection(numberSections){
                 searchData.validOptions[idNumb] = true; // There are options for this row and sub category
             } else {
                 // Find all descriptions for the currently selected sub category
-                $.post("/sections/desc",{category : category ,section : selections[idNumb].section, subCategory : ""}, function(data){
+                $.post("/sections/desc",{category : categoryNew ,section : searchData.selections[idNumb].section, subCategory : ""}, function(data){
                     if(data.descriptions.length > 0 &&  data.descriptions[0] !== null){
                         $('#description-select'+idNumb).html(''); // Empty temp options
                     } else {
