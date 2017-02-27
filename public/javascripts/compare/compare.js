@@ -367,7 +367,6 @@ function rowClicked(id){
   d3.selectAll(".dot."+text.replace(/ /g , ""))
   .classed("vec-dot-selected", true);
 
-  //showBarWithRowElem(id,text,"#bar-a","#head-row-tablea","#tablea");
 
     $('.table-edb').each(function(){
         var idTable = (!(this.id.slice(-2).indexOf("e") > -1) ? this.id.slice(-2) : this.id.slice(-1));
@@ -388,9 +387,62 @@ function rowClicked(id){
         }
 
         var id = "rowtable"+idTable+rowNumb;
+
         showBarWithRowElem(id,text,"#bar-"+idTable,"#head-row-table"+idTable,"#table"+idTable,unit);
     });
 }
+
+function updateTableBarGraph(){
+    $('.table-edb').each(function(){
+
+        // Get the id of the table can be a,b,c,d,ab,cd therefore we have to check if it is two characters
+        var idTable = (!(this.id.slice(-2).indexOf("e") > -1) ? this.id.slice(-2) : this.id.slice(-1));
+
+        // Grab the row number which is the last character if less than the 10th row
+        var rowNumb = rowSelected.slice(-1);
+
+        // Need to account for numbers greater than 10
+        if(!isNaN(rowSelected.slice(-2))){
+            rowNumb = rowSelected.slice(-2);
+        }
+
+        var unit = "";
+        for(var i = 0; i < dataStructure.selectionTable.length; i++){
+            if(dataStructure.selectionTable[i].id === idTable){
+                unit = dataStructure.selectionTable[i].unit;
+            }
+        }
+
+        var id = "rowtable"+idTable+rowNumb;
+        var text = $("#"+id+" .edb-cell").text();
+
+
+        showBarWithRowElem(id,text,"#bar-"+idTable,"#head-row-table"+idTable,"#table"+idTable,unit);
+    });
+}
+
+function updateTotalsBarGraph(){
+    $('.table-tot').each(function(){
+        //var idTable = this.id.slice(-1);
+        var idTable = (!(this.id.slice(-2).indexOf("l") > -1) ? this.id.slice(-2) : this.id.slice(-1));
+
+
+        var unit = "";
+        for(var i = 0; i < dataStructure.selectionTable.length; i++){
+            if(dataStructure.selectionTable[i].id === idTable){
+                unit = dataStructure.selectionTable[i].unit;
+            }
+        }
+
+        var rowNumb = totalsRowSelectedID.slice(-1);
+
+        var id = "row-tot-"+idTable+rowNumb;
+        var reg = $("#"+id+" .reg-cell").text();
+
+        showBarWithRowElem(id,reg,"#tot-bar-"+idTable,"#head-row-totals-"+idTable,"#table-total"+idTable,unit);
+    });
+}
+
 
 var totalsRowSelectedID = "";
 
@@ -468,7 +520,6 @@ function showBarWithRowElem(rowID, edb, div, headRow, tableID,unit){
         var val = +$(this).attr("origValue");
         max = val > max ? val : max;
     });
-
     createBarGraph(div, max, data, edb,unit);
 }
 
@@ -805,6 +856,10 @@ function applyCPI(){
 
         showAllRegularGraphs(dataStructure.selectionData, false);
         showAllCombinedGraphs(dataStructure.combineData, false);
+
+        // Updates the bar graphs for the two tables in all tabs that exist
+        updateTableBarGraph();
+        updateTotalsBarGraph();
     }
 }
 
