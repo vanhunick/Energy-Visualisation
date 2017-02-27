@@ -118,7 +118,7 @@ function createBoxPlot(dataObject,divID,unit){
             .data(scatterData)
             .enter().append("circle")
             .attr("class",function(d){return "dot "+d.edb.replace(/ /g , "");})
-            .attr("r", 2)
+            .attr("r", 4)
             .attr("cx", function(d) { return boxPlotObjects.x(d.year) + whiskBoxWidth/2; })
             .attr("cy", function(d) { return boxPlotObjects.y(d.value); })
             .on('mouseover', tip.show)

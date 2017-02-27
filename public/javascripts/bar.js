@@ -4,7 +4,7 @@
 
 // Specifies the barMargins and barWidth/barHeight of the svg
 var barMargin = { top: 60, right: 20, bottom: 50, left: 50 },
-    barWidth = 550 - barMargin.left - barMargin.right,
+    barWidth = 450 - barMargin.left - barMargin.right,
     barHeight = 400 - barMargin.top - barMargin.bottom;
 
 
@@ -12,7 +12,7 @@ var singlebarGraphs = [];
 
 function BarGraph(id){
     this.id = id;
-    this.x = d3.scaleBand().range([0, barWidth]).padding(0.1);
+    this.x = d3.scaleBand().range([0, barWidth]).padding(0.5);
     this.y = d3.scaleLinear().range([barHeight, 0]).nice();
     this.yAxis = d3.axisLeft();
     this.xAxis = d3.axisBottom();

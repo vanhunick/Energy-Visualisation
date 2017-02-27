@@ -12,6 +12,15 @@ body {
   background: #F6F4F3;
 }
 
+.table-edb {
+  margin-left: 2%;
+}
+
+.table-tot {
+  margin-left: 2%;
+  margin-top: 6%;
+}
+
 .page-title {
   font-size: 400%;
   color: #376996;
@@ -134,9 +143,7 @@ a {
   /*font: 10px sans-serif;*/
 }
 
-.table-tot {
-  margin-top: 4%;
-}
+
 
 /*.box circle*/
 .box line,
