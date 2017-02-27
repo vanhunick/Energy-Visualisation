@@ -257,12 +257,12 @@ function insertTable(tableRows,id){
     var cellCount = 0; // For the id
     var cellValues = []; // All the cell values
     var observerd = true; // observerd or forcast, currently always observed
-
+    var rowCount = 0;
     // Create the rows of data
     for(var i = 0; i < tableRows.length; i++){
         if(!done.includes(tableRows[i].edb)){
             done.push(tableRows[i].edb);
-            var row= "<tr class='table-row' id=row"+id+i+">";
+            var row= "<tr class='table-row' id=row"+id+rowCount+">";
             // Insert name in column and assign an id to the row
             row += "<th class='edb-cell'>" + tableRows[i].edb + "</th>";
 
@@ -285,9 +285,10 @@ function insertTable(tableRows,id){
             $("#"+id).append(row + '</tr>'); // end and append the row
 
             // Assing a on click function to each of the rows to generate the bar graph with the row specific data
-            $("#row"+id+i).click(function(event) {
+            $("#row"+id+rowCount).click(function(event) {
                rowClicked(this.id); // Call the function to highlight the data in all graphs for the edb
             });
+            rowCount++;
         }
     }
 
@@ -364,7 +365,14 @@ function rowClicked(id){
 
     $('.table-edb').each(function(){
         var idTable = (!(this.id.slice(-2).indexOf("e") > -1) ? this.id.slice(-2) : this.id.slice(-1));
+
         var rowNumb = rowSelected.slice(-1);
+
+        // Need to account for numbers greater than 10
+        if(!isNaN(rowSelected.slice(-2))){
+            rowNumb = rowSelected.slice(-2);
+        }
+
 
         var unit = "";
         for(var i = 0; i < dataStructure.selectionTable.length; i++){

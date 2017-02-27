@@ -3,9 +3,9 @@
  */
 
 // Specifies the barMargins and barWidth/barHeight of the svg
-var barMargin = { top: 60, right: 20, bottom: 30, left: 50 },
+var barMargin = { top: 60, right: 20, bottom: 50, left: 50 },
     barWidth = 550 - barMargin.left - barMargin.right,
-    barHeight = 350 - barMargin.top - barMargin.bottom;
+    barHeight = 400 - barMargin.top - barMargin.bottom;
 
 
 var singlebarGraphs = [];
@@ -87,9 +87,17 @@ function createNewGraph(divID, tableMax, data,edb, yLabel){
     barGraph.svg.append("text")
         .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
         .attr("transform", "translate("+ -(barMargin.left/2+10) +","+( barMargin.top-50)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
-        .style("font-size", "10px")
+        .style("font-size", "16px")
         .attr("class", "unit-text")
         .text(yLabel);
+
+    // Add year as the x-axis label
+    barGraph.svg.append("text")
+        .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
+        .attr("transform", "translate("+ +(barWidth/2) +","+( barMargin.top + barHeight -barMargin.bottom + 20 )+")")  // text is drawn off the screen top left, move down and out and rotate
+        .style("font-size", "16px")
+        .attr("class", "unit-text")
+        .text("Year");
 }
 
 // We do not need table max and the axis should never be updated for a graph
@@ -97,7 +105,7 @@ function updateGraph(barGraph, data, edb){
   barGraph.svg.selectAll(".bar") // None exist yet but will be created with enter
       .data(data) // enter the data array
       .transition()
-      .duration(1000)
+      .duration(750)
       .attr("y", function(d) { return barGraph.y(d.value); }) // set the y value according to the value
       .attr("height", function(d) { return barHeight - barGraph.y(d.value); }); // set the barHeight
 

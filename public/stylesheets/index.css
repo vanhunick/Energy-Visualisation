@@ -134,6 +134,10 @@ a {
   /*font: 10px sans-serif;*/
 }
 
+.table-tot {
+  margin-top: 4%;
+}
+
 /*.box circle*/
 .box line,
 .box rect {
