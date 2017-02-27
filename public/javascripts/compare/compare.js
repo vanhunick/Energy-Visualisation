@@ -110,14 +110,14 @@ function highlightGraphsOnLoad(selectionsTables){
     }
 }
 
-// Shows the tables on the page givin the data in the selection table array
+// Shows the tables on the page giving the data in the selection table array
 function showTables(selectionTablesArray){
     selectionTablesArray.forEach(function (tableData) {
         // Add in the title using the id and the tile / subtitle for each table
         $('#title-'+tableData.id).append('<h2 class="title">'+tableData.title+'</h2>').append('<h4 class="subTitle">'+tableData.subTitle+'</h4>');
 
         insertTable(tableData.rows,'table'+tableData.id);
-        insertTotalsTable(tableData.rows, 'table-total'+tableData.id, regions,false); // Creates and inserts the total table
+        insertTotalsTable(tableData.rows, 'table-total'+tableData.id, regions,false,false); // Creates and inserts the total table
     })
 }
 
@@ -168,7 +168,7 @@ function showAllCombinedGraphs(selectionData, showTitle){
 }
 
 // Creates and inserts a total table for each region
-function insertTotalsTable(tableRows, id, regions, tableExists){
+function insertTotalsTable(tableRows, id, regions, tableExists, update){
     var tableID = (!(id.slice(-2).indexOf("l") > -1) ? id.slice(-2) : id.slice(-1));
     var names = {n : "North Island", uni : "Upper North Island", eni : "Eastern North Island", swni : "South-West North Island", s : "South Island", usi : "Upper South Island", lsi : "Lower South Island", nz : "New Zealand"};
     var totCells = []; // Hold the totals for each region
@@ -192,11 +192,18 @@ function insertTotalsTable(tableRows, id, regions, tableExists){
 
     var cellCount = 0; // Used for id cells
     var rowCount = 0; // Used for id rows
+
+    if(update){
+        $("#"+id).html(''); // Clear last table
+    }
+
     $("#"+id).append('<tr id="head-row-totals-'+tableID+'" class="table-row table-head"> <th>Region</th>'+ years + '</tr>');
 
     for (var property in totals) {
         if (totals.hasOwnProperty(property)) {
             var row= "<tr class='table-row' id=row-tot-"+tableID+rowCount+">";
+
+            //TODO (Note when updated origValue will be the updated value not the original)
 
             // Insert name in column and assign an id to the row
             row += "<th class='reg-cell'>" + names[property] + "</th>";
@@ -269,7 +276,6 @@ function insertTable(tableRows,id){
             for(var k = 0; k < availableObsYears.length; k++){
                 // Iterate through all rows finding ones with the current edb
                 for(var j = 0; j < tableRows.length; j++){
-                    //if(!yearDone.includes())
 
                     // Check it matches edb and year inserting into
                     if(tableRows[j].edb === tableRows[i].edb && tableRows[j].obs_yr === availableObsYears[k] && (!yearDone.includes(tableRows[j].obs_yr))){
@@ -794,7 +800,7 @@ function applyCPI(){
 
         // At this point the rows have been updated so we can update the totals table
         dataStructure.selectionTable.forEach(function (tableData) {
-            insertTotalsTable(tableData.rows, 'table-total'+tableData.id, regions,true);
+            insertTotalsTable(tableData.rows, 'table-total'+tableData.id, regions,true, true);
         });
 
         showAllRegularGraphs(dataStructure.selectionData, false);
@@ -869,7 +875,7 @@ function applyCPIToTable(table, cpiValues){
 
 function revertCPI(){
     noCPICells.forEach(function(e){
-        $('#'+e.id).text(e.value);
+        $('#'+e.id).text(searchData.dpFormat(e.value));
     });
     applyGradientCSS(noCPICells);
 }
