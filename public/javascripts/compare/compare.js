@@ -106,6 +106,7 @@ function highlightGraphsOnLoad(selectionsTables){
     for(var i = 0; i < selectionsTables.length; i++){
         rowClicked("rowtable"+selectionsTables[i].id+"0");
         totalsRowClicked("row-tot-"+selectionsTables[i].id+"0");
+        return; // Only need to click on one row to fill out all of them
     }
 }
 
@@ -365,8 +366,15 @@ function rowClicked(id){
         var idTable = (!(this.id.slice(-2).indexOf("e") > -1) ? this.id.slice(-2) : this.id.slice(-1));
         var rowNumb = rowSelected.slice(-1);
 
+        var unit = "";
+        for(var i = 0; i < dataStructure.selectionTable.length; i++){
+            if(dataStructure.selectionTable[i].id === idTable){
+                unit = dataStructure.selectionTable[i].unit;
+            }
+        }
+
         var id = "rowtable"+idTable+rowNumb;
-        showBarWithRowElem(id,text,"#bar-"+idTable,"#head-row-table"+idTable,"#table"+idTable);
+        showBarWithRowElem(id,text,"#bar-"+idTable,"#head-row-table"+idTable,"#table"+idTable,unit);
     });
 }
 
@@ -375,7 +383,6 @@ var totalsRowSelectedID = "";
 function totalsRowClicked (id){
     var reg = $("#"+id+" .reg-cell").text();
     if(totalsRowSelectedID === id){// Clicked on the same row so unselect
-        //$("#"+id).removeClass("row-selected");
         reg = $("#"+totalsRowSelectedID+" .reg-cell").text();
 
         $('.table-row').find(".reg-cell:contains('"+reg+"')").filter(function() {
@@ -392,9 +399,6 @@ function totalsRowClicked (id){
         }).parent().removeClass("row-selected"); // Selects edb row in all tables
     }
 
-
-
-    //$("#"+id).addClass("row-selected");
     $('.table-row').find(".reg-cell:contains('"+reg+"')").filter(function() {
         return $(this).text() === reg;
     }).parent().addClass("row-selected"); // Selects edb row in all tables
@@ -409,17 +413,25 @@ function totalsRowClicked (id){
         //var idTable = this.id.slice(-1);
         var idTable = (!(this.id.slice(-2).indexOf("l") > -1) ? this.id.slice(-2) : this.id.slice(-1));
 
+
+        var unit = "";
+        for(var i = 0; i < dataStructure.selectionTable.length; i++){
+            if(dataStructure.selectionTable[i].id === idTable){
+                unit = dataStructure.selectionTable[i].unit;
+            }
+        }
+
         var rowNumb = totalsRowSelectedID.slice(-1);
 
         var id = "row-tot-"+idTable+rowNumb;
 
-        showBarWithRowElem(id,reg,"#tot-bar-"+idTable,"#head-row-totals-"+idTable,"#table-total"+idTable);
+        showBarWithRowElem(id,reg,"#tot-bar-"+idTable,"#head-row-totals-"+idTable,"#table-total"+idTable,unit);
     });
 
     //showBarWithRowElem(id,reg,"#tot-bar-a","#head-row-totals-a","#table-totala");
 }
 
-function showBarWithRowElem(rowID, edb, div, headRow, tableID){
+function showBarWithRowElem(rowID, edb, div, headRow, tableID,unit){
     var data = [];
 
     $(headRow).find('th').each(function (index, element) {
@@ -443,7 +455,7 @@ function showBarWithRowElem(rowID, edb, div, headRow, tableID){
         max = val > max ? val : max;
     });
 
-    createBarGraph(div, max, data, edb);
+    createBarGraph(div, max, data, edb,unit);
 }
 
 

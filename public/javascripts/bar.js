@@ -22,7 +22,7 @@ function BarGraph(id){
 
 
 // If the bargraph does not exists creates a new one and places it in the div else updates already existing graph
-function createBarGraph(divID, tableMax, data, edb){
+function createBarGraph(divID, tableMax, data, edb, yLabel){
   var barGraph = null;
   singlebarGraphs.forEach(function(barElem){
     if(barElem.id === divID){
@@ -31,13 +31,13 @@ function createBarGraph(divID, tableMax, data, edb){
   });
 
   if(barGraph === null){
-    createNewGraph(divID, tableMax, data,edb);
+    createNewGraph(divID, tableMax, data,edb, yLabel);
   } else {
     updateGraph(barGraph, data,edb);
   }
 }
 
-function createNewGraph(divID, tableMax, data,edb){
+function createNewGraph(divID, tableMax, data,edb, yLabel){
   var barGraph = new BarGraph(divID);
   singlebarGraphs.push(barGraph);
 
@@ -83,6 +83,13 @@ function createNewGraph(divID, tableMax, data,edb){
       .attr("text-anchor", "middle")
       .style("font-size", "24px")
       .text(edb);
+
+    barGraph.svg.append("text")
+        .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
+        .attr("transform", "translate("+ -(barMargin.left/2+10) +","+( barMargin.top-50)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
+        .style("font-size", "10px")
+        .attr("class", "unit-text")
+        .text(yLabel);
 }
 
 // We do not need table max and the axis should never be updated for a graph
