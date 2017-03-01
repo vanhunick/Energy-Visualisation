@@ -10,7 +10,8 @@ var pg = require('pg');
 var squel = require("squel");
 
 router.get('/', function(req, res, next) {
-    res.render('core', {sections: ""}); // Send the search results and render index
+	// No longer used route
+    res.render('404', {sections: ""}); // Send the search results and render index
 });
 
 module.exports = router;
