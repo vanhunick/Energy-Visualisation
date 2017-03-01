@@ -334,6 +334,7 @@ DataProcessor.prototype.applyCPIToTableRows = function(rows, cpiValues){
 
 // Adds a section, category, sub category, or descriptions to a particular row in selections
 DataProcessor.prototype.addToSelection = function (id,type,data,selections) {
+    
     for(var i = 0; i < selections.length; i++){
         if(selections[i].id+"" === id+""){ // Convert them both to strings
             if(type === "section"){

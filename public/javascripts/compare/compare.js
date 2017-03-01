@@ -68,7 +68,9 @@ $(document).ready( function() {
     $('#search-btn-compare').click(function(){ // Listener to search button
         search(); // Search encodes the selections into the url and sends to server
     });
-    cpiValidationSetup(); // Set up cpi validation rules
+    if($('.cpi-form').length > 0 ){
+        cpiValidationSetup(); // Set up cpi validation rules    
+    }
 });
 
 
@@ -86,8 +88,8 @@ function loadFromURL(urlSelections){
         //searchData = new Data(data.rows, lastSearch, dataTables);
         searchData.rows = data.rows;
         searchData.tables = dataTables;
+
         searchData.copyOfTables = dp.copyDataTables(dataTables);
-        searchData.selections = [];
 
         urlSelections.forEach(function(s){
           setSelectionsFromURL(s, searchData.validOptions); // Modifies valid options
@@ -511,6 +513,7 @@ function showBarWithRowElem(rowID, edb, div, headRow, tableID,unit){
         if(index != 0){
             data[index-1].value = $(element).text();
         } else {
+            console.log(data);
             title = data[index].value = $(element).text();
         }
     });
@@ -595,7 +598,7 @@ function setSelectionsFromURL(selection, validOptions){
 
         if(data.subCategories.length > 0  &&  data.subCategories[0] !== null){
             $('#subsection-select'+selection.id).html(''); // Empty temp options
-            validOptions[selection.id] = true; // There are options for this row and sub category
+            searchData.validOptions[selection.id] = true; // There are options for this row and sub category
         } else {
             return;
         }
@@ -640,12 +643,13 @@ function loadInSections(fromURL, userSelections){ // if from url false selection
     /// Query for all sections
     $.get("/sections/sections", function(data){
         // Create the four filters rows
-        addSection(0);
-        addSection(1);
-        addSection(2);
-        addSection(3);
+        addSection(0,searchData);
+        addSection(1,searchData);
+        addSection(2,searchData);
+        addSection(3,searchData);
 
         if(fromURL){
+
           for(var i = 0; i < userSelections.length; i++){
               searchData.selections[i].description = userSelections[i].description;
               searchData.selections[i].category = userSelections[i].category;
@@ -653,6 +657,7 @@ function loadInSections(fromURL, userSelections){ // if from url false selection
               searchData.selections[i].subCategory = userSelections[i].subCategory;
             }
         }
+        
         dp.sortSections(data); // Sort the sections
 
         // Go through each row and add the sections in
@@ -660,8 +665,8 @@ function loadInSections(fromURL, userSelections){ // if from url false selection
             for(var j = 0; j < data.sections.length; j++){
                 if(fromURL && userSelections[i].section === data.sections[j]){
                     $("#section-select"+searchData.selections[i].id+"").append('<option selected>' + data.sections[j] + '</option>');
-                    searchData.validOptions[searchData.selections[i].id] = true;
                 } else {
+
                     $("#section-select"+searchData.selections[i].id+"").append('<option>' + data.sections[j] + '</option>');
                 }
             }
@@ -671,16 +676,23 @@ function loadInSections(fromURL, userSelections){ // if from url false selection
 }
 
 // Adds a new row of filters for section category and sub category
-function addSection(numberSections){
+function addSection(numberSections,searchData){
     var table = ['A','B','C','D','E'];
 
     // Add in a new row div
     $('#compare-div').append('<div class="row" id="titleRow'+numberSections+'"><div class="col-md-12"><h5  class="selection-title">Make a selection for table '+table[numberSections]+'</h5> </div></div>');
     $('#compare-div').append('<div class="row" id="row'+numberSections+'">');
     $("#row"+numberSections).append('<div class="col-md-12 compare-col" id="col'+numberSections+'">');
+    $("#col"+numberSections).append('<button type="button" id="clear-'+numberSections+'" class="btn btn-danger">Clear</button>').on('click', function(event){
+        var idNumb = event.target.id.charAt(event.target.id.length-1);
+        clearSelection(idNumb);
+    });
     $("#col"+numberSections).append('<select data-width="250px" class="selectpicker select-compare"  title="Section" id="section-select'+numberSections+'"></select>');// add section selector with the number section as the dynamic id
 
+
+
     searchData.selections.push({id : numberSections, section : "", category : "", subCategory : "", description : ""});// Push the information for the new row into the selections array
+    console.log(searchData.selections.length);
 
     // Add a change listener for when a section is selected
     $("#section-select"+numberSections).on('change', function(event){
@@ -692,8 +704,8 @@ function addSection(numberSections){
         $('#category-select'+idNumb).html(''); // Empty temp options
         $('#subsection-select'+idNumb).html(''); // Empty temp options
         $('#description-select'+idNumb).html(''); // Empty temp options
-        searchData.selections[idNumb] = {id : numberSections, section : "", category : "", subCategory : "", description : ""};
-        searchData.validOptions[idNumb] = false;
+        searchData.selections[+idNumb] = {id : numberSections, section : "", category : "", subCategory : "", description : ""};
+        searchData.validOptions[+idNumb] = false;
 
         // Find all the categories associated with this section
         $.post("/sections/s",{selected : section }, function(data){
@@ -718,7 +730,7 @@ function addSection(numberSections){
     $('#category-select'+numberSections).on('change', function(event){
         var categoryNew = $(this).find("option:selected").text();
 
-        var idNumb = event.target.id.charAt(event.target.id.length-1);
+        var idNumb = +(event.target.id.charAt(event.target.id.length-1));
         $('#description-select'+idNumb).html(''); // Empty temp options
 
         // Find all sub categories for the currently selected category
@@ -784,10 +796,7 @@ function addSection(numberSections){
         dp.addToSelection(idNumb,"description", data, searchData.selections);
     });
 
-    $("#col"+numberSections).append('<button type="button" id="clear-'+numberSections+'" class="btn btn-danger">Clear</button>').on('click', function(event){
-        var idNumb = event.target.id.charAt(event.target.id.length-1);
-        clearSelection(idNumb);
-    });
+    
 }
 
 
