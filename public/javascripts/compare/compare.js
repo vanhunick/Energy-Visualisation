@@ -513,7 +513,6 @@ function showBarWithRowElem(rowID, edb, div, headRow, tableID,unit){
         if(index != 0){
             data[index-1].value = $(element).text();
         } else {
-            console.log(data);
             title = data[index].value = $(element).text();
         }
     });
@@ -692,7 +691,6 @@ function addSection(numberSections,searchData){
 
 
     searchData.selections.push({id : numberSections, section : "", category : "", subCategory : "", description : ""});// Push the information for the new row into the selections array
-    console.log(searchData.selections.length);
 
     // Add a change listener for when a section is selected
     $("#section-select"+numberSections).on('change', function(event){
