@@ -50,10 +50,12 @@ var regions = {
        "MainPower NZ","Marlborough Lines","Nelson Electricity","Network Tasman",
        "Network Waitaki","Orion NZ","OtagoNet","The Power Company","Westpower"],
   usi : ["Alpine Energy","Buller Electricity","MainPower NZ","Marlborough Lines","Nelson Electricity","Network Tasman","Orion NZ","Westpower"],
-  lsi : ["Aurora Energy","Electricity Ashburton","Electricity Invercargill","Network Waitaki","OtagoNet","The Power Company"],
-  nz : ["","","","","","","","","","","","","","","","","","","","","","","","","","","","",""]
+  lsi : ["Aurora Energy","Electricity Ashburton","Electricity Invercargill","Network Waitaki","OtagoNet","The Power Company"]
+
 };
 
+// Used to calculate average or total
+var numberOfCompanies = 29;
 
 // Called when the document is loaded
 $(document).ready( function() {
@@ -210,10 +212,17 @@ function insertTotalsTable(tableRows, id, regions, tableExists, update){
             // Insert name in column and assign an id to the row
             row += "<th class='reg-cell'>" + names[property] + "</th>";
             totals[property].forEach(function(value){
-                row += "<th id='t-total"+tableID+""+cellCount+"' origValue='"+ value / regions[property].length +"' class='cell'>" + searchData.dpFormat(value / regions[property].length) + "</th>";
-                totCells.push({id : "#t-total"+tableID+""+cellCount, value : value / regions[property].length});
+                var avg;
+                if(property === "nz"){
+                    avg = value / numberOfCompanies;
+                } else {
+                    avg = value / regions[property].length;
+                }
+
+                row += "<th id='t-total"+tableID+""+cellCount+"' origValue='"+ avg +"' class='cell'>" + searchData.dpFormat(avg) + "</th>";
+                totCells.push({id : "#t-total"+tableID+""+cellCount, value :avg});
                 if(!tableExists){
-                    noCPICells.push({id : "t-total"+tableID+""+cellCount, value : value / regions[property].length});
+                    noCPICells.push({id : "t-total"+tableID+""+cellCount, value : avg});
                 }
                 cellCount++;
 

@@ -14,10 +14,12 @@ body {
 
 .table-edb {
   margin-left: 2%;
+  margin-right: 10%;
 }
 
 .table-tot {
   margin-left: 2%;
+  margin-right: 10%;
   margin-top: 6%;
 }
 
@@ -27,11 +29,6 @@ body {
   font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
-/*Used to give all tables a small margin to the right*/
-.table-all {
-  margin-left: 20px;
-  margin-top: 20px;
-}
 
 .single-bar {
   fill : lightgreen;
