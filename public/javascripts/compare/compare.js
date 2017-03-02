@@ -51,7 +51,6 @@ var regions = {
        "Network Waitaki","Orion NZ","OtagoNet","The Power Company","Westpower"],
   usi : ["Alpine Energy","Buller Electricity","MainPower NZ","Marlborough Lines","Nelson Electricity","Network Tasman","Orion NZ","Westpower"],
   lsi : ["Aurora Energy","Electricity Ashburton","Electricity Invercargill","Network Waitaki","OtagoNet","The Power Company"]
-
 };
 
 // Used to calculate average or total
@@ -94,7 +93,7 @@ function loadFromURL(urlSelections){
         searchData.copyOfTables = dp.copyDataTables(dataTables);
 
         urlSelections.forEach(function(s){
-          setSelectionsFromURL(s, searchData.validOptions); // Modifies valid options
+          setSelectionsFromURL(s); // Modifies valid options
         });
 
         dataStructure = dp.createDataStructuresWithCopy(searchData.copyOfTables); // Sets up the data so it can easily be iterated over to create the tables and graphs
@@ -583,66 +582,33 @@ function serialise(obj) {
 }
 
 // Loads in a selection from the user by grabbing the possible sections, categories, sub categories and descriptions from the DB
-function setSelectionsFromURL(selection, validOptions){
-    // Find all the categories associated with this section
-    $.post("/sections/s",{selected : selection.section }, function(data){
-        if(data.categories.length > 0  &&  data.categories[0] !== null){
-            $('#category-select'+selection.id).html(''); // Empty temp options
-        }
-        // Add the options to the drop down
-        for(var i = 0; i < data.categories.length; i++){
-            if(data.categories[i] === selection.category){
-                $('#category-select'+selection.id).append('<option value="' + data.categories[i] + '"selected>' + data.categories[i] + '</option>');
-            } else {
-                $('#category-select'+selection.id).append('<option value="' + data.categories[i] + '">' + data.categories[i] + '</option>');
-            }
-        }
-        // Refresh all drop downs
-        $(".selectpicker").selectpicker('refresh');
-    });
+function setSelectionsFromURL(selection){
+    // Find all the categories associated with selected section
+    getCategoriesFromDatabase(selection.section, function (categories,noResult) {
+      if(!noResult){
+        addOptionsToSelector('#category-select'+selection.id,categories, selection.category);
+      }});
 
-    // Find all sub categories for the currently selected category
-    $.post("/sections/sc",{section : selection.section, category : selection.category}, function(data){
+    // Find all the  sub categories associated with selected section and category
+    getSubCategoriesFromDatabase(selection.section, selection.category, function (subCategories, noResult) {
+      if(!noResult){
+        searchData.validOptions[selection.id] = true; // There are options for this row and sub category
+        addOptionsToSelector('#subsection-select'+selection.id,subCategories,selection.subCategory);
+      }});
 
-        if(data.subCategories.length > 0  &&  data.subCategories[0] !== null){
-            $('#subsection-select'+selection.id).html(''); // Empty temp options
-            searchData.validOptions[selection.id] = true; // There are options for this row and sub category
-        } else {
-            return;
-        }
-
-        // Add sub section options
-        for(var i = 0; i < data.subCategories.length; i++){
-            if(data.subCategories[i] === selection.subCategory){
-                $('#subsection-select'+selection.id).append('<option selected>' + data.subCategories[i] + '</option>');
-            } else {
-                $('#subsection-select'+selection.id).append('<option>' + data.subCategories[i] + '</option>');
-            }
-        }
-        $(".selectpicker").selectpicker('refresh');
-    });
-
-    // Grab the descriptions
-    $.post("/sections/desc",{category : selection.category,section : selection.section, subCategory : selection.subCategory}, function(data){
-        if(data.descriptions.length > 0 &&  data.descriptions[0] !== null){
-            $('#description-select'+selection.id).html(''); // Empty temp options
-        } else {
-            return;
-        }
-        // Add sub section options
-        for(var i = 0; i < data.descriptions.length; i++){
-            if(data.descriptions[i] === selection.description){
-                $('#description-select'+selection.id).append('<option selected>' + data.descriptions[i] + '</option>');
-            } else {
-                $('#description-select'+selection.id).append('<option>' + data.descriptions[i] + '</option>');
-            }
-        }
-        $(".selectpicker").selectpicker('refresh');
-    });
+    // Find all the  descriptions associated with selected section, category, and subsections
+    getDescriptionsFromDatabase(selection.section,selection.category,selection.subCategory, function (descriptions,noResult) {
+      if(!noResult){
+        addOptionsToSelector('#description-select'+selection.id,descriptions,selection.description);
+      }});
 }
 
 
 // Loads in sections along with the rows of selection boxes
+/**
+ *
+ *
+ * */
 function loadInSections(fromURL, userSelections){ // if from url false selections is null
     if(!fromURL){
         searchData = new Data([],[],[]); // Need to add empty array to put selections in
@@ -657,7 +623,6 @@ function loadInSections(fromURL, userSelections){ // if from url false selection
         addSection(3,searchData);
 
         if(fromURL){
-
           for(var i = 0; i < userSelections.length; i++){
               searchData.selections[i].description = userSelections[i].description;
               searchData.selections[i].category = userSelections[i].category;
@@ -665,25 +630,93 @@ function loadInSections(fromURL, userSelections){ // if from url false selection
               searchData.selections[i].subCategory = userSelections[i].subCategory;
             }
         }
-        
         dp.sortSections(data); // Sort the sections
 
-        // Go through each row and add the sections in
-        for(var i = 0; i < searchData.selections.length; i++){
-            for(var j = 0; j < data.sections.length; j++){
-                if(fromURL && userSelections[i].section === data.sections[j]){
-                    $("#section-select"+searchData.selections[i].id+"").append('<option selected>' + data.sections[j] + '</option>');
-                } else {
+        searchData.selections.forEach(function (selection, i) {
+          addOptionsToSelector("#section-select"+selection.id,data.sections,fromURL ? userSelections[i].section : "");
+        });
 
-                    $("#section-select"+searchData.selections[i].id+"").append('<option>' + data.sections[j] + '</option>');
-                }
-            }
-            $(".selectpicker").selectpicker('refresh');
-        }
+        // Go through each row and add the sections in
+        //for(var i = 0; i < searchData.selections.length; i++){
+        //    for(var j = 0; j < data.sections.length; j++){
+        //        if(fromURL && userSelections[i].section === data.sections[j]){
+        //            $("#section-select"+searchData.selections[i].id+"").append('<option selected>' + data.sections[j] + '</option>');
+        //        } else {
+        //
+        //            $("#section-select"+searchData.selections[i].id+"").append('<option>' + data.sections[j] + '</option>');
+        //        }
+        //    }
+        //    $(".selectpicker").selectpicker('refresh');
+        //}
     });
 }
 
-// Adds a new row of filters for section category and sub category
+/**
+ *  Grabs all the categories for a specific section
+ *
+ *  @param section {String} The section to look for distinct categories in
+ *  @callback should take (Object[], Boolean) array contains categories boolean is true if no results false if there is a result
+ * */
+function getCategoriesFromDatabase(section, callback){
+  // Find all the categories associated with this section
+  $.post("/sections/s",{selected : section }, function(data){
+    if(data.categories.length > 0  &&  data.categories[0] !== null){
+      callback(data.categories, false);
+    } else { // The one special case where category is null
+      callback([], true); // No result
+    }});
+}
+
+
+/**
+ * Grabs all sub categories for a specific section and category
+ *
+ * @param section {String} The section to look for distinct categories in
+ * @param category {String} The category to look for distinct sub categories in
+ * */
+function getSubCategoriesFromDatabase(section, category, callback){
+  $.post("/sections/sc",{section : section, category : category}, function(data){
+    if(data.subCategories.length > 0  &&  data.subCategories[0] !== null){
+      callback(data.subCategories, false); // There is a result
+    } else {
+      callback([], true); // No results
+    }
+  });
+}
+
+function getDescriptionsFromDatabase(section,category,subCategory,callback){
+  // Find all descriptions for the currently selected sub category
+  $.post("/sections/desc",{category : category,section : section, subCategory : subCategory}, function(data){
+    if(data.descriptions.length > 0 &&  data.descriptions[0] !== null){
+      callback(data.descriptions, false);
+    } else {
+      callback(data.descriptions, true);
+    }});
+}
+
+
+function addOptionsToSelector(selectorID, options, selectedOption){
+  $(selectorID).html(''); // Empty temp options
+  for(var i = 0; i < options.length; i++){
+    if(options[i] === null)continue;
+    if(options[i] === selectedOption){
+      $(selectorID).append('<option selected>' + options[i] + '</option>');
+    } else {
+      $(selectorID).append('<option>' + options[i] + '</option>');
+    }
+  }
+  $(".selectpicker").selectpicker('refresh'); // Refresh the selections
+}
+
+
+/**
+ * Adds a row of selectors to the page to allow the user to choose a section, category, sub category and description. Also adds
+ * function to respond to a selection being made. For example when a section is chosen a query is made to the database to find all categories within
+ * the sections
+ *
+ * @param numberOfSections {Number} Each selector has an id which includes the number of the row therefore this should be passed in to create a unique id
+ * @param searchData {Object} This holds the selections array which represents what the user has already choosen in any of the rows
+ * */
 function addSection(numberSections,searchData){
     var table = ['A','B','C','D','E'];
 
@@ -696,103 +729,61 @@ function addSection(numberSections,searchData){
         clearSelection(idNumb);
     });
     $("#col"+numberSections).append('<select data-width="250px" class="selectpicker select-compare"  title="Section" id="section-select'+numberSections+'"></select>');// add section selector with the number section as the dynamic id
-
-
-
     searchData.selections.push({id : numberSections, section : "", category : "", subCategory : "", description : ""});// Push the information for the new row into the selections array
 
     // Add a change listener for when a section is selected
     $("#section-select"+numberSections).on('change', function(event){
         var section = $(this).find("option:selected").text(); // Grab the selection
-
         var idNumb = event.target.id.charAt(event.target.id.length-1); // Grab the last character of the id that generated the event to work out correct id
 
         // First empty out all options for sub selections
-        $('#category-select'+idNumb).html(''); // Empty temp options
-        $('#subsection-select'+idNumb).html(''); // Empty temp options
-        $('#description-select'+idNumb).html(''); // Empty temp options
-        searchData.selections[+idNumb] = {id : numberSections, section : "", category : "", subCategory : "", description : ""};
-        searchData.validOptions[+idNumb] = false;
+        $('#category-select'+idNumb,'#subsection-select'+idNumb,'#description-select'+idNumb).html(''); // Empty temp options
 
-        // Find all the categories associated with this section
-        $.post("/sections/s",{selected : section }, function(data){
-            if(data.categories.length > 0  &&  data.categories[0] !== null){
-                $('#category-select'+idNumb).html(''); // Empty temp options
-            } else { // The one special case where category is null
+        searchData.selections[idNumb] = {id : numberSections, section : "", category : "", subCategory : "", description : ""};
+        searchData.validOptions[idNumb] = false;
 
-            }
-            // Add the options to the drop down
-            for(var i = 0; i < data.categories.length; i++){
-                if(data.categories[i] === null)continue;
-                $('#category-select'+idNumb).append('<option>' + data.categories[i] + '</option>');
-            }
-            // Refresh all drop downs
-            $(".selectpicker").selectpicker('refresh');
+        getCategoriesFromDatabase(section, function (sections, noResult) {
+          if(!noResult){
+            addOptionsToSelector('#category-select'+idNumb,sections,"");
+          }
         });
-        dp.addToSelection(idNumb,"section",section, searchData.selections); // Record change in the array of selections
+        dp.addToSelection(+idNumb,"section",section, searchData.selections); // Record change in the array of selections
     });
 
     // add category selector
     $("#col"+numberSections).append('<select data-width="190px" class="selectpicker select-compare" title="Category" id="category-select'+numberSections+'"></select>');
     $('#category-select'+numberSections).on('change', function(event){
         var categoryNew = $(this).find("option:selected").text();
-
         var idNumb = +(event.target.id.charAt(event.target.id.length-1));
+
         $('#description-select'+idNumb).html(''); // Empty temp options
 
-        // Find all sub categories for the currently selected category
-        $.post("/sections/sc",{section : searchData.selections[idNumb].section, category : categoryNew}, function(data){
-            if(data.subCategories.length > 0  &&  data.subCategories[0] !== null){
-                $('#subsection-select'+idNumb).html(''); // Empty temp options
-                searchData.validOptions[idNumb] = true; // There are options for this row and sub category
-            } else {
-                // Find all descriptions for the currently selected sub category
-                $.post("/sections/desc",{category : categoryNew ,section : searchData.selections[idNumb].section, subCategory : ""}, function(data){
-                    if(data.descriptions.length > 0 &&  data.descriptions[0] !== null){
-                        $('#description-select'+idNumb).html(''); // Empty temp options
-                    } else {
-                        return;
-                    }
-                    // Add sub section options
-                    for(var i = 0; i < data.descriptions.length; i++){
-                        $('#description-select'+idNumb).append('<option>' + data.descriptions[i] + '</option>');
-                    }
-                    $(".selectpicker").selectpicker('refresh');
-                });
-                return;
-            }
-            // Add sub section options
-            for(var i = 0; i < data.subCategories.length; i++){
-                $('#subsection-select'+idNumb).append('<option>' + data.subCategories[i] + '</option>');
-            }
-            $(".selectpicker").selectpicker('refresh');
-            $(".selectpicker").selectpicker('refresh');
+        getSubCategoriesFromDatabase(searchData.selections[idNumb].section, categoryNew, function (subCategories, noResults) { // Find all subcategories for a section and category
+          if(!noResults){
+            addOptionsToSelector('#subsection-select'+idNumb,subCategories,"");
+          } else { // Find descriptions for section and category
+            getDescriptionsFromDatabase(searchData.selections[idNumb].section,categoryNew,"", function (descriptions,noResult) {
+              if(!noResult){
+                addOptionsToSelector('#description-select'+idNumb,descriptions,"");
+              }
+            });
+          }
         });
         dp.addToSelection(idNumb,"category", categoryNew, searchData.selections);
-        $(".selectpicker").selectpicker('refresh');
     });
 
     // add sub category selector
     $("#col"+numberSections).append('<select data-width="190px" class="selectpicker select-compare" title="Subsection" id="subsection-select'+numberSections+'"></select>');
     $('#subsection-select'+numberSections).on('change', function(event){
-        var idNumb = event.target.id.charAt(event.target.id.length-1);
-        var subCat = $(this).find("option:selected").text();
+      var idNumb = event.target.id.charAt(event.target.id.length-1);
+      var subCat = $(this).find("option:selected").text();
 
-        // Find all descriptions for the currently selected sub category
-        $.post("/sections/desc",{category : searchData.selections[idNumb].category,section : searchData.selections[idNumb].section, subCategory : subCat}, function(data){
-            if(data.descriptions.length > 0 &&  data.descriptions[0] !== null){
-                $('#description-select'+idNumb).html(''); // Empty temp options
-            } else {
-                return;
-            }
-
-            // Add sub section options
-            for(var i = 0; i < data.descriptions.length; i++){
-                $('#description-select'+idNumb).append('<option>' + data.descriptions[i] + '</option>');
-            }
-            $(".selectpicker").selectpicker('refresh');
-        });
-        dp.addToSelection(idNumb,"subcategory", subCat, searchData.selections);
+      getDescriptionsFromDatabase(searchData.selections[idNumb].section,searchData.selections[idNumb].category,subCat, function (descriptions,noResult) {
+        if(!noResult){
+          addOptionsToSelector('#description-select'+idNumb,descriptions,"");
+        }
+      });
+      dp.addToSelection(idNumb,"subcategory", subCat, searchData.selections);
     });
 
     // add description selector
@@ -800,20 +791,16 @@ function addSection(numberSections,searchData){
     $('#description-select'+numberSections).on('change', function(event){
         var idNumb = event.target.id.charAt(event.target.id.length-1);
         var data = $(this).find("option:selected").text();
-        dp.addToSelection(idNumb,"description", data, searchData.selections);
+        dp.addToSelection(+idNumb,"description", data, searchData.selections);
     });
-
-    
 }
 
 
 // Clears a row of selections
 function clearSelection(idNumb){
   searchData.selections[idNumb] = {id : idNumb, section : "", category : "", subCategory : "", description : ""};
-    searchData.validOptions[idNumb] = false;
-  $('#description-select'+idNumb).html('');
-  $('#subsection-select'+idNumb).html('');
-  $('#category-select'+idNumb).html('');
+  searchData.validOptions[idNumb] = false;
+  $('#description-select'+idNumb+',#subsection-select'+idNumb+',#category-select'+idNumb).html('');
   $('#section-select'+idNumb).find("option:selected").removeAttr("selected");
   $(".selectpicker").selectpicker('refresh');
 }
