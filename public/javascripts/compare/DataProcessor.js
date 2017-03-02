@@ -1,13 +1,23 @@
+/**
+ * Object contains a number of functions to manipulate data from the database
+ * */
 function DataProcessor(){}
 
-// Function that returns a copy of the dataTables objects
+
+/**
+ * Creates of copy of the dataTables object. Copies each table and its values for each row.
+ *
+ * @param dataTables {Object} contains 6 arrays of rows one for each table. Attribute can be undefined if table does not exist
+ * @returns {object} A copy of the dataTables object
+ * */
 DataProcessor.prototype.copyDataTables = function(dataTables) {
   var origTables = [dataTables.tableA,dataTables.tableB,dataTables.tableC,dataTables.tableD,dataTables.tableAB,dataTables.tableCD]; // Add tables to array to iterate over them
-  var tables = [[],[],[],[],[],[]]; // Empty arras to insert new rows with values copies of the original
+  var tables = [[],[],[],[],[],[]]; // Empty arrays to insert new rows with values that are copies of the original
 
+  // Iterate over the original tables
   for(var j = 0; j < origTables.length; j++){
       var a = origTables[j]; // Grab the current table with index i
-      if(a !== undefined){ // It might not exist due to it not being selected
+      if(a !== undefined){ // It might not exist due to it not being selected by the user
           for(var i = 0; i < a.length; i++){ // For every row copy all the fields
               tables[j].push({category :a[i].category, description : a[i].description,disc_yr: a[i].disc_yr,edb: a[i].edb,
                   fcast_yr: a[i].fcast_yr,network:a[i].network,note:a[i].note,obs_yr:a[i].obs_yr,p_key: a[i].p_key,sch_ref:a[i].sch_ref,
@@ -18,33 +28,44 @@ DataProcessor.prototype.copyDataTables = function(dataTables) {
   return new DataTables(tables[0],tables[1],tables[2],tables[3],tables[4],tables[5]); // Return the copy
 }
 
-// Creates a data structure that can be used to display the data inside html elements
-DataProcessor.prototype.createDataStructuresWithCopy = function (copyOfDataTables){
-    var selectionDataArray = [];
-    var selectionTablesArray = []; // Tables also contains combined data
-    var combinedSelectionDataArray = [];
 
-    // An array of true / false values if a table contains values
+/**
+ * Creates and object with three arrays that are used to iterate over and add the data to the page. The structure simplifies
+ * creation of table, graphs and combined graphs.
+ *
+ * @param dataTables {Object} contains 6 arrays of rows one for each table. Table array can be empty if table does not exist
+ * @returns {object} Data structure
+ * */
+DataProcessor.prototype.createDataStructuresWithCopy = function (copyOfDataTables){
+    var selectionDataArray = []; // Used to create the regular graphs
+    var selectionTablesArray = []; // Tables also contains combined data
+    var combinedSelectionDataArray = []; // Used to create vector graphs
+
+    // An array of true or false values if a table contains values
     var selectedRows = [copyOfDataTables.tableA.length > 0,copyOfDataTables.tableB.length > 0,copyOfDataTables.tableC.length > 0,copyOfDataTables.tableD.length > 0];
 
     // An array with the tables data
     var tables = [copyOfDataTables.tableA,copyOfDataTables.tableB,copyOfDataTables.tableC,copyOfDataTables.tableD,copyOfDataTables.tableAB,copyOfDataTables.tableCD];
 
     // Creates the 4 normal tables and the combined tables
-    var ids = ['a','b','c','d','ab','cd'];
+    var ids = ['a','b','c','d','ab','cd']; // The id's line up with the tables array to add an id to each row
     for(var i = 0; i < selectedRows.length; i++){
-        if(selectedRows[i]){
-            var title = tables[i][0].section + ", " + tables[i][0].category;
-            var subtitle = tables[i][0].sub_category === null ? tables[i][0].description : tables[i][0].sub_category + ", " + tables[i][0].description;
-            selectionTablesArray.push(new SelectedTableData(tables[i],ids[i],title,subtitle, tables[i][0].units)); // TODO add unit for combined
+        if(selectedRows[i]){ // Only go through table if it has rows
+            var subtitle = tables[i][0].section + ", " + tables[i][0].category; // Create subtitle with section and category
+
+            // Check if sub category is null if so just use description else also use sub category
+            var title = tables[i][0].sub_category === null ? tables[i][0].description : tables[i][0].sub_category + ", " + tables[i][0].description;
+
+            // Add a row along with the id of the table the title, subtitle and unit to both table and selection arrays
+            selectionTablesArray.push(new SelectedTableData(tables[i],ids[i],title,subtitle, tables[i][0].units));
             selectionDataArray.push(new SelectionData(tables[i], title, subtitle ,tables[i][0].units,ids[i]));
 
-            // Check for combined special case
+            // Check for combined special case, if A or C exist it is possible a combined table needs to be created
             if(ids[i] === 'a' || ids[i] === 'c'){
                 if(selectedRows[i+1]){ // Check that a selections has been made if so create the combined table
-                    var jump = i === 0 ? 4 : 3;
-                    var titleJump = tables[i+1][0].section + ", " + tables[i+1][0].category;
-                    var subTitleJump = tables[i+1][0].sub_category === null ? tables[i+1][0].description : tables[i+1][0].sub_category + ", " + tables[i+1][0].description;
+                    var jump = i === 0 ? 4 : 3; // If 0 need to jump to the location of ab table else jump to location of cd table
+                    var subTitleJump = tables[i+1][0].section + ", " + tables[i+1][0].category;
+                    var titleJump = tables[i+1][0].sub_category === null ? tables[i+1][0].description : tables[i+1][0].sub_category + ", " + tables[i+1][0].description;
                     selectionTablesArray.push(new SelectedTableData(tables[i+jump],ids[i+jump], title + ", " + subtitle, titleJump + ", " + subTitleJump, tables[i+1][0].units));
                     combinedSelectionDataArray.push(new SelectionDataCombined(tables[i+jump],tables[i],tables[i+1], title + " " + subtitle, titleJump + " " + subTitleJump,tables[i][0].units,tables[i+1][0].units,ids[i+jump])); // TODO ask how to format titles for combined
                 }
@@ -55,7 +76,14 @@ DataProcessor.prototype.createDataStructuresWithCopy = function (copyOfDataTable
 }
 
 
-// Checks that if there is a value selected in a row the others must be selected too before searching
+/**
+ * Checks if the selections the user has made are complete. For example if a selection is made for a section in a row the category
+ * also has to be chosen along with a description and sub category if it exists.
+ *
+ * @param selections {Object} the currently selected sections for each row, an array of 4 selection rows
+ * @param validOptions {Object} contains if a row has a sub category or not false if no sub category
+ * @returns {Boolean} true if a valid search false if not
+ * */
 DataProcessor.prototype.validateSearchParams = function (selections, validOptions){
     var returnVal = true;
     selections.forEach(function (elem, i) {
@@ -74,7 +102,15 @@ DataProcessor.prototype.validateSearchParams = function (selections, validOption
     return returnVal;
 }
 
-// Returns if a row from the DB matches one of the specified rows by the user
+
+/**
+ * Checks if a row from the database matches the selection from the user. This is used because the user can make four different
+ * selections and the query for the database retuns all the rows for all the sections.
+ *
+ * @param DBRow {Object} A row from the database contains all the fields
+ * @param Selection {Object} contains section, category, sub category and description from a user selection
+ * @returns {Boolean} true if a database row belongs to the user selection
+ * */
 DataProcessor.prototype.matchDBRow = function (DBRow, selection) {
   if(DBRow.section === selection.section && DBRow.category === selection.category && DBRow.description === selection.description){
       if(DBRow.sub_category !== null){
@@ -86,8 +122,22 @@ DataProcessor.prototype.matchDBRow = function (DBRow, selection) {
 }
 
 
-// Takes all rows and filers into corresponding tables
+/**
+ * Takes rows from database query result and splits into corresponding table. Uses the matchDBRow function to match
+ * a row to a selection. Once filtered creates and object containing each table and the rows
+ *
+ * Also creates the combined tables by using the combineTable function and adds the combined tables to the returned
+ * object.
+ *
+ * Note any null values in the rows are changed to 0
+ *
+ * @param rows {Object} All the rows from the users selections
+ * @param search {Object} object that contains the four different selections the user may have made
+ * @returns {Object} An object that contains a property for each table which is an array with the corresponding rows
+ * */
 DataProcessor.prototype.filterRowsToTables = function (rows, search) {
+
+  // Create four arrays for the different rows that belong to each of the searches
   var aRows = rows.filter(function(e){return dp.matchDBRow(e,search.aTable);});
   var bRows = rows.filter(function(e){return dp.matchDBRow(e,search.bTable);});
   var cRows = rows.filter(function(e){return dp.matchDBRow(e,search.cTable);});
@@ -111,6 +161,16 @@ DataProcessor.prototype.filterRowsToTables = function (rows, search) {
 }
 
 
+/**
+ * Combines the two tables by going through each row and dividing the value of table1 to the corresponding value from
+ * a row in table 2
+ *
+ * Note if table 2 value is 0 it is divided by 1 instead
+ *
+ * @param table1Rows {Object} An array of rows that belong to one table
+ * @param table2Rows {Object} An array of rows that belong to another table
+ * @returns {Ojbect[]} An array of rows as a result of combining table1 and table2
+ * */
 DataProcessor.prototype.combineTables = function(table1Rows, table2Rows) {
   var combined = [];
   var at = table1Rows;
@@ -137,20 +197,23 @@ DataProcessor.prototype.combineTables = function(table1Rows, table2Rows) {
 }
 
 
-
-
-
-// table 1 can be A and table two C or table 1 is A / B and table two is
+/**
+ * Creates the data from the table rows used by the vector graph. Each entry in the array contains the edb an array of years with the value from
+ * table a and table b.
+ *
+ * @param table1Rows {Object} An array of rows that belong to one table
+ * @param table2Rows {Object} An array of rows that belong to another table
+ * @returns {Ojbect[]} Data for the vector graph in the form [{ EDB, [ { year1, valueA, valueB }, {year2, valueA, valueB },...]}]
+ * */
 DataProcessor.prototype.createDataForVectorGraph = function(table1Rows,table2Rows) {
     var at = table1Rows;
     var bt = table2Rows;
     var edbDone = []; // The edbs that have been processed
     var vecData = []; // The final entry in the form { EDB, [ { year1, valueA, valueB }, {year2, valueA, valueB }]}
 
-    var availableObsYears = [];
+    var availableObsYears = []; // The years for both table 1 and table 2
     table1Rows.forEach(function (row1) {
         if(!availableObsYears.includes(row1.obs_yr)){
-
             // Check if the second set of rows also contains the year
             for(var i = 0; i < table2Rows.length; i++){
               if(table2Rows[i].obs_yr === row1.obs_yr){
@@ -163,7 +226,6 @@ DataProcessor.prototype.createDataForVectorGraph = function(table1Rows,table2Row
 
     // Go through every row
     for (var i = 0; i < at.length; i++) {
-
         // Check if the EDB has already been processed
         if (!edbDone.includes(at[i].edb)) {
 
@@ -174,9 +236,7 @@ DataProcessor.prototype.createDataForVectorGraph = function(table1Rows,table2Row
             var edbRowsBt = bt.filter(function (d) {
                 return d.edb === at[i].edb
             });
-
             edbDone.push(at[i].edb); // Add year to done so it is not repeated
-
             var yearsDone = []; // Processed years
             var edbYearArray = [];
 
@@ -218,7 +278,12 @@ DataProcessor.prototype.createDataForVectorGraph = function(table1Rows,table2Row
 }
 
 
-// Creates the data needed to create box plots for one table
+/**
+ * Creates the data from the table rows which is then used by the box plot.
+ *
+ * @param tableRows {Object} The rows from the table the box plot is visualising
+ * @returns {Ojbect[]} Data for the box plot
+ * */
 DataProcessor.prototype.createDataForBoxPlot = function (tableRows){
     var yearsDone = []; // Years processed
     var years = []; // Will contain an array of rows for each year
@@ -263,7 +328,13 @@ DataProcessor.prototype.createDataForBoxPlot = function (tableRows){
     return {min : min, max : max, data : data, scatterData : sValues};
 }
 
-// Creates the data for the bar graphs from the rows used in D3
+
+/**
+ * Creates the data from the table rows which is then used by the grouped bar graph.
+ *
+ * @param tows {Object} The rows from the table the bar graph is visualising
+ * @returns {Ojbect[]} Data for the bar graph
+ * */
 DataProcessor.prototype.createDataForGroupedGraph = function(rows){
     var availableObsYears = [];
 
@@ -297,6 +368,12 @@ DataProcessor.prototype.createDataForGroupedGraph = function(rows){
     return {data : data, keys : availableObsYears};
 }
 
+
+/**
+ * Sorts the sections
+ *
+ * @param rows {Object} data object that contains the sections array
+ * */
 DataProcessor.prototype.sortSections = function(data) {
   data.sections.sort(function(a,b){
       // First check simple case of number difference
@@ -316,7 +393,15 @@ DataProcessor.prototype.sortSections = function(data) {
 }
 
 
-// Applies the CPI to rows of data
+/**
+ * Applies a CPI consumer price index percentage to each of the rows values. The cpiValues contains a value for each of the years.
+ *
+ * The CPI is apploed by starting at the year the value was observed at compounding the cpi values until the last year in the
+ * cpiValues object.
+ *
+ * @param rows {Object} The rows cpi will be applied to
+ * @param cpi values {Object} The values to add to each year
+ * */
 DataProcessor.prototype.applyCPIToTableRows = function(rows, cpiValues){
     // Find the min and max year from the data
     rows.forEach(function(elem, index){ // Grab every Row
@@ -332,7 +417,15 @@ DataProcessor.prototype.applyCPIToTableRows = function(rows, cpiValues){
     });
 }
 
-// Adds a section, category, sub category, or descriptions to a particular row in selections
+
+/**
+ * Adds in a section, category, sub category, or description to a row in selections. The id is used to
+ * work out which row it goes in. The type is used for working out which property to set
+ *
+ * @param id {Number} the id of the selection row
+ * @param type {String} the type of selection section, category etc.
+ * @param selections {Object[]} The array of rows to set the selection in
+ * */
 DataProcessor.prototype.addToSelection = function (id,type,data,selections) {
     
     for(var i = 0; i < selections.length; i++){
@@ -350,6 +443,15 @@ DataProcessor.prototype.addToSelection = function (id,type,data,selections) {
     }
 }
 
+
+/**
+ * Works out the total for each region based on the edb for each row and which region it is part of
+ *
+ * @param tableRows {Object[]} the rows from a table
+ * @param regions {Object[]} An array of regions and which edbs make up that region
+ * @param availableYears {Object[]} The years that totals should be created for
+ * @returns {Object} contains each region and an array of years along with totals for that year
+ * */
 DataProcessor.prototype.createTableTotals = function (tableRows, regions, availableObsYears) {
     var regionStrings = ["n","uni","eni", "swni", "s", "usi", "lsi"]; // All the regions
     var totals = {}; // reg : "" , years : []
@@ -376,25 +478,38 @@ DataProcessor.prototype.createTableTotals = function (tableRows, regions, availa
             });
         });
     }
-
     var nz = []; // To find the totals of NZ add north and south tegether
     for(var i = 0; i < availableObsYears.length; i++){
         nz.push(totals["n"][i] + totals["s"][i]);
     }
-    totals["nz"] = nz; // Add the NZ property to totals // TODO change array at the top
-
+    totals["nz"] = nz; // Add the NZ property to totals
     return totals;
 }
 
 
-
+/**
+ * The data structure object
+ *
+ * @param selectionsData {Object[]} Used for creating regular graphs
+ * @param selectionTable{Object[]} Used for creating the html tables
+ * @param combineData {Object[]} Used for the vector graphs
+ * */
 function DataStructure(selectionData, selectionTable, combineData){
     this.selectionData = selectionData; // Contains the rows, id, title, subtitle amd init for each selection
     this.selectionTable = selectionTable; // Contains the rows, id, title, subtitle amd init for each table
     this.combineData = combineData; // Contains combined rows along with titles and units
 }
 
-// Object for holder the users selection
+
+/**
+ * Object for holding the users selections each property contains a
+ * section, category, sub category and description. They can be empty strings
+ *
+ * @param a {Object} A selection
+ * @param b {Object} B selection
+ * @param c {Object} C selection
+ * @param d {Object} D selection
+ * */
 function Selection(a,b,c,d){
     this.aTable = a;
     this.bTable = b;
@@ -402,7 +517,19 @@ function Selection(a,b,c,d){
     this.dTable = d;
 }
 
-// Object for holder rows for all tables
+
+/**
+ * Object for holding the rows that belong to each of the table selections.
+ * Also contains the combined tables. Each of the arrays could be empty if no
+ * selection was made for a table
+ *
+ * @param tableA {Object[]} A selection
+ * @param tableB {Object[]} B selection
+ * @param tableC {Object[]} C selection
+ * @param tableD {Object[]} D selection
+ * @param tableAB {Object[]} AB selection
+ * @param tableCD {Object[]} CD selection
+ * */
 function DataTables(tableA,tableB,tableC,tableD,tableAB,tableCD){
     this.tableA = tableA;
     this.tableB = tableB;
@@ -412,7 +539,11 @@ function DataTables(tableA,tableB,tableC,tableD,tableAB,tableCD){
     this.tableCD = tableCD;
 }
 
-// Data object for each section, used for graphs
+
+/**
+ * Contains data for a particular selection. The rows that belong to the sections and
+ * the shared title subtitle and unit.
+ * */
 function SelectionData(rows,title,subTitle,unit,id){
     this.rows = rows;
     this.title = title;
@@ -421,7 +552,10 @@ function SelectionData(rows,title,subTitle,unit,id){
     this.unit = unit;
 }
 
-// Data object for Rows combined
+
+/**
+ * Contains data for a particular selection. The rows that belong to both tables and the combined rows
+ * */
 function SelectionDataCombined(rows, table1Rows,table2Rows,title1,title2,unit1,unit2,id){
     this.rows = rows; // Combined rows
     this.title1 = title1;
@@ -433,7 +567,11 @@ function SelectionDataCombined(rows, table1Rows,table2Rows,title1,title2,unit1,u
     this.table2Rows = table2Rows;
 }
 
-// Data object for each table
+
+/**
+ * Contains data for a particular selection. The rows that belong to the sections and
+ * the shared title subtitle and unit. Used to generate html tables
+ * */
 function SelectedTableData(rows,id, title, subTitle, unit){
     this.rows = rows;
     this.id = id;
