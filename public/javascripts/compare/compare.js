@@ -26,17 +26,19 @@ if (!Array.prototype.includes) {
 var dp = new DataProcessor();
 
 function Data(){
-    this.rows = [];
-    this.selections = []; // The selected sections
-    this.tables = null;
-    this.copyOfTables = null;
-    this.validOptions = [false,false,false,false];
-    this.dpFormat = d3.format(".4r");
+    this.rows = []; // All the rows from a search
+    this.selections = []; // The selected sections (section, category, sub category, description for each row)
+    this.tables = null; // The rows filtered into the separate tables
+    this.copyOfTables = null; // tables copied so modifications can be made
+    this.validOptions = [false,false,false,false]; // Array to show if a sub category exists for a row true if it does
+    this.dpFormat = d3.format(".4r"); // Used to format numbers displayed
 }
 
 var searchData; // An instance of the Data object
 var dataStructure; // Contains arrays for tables, graphs and combined graphs
 
+var rowSelected = ""; // Holds the id of the currently selected row
+var totalsRowSelectedID = "";
 
 // Object to hold which company belongs to a specific region
 var regions = {
@@ -53,19 +55,12 @@ var regions = {
   lsi : ["Aurora Energy","Electricity Ashburton","Electricity Invercargill","Network Waitaki","OtagoNet","The Power Company"]
 };
 
-// Used to calculate average or total
-var numberOfCompanies = 29;
 
 // Called when the document is loaded
 $(document).ready( function() {
     // Highlight the selected link
     $(".nav-link").removeClass('active');
     $("#benchmarks-link").addClass('active');
-
-    // On click listener for company selector
-    $('#company-select').on('change', function(){
-        selectedCompany = $(this).find("option:selected").text();
-    });
     $('#search-btn-compare').click(function(){ // Listener to search button
         search(); // Search encodes the selections into the url and sends to server
     });
@@ -75,7 +70,11 @@ $(document).ready( function() {
 });
 
 
-// Uses the url to find what was searches and asks server for rows relating to that search
+/**
+ * The first method that is called when loading the page from a URL with a selection. A selection can contain multiple searches up to 4.
+ *
+ * @param urlSelections{Object[]} contains the user selections for each row
+ * */
 function loadFromURL(urlSelections){
     searchData = new Data();
     loadInSections(true,urlSelections); // First load in the section rows and set the searched selections
@@ -84,7 +83,6 @@ function loadFromURL(urlSelections){
     $.post("/compare/search",{company : "", selections : JSON.stringify(urlSelections)}, function(data){
         // Queries the db for each of the secions and finds and inserts the sub sections as options
         var lastSearch = new Selection(urlSelections[0],urlSelections[1],urlSelections[2],urlSelections[3]); // Set the last search
-
         var dataTables = dp.filterRowsToTables(data.rows, lastSearch); // Filter the rows into their tables
         //searchData = new Data(data.rows, lastSearch, dataTables);
         searchData.rows = data.rows;
@@ -105,6 +103,12 @@ function loadFromURL(urlSelections){
     });
 }
 
+
+/**
+ * Highlights the graphs by acting like a user clicked on the first row in each table.
+ *
+ * @param selectionTables {Object[]} the data for each table
+ * */
 function highlightGraphsOnLoad(selectionsTables){
     for(var i = 0; i < selectionsTables.length; i++){
         rowClicked("rowtable"+selectionsTables[i].id+"0");
@@ -113,19 +117,28 @@ function highlightGraphsOnLoad(selectionsTables){
     }
 }
 
-// Shows the tables on the page giving the data in the selection table array
+
+/**
+ * Shows the tables on the page giving the data in the selection table array
+ *
+ * @param selectionTableArray {Object[]} contains all the rows for each table
+ * */
 function showTables(selectionTablesArray){
     selectionTablesArray.forEach(function (tableData) {
         // Add in the title using the id and the tile / subtitle for each table
         $('#title-'+tableData.id).append('<h2 class="title">'+tableData.title+'</h2>').append('<h4 class="subTitle">'+tableData.subTitle+'</h4>');
-
         insertTable(tableData.rows,'table'+tableData.id);
         insertTotalsTable(tableData.rows, 'table-total'+tableData.id, regions,false,false); // Creates and inserts the total table
     })
 }
 
 
-// Shows graphs for A,B,C,D
+/**
+ * Shows the bar and boxplot graphs for tables A,B,C, and D.
+ *
+ * @param selectionData {Object[]} contains all the rows
+ * #param addTitles {Boolean} when the table is already displayed and only the data needs to be updated titles should not be added
+ * */
 function showAllRegularGraphs(selectionData, addTitles){
     selectionData.forEach(function (selection) {
         // Insert the titles for the graphs
@@ -145,7 +158,12 @@ function showAllRegularGraphs(selectionData, addTitles){
 }
 
 
-// Shows graphs for A/B, C/D and A/B / C/D
+/**
+ * Shows the bar, box plot, and vector graphs for tables A/B, B/C and A/B / C/D.
+ *
+ * @param selectionData {Object[]} contains all the rows
+ * #param addTitles {Boolean} when the table is already displayed and only the data needs to be updated titles should not be added
+ * */
 function showAllCombinedGraphs(selectionData, showTitle){
     selectionData.forEach(function(selection){
         // Insert titles
@@ -170,7 +188,15 @@ function showAllCombinedGraphs(selectionData, showTitle){
     }
 }
 
-// Creates and inserts a total table for each region
+
+/**
+ * Creates and inserts a total table for each region
+ *
+ * @param tableRows {Object[]} contains all the rows from the tables
+ * @param id {String} the id of the table
+ * @param regions {Object} contains a property for each region and which edbs belong to it
+ * @param update {Boolean} if the table needs to be updated or created
+ * */
 function insertTotalsTable(tableRows, id, regions, tableExists, update){
     var tableID = (!(id.slice(-2).indexOf("l") > -1) ? id.slice(-2) : id.slice(-1));
     var names = {n : "North Island", uni : "Upper North Island", eni : "Eastern North Island", swni : "South-West North Island", s : "South Island", usi : "Upper South Island", lsi : "Lower South Island", nz : "New Zealand"};
@@ -199,6 +225,9 @@ function insertTotalsTable(tableRows, id, regions, tableExists, update){
     if(update){
         $("#"+id).html(''); // Clear last table
     }
+
+    // Used to calculate average or total
+    var numberOfCompanies = 29;
 
     $("#"+id).append('<tr id="head-row-totals-'+tableID+'" class="table-row table-head"> <th>Region</th>'+ years + '</tr>');
 
@@ -237,12 +266,13 @@ function insertTotalsTable(tableRows, id, regions, tableExists, update){
 }
 
 
-
-
-// Here every row belongs to the specific table
+/**
+ * Creates and inserts a total table for each region
+ *
+ * @param tableRows {Object[]} contains all the rows for a particular table
+ * @param id {String} the id of the table
+ * */
 function insertTable(tableRows,id){
-    var totals = []; // Format reg : "", year : numb
-
     // Sorts the EDB names
     tableRows.sort(function (a,b) {
         return [a.edb, b.edb].sort()[0] === a.edb ? -1 : 1; // Sort two names and return the first
@@ -258,7 +288,6 @@ function insertTable(tableRows,id){
         return +a - +b;
     });
 
-
     // Create cells for each of the years to use as header
     var years = "";
     availableObsYears.forEach(function (year) {
@@ -273,7 +302,6 @@ function insertTable(tableRows,id){
     var yearDone = [];
     var cellCount = 0; // For the id
     var cellValues = []; // All the cell values
-    var observerd = true; // observerd or forcast, currently always observed
     var rowCount = 0;
     // Create the rows of data
     for(var i = 0; i < tableRows.length; i++){
@@ -308,7 +336,6 @@ function insertTable(tableRows,id){
         }
     }
 
-    //
     var percent = true;
     if(id === "tableab" || "tablcd"){
         percent = false;
@@ -318,124 +345,100 @@ function insertTable(tableRows,id){
     applyGradientCSS(cellValues, percent);
 }
 
-var rowSelected = ""; // Holds the id of the currently selected row
 
-// Called when a row is clicked on a table
+/**
+ * Called when the user clicks on a row in a table
+ *
+ * @param id {String} The id of the row clicked
+ * */
 function rowClicked(id){
-
   if(rowSelected === id){// Clicked on the same row so unselect
     // Remove all selected classes from elements
     var text = $("#"+id+" .edb-cell").text();
-    highlight(text, true); // highlight and removehighliting from bar graph
-    //$('.table').find('tr').removeClass('row-selected');
-      $('.table-row').find(".edb-cell:contains('"+text+"')").parent().removeClass("row-selected"); // Selects edb row in all tables
-
-      // d3.selectAll(".bar-selected").classed("bar-selected", false);
+    highlight(text, true); // highlight and remove highlighting from bar graph
+    $('.table-row').find(".edb-cell:contains('"+text+"')").parent().removeClass("row-selected"); // Selects edb row in all tables
     d3.selectAll(".line-selected-table").classed("line-selected", false);
     d3.selectAll(".vec-dot-selected").classed("vec-dot-selected", false);
     rowSelected = ""; // Nothing is selected
     return;
   }
 
-
-    // Remove the selected class from all rows
-    if(rowSelected !== ""){
-        var text = $("#"+rowSelected+" .edb-cell").text();
-        $('.table-row').find(".edb-cell:contains('"+text+"')").parent().removeClass("row-selected"); // Selects edb row in all tables
-    }
-    var text = $("#"+id+" .edb-cell").text();
-  rowSelected = id; // Set the lelected row
-
-  // Grab the text using the id
-
-
-
-  // Add the row selected class to the only one selected
-  //$("#"+id).addClass("row-selected");
+  // Remove the selected class from all rows
+  if(rowSelected !== ""){
+    var text = $("#"+rowSelected+" .edb-cell").text();
+    $('.table-row').find(".edb-cell:contains('"+text+"')").parent().removeClass("row-selected"); // Selects edb row in all tables
+  }
+  var text = $("#"+id+" .edb-cell").text();
+  rowSelected = id; // Set the selected row
 
   // Get the edb from the selected row
   var edb = $("#"+id+".edb-cell").text();
 
-    $('.table-row').find(".edb-cell:contains('"+text+"')").parent().addClass("row-selected"); // Selects edb row in all tables
+  $('.table-row').find(".edb-cell:contains('"+text+"')").parent().addClass("row-selected"); // Selects edb row in all tables
 
-
-
-    // Select all lines with the selected class and remove class
-  d3.selectAll(".line-selected-table")
-  .classed("line-selected", false);
-
-  d3.selectAll(".vec-dot-selected")
-  .classed("vec-dot-selected", false);
+  // Select all lines with the selected class and remove class
+  d3.selectAll(".line-selected-table").classed("line-selected", false);
+  d3.selectAll(".vec-dot-selected").classed("vec-dot-selected", false);
 
   // Select all rectangle with the correct EDB and outline bars
   // Also removes the highlight of previous selection
   highlight(text, false);
+  d3.selectAll("line."+text.replace(/ /g , "")).classed("line-selected-table", true);
+  d3.selectAll(".dot."+text.replace(/ /g , "")).classed("vec-dot-selected", true);
 
-  d3.selectAll("line."+text.replace(/ /g , ""))
-  .classed("line-selected-table", true);
-
-  d3.selectAll(".dot."+text.replace(/ /g , ""))
-  .classed("vec-dot-selected", true);
-
-
-    $('.table-edb').each(function(){
-        var idTable = (!(this.id.slice(-2).indexOf("e") > -1) ? this.id.slice(-2) : this.id.slice(-1));
-
-        var rowNumb = rowSelected.slice(-1);
-
-        // Need to account for numbers greater than 10
-        if(!isNaN(rowSelected.slice(-2))){
-            rowNumb = rowSelected.slice(-2);
-        }
-
-
-        var unit = "";
-        for(var i = 0; i < dataStructure.selectionTable.length; i++){
-            if(dataStructure.selectionTable[i].id === idTable){
-                unit = dataStructure.selectionTable[i].unit;
-            }
-        }
-
-        var id = "rowtable"+idTable+rowNumb;
-
-        showBarWithRowElem(id,text,"#bar-"+idTable,"#head-row-table"+idTable,"#table"+idTable,unit);
-    });
+  $('.table-edb').each(function(){
+    var idTable = (!(this.id.slice(-2).indexOf("e") > -1) ? this.id.slice(-2) : this.id.slice(-1));
+    var rowNumb = rowSelected.slice(-1);
+    // Need to account for numbers greater than 10
+    if(!isNaN(rowSelected.slice(-2))){
+      rowNumb = rowSelected.slice(-2);
+    }
+    var unit = "";
+    for(var i = 0; i < dataStructure.selectionTable.length; i++){
+      if(dataStructure.selectionTable[i].id === idTable){
+        unit = dataStructure.selectionTable[i].unit;
+      }
+    }
+    var id = "rowtable"+idTable+rowNumb;
+    showBarWithRowElem(id,text,"#bar-"+idTable,"#head-row-table"+idTable,"#table"+idTable,unit);
+  });
 }
 
+
+/**
+ * Called when the bar graph generated from a single row in a table needs to be updated
+ * */
 function updateTableBarGraph(){
-    $('.table-edb').each(function(){
+  $('.table-edb').each(function(){
+    var idTable = (!(this.id.slice(-2).indexOf("e") > -1) ? this.id.slice(-2) : this.id.slice(-1));// Get the id of the table can be a,b,c,d,ab,cd therefore we have to check if it is two characters
+    var rowNumb = rowSelected.slice(-1);// Grab the row number which is the last character if less than the 10th row
 
-        // Get the id of the table can be a,b,c,d,ab,cd therefore we have to check if it is two characters
-        var idTable = (!(this.id.slice(-2).indexOf("e") > -1) ? this.id.slice(-2) : this.id.slice(-1));
+    // Need to account for numbers greater than 10
+    if(!isNaN(rowSelected.slice(-2))){
+      rowNumb = rowSelected.slice(-2);
+    }
 
-        // Grab the row number which is the last character if less than the 10th row
-        var rowNumb = rowSelected.slice(-1);
+    var unit = "";
+    for(var i = 0; i < dataStructure.selectionTable.length; i++){
+      if(dataStructure.selectionTable[i].id === idTable){
+        unit = dataStructure.selectionTable[i].unit;
+      }
+    }
 
-        // Need to account for numbers greater than 10
-        if(!isNaN(rowSelected.slice(-2))){
-            rowNumb = rowSelected.slice(-2);
-        }
-
-        var unit = "";
-        for(var i = 0; i < dataStructure.selectionTable.length; i++){
-            if(dataStructure.selectionTable[i].id === idTable){
-                unit = dataStructure.selectionTable[i].unit;
-            }
-        }
-
-        var id = "rowtable"+idTable+rowNumb;
-        var text = $("#"+id+" .edb-cell").text();
-
-
-        showBarWithRowElem(id,text,"#bar-"+idTable,"#head-row-table"+idTable,"#table"+idTable,unit);
+    var id = "rowtable"+idTable+rowNumb;
+    var text = $("#"+id+" .edb-cell").text();
+    showBarWithRowElem(id,text,"#bar-"+idTable,"#head-row-table"+idTable,"#table"+idTable,unit);
     });
 }
 
+
+/**
+ * Called when the bar graph generated from a single row in a totals table needs to be updated
+ * */
 function updateTotalsBarGraph(){
     $('.table-tot').each(function(){
         //var idTable = this.id.slice(-1);
         var idTable = (!(this.id.slice(-2).indexOf("l") > -1) ? this.id.slice(-2) : this.id.slice(-1));
-
 
         var unit = "";
         for(var i = 0; i < dataStructure.selectionTable.length; i++){
@@ -445,17 +448,20 @@ function updateTotalsBarGraph(){
         }
 
         var rowNumb = totalsRowSelectedID.slice(-1);
-
         var id = "row-tot-"+idTable+rowNumb;
         var reg = $("#"+id+" .reg-cell").text();
-
         showBarWithRowElem(id,reg,"#tot-bar-"+idTable,"#head-row-totals-"+idTable,"#table-total"+idTable,unit);
     });
 }
 
 
-var totalsRowSelectedID = "";
 
+
+/**
+ * Called when the user clicks on a row in a totals table
+ *
+ * @param id {String} The id of the row clicked
+ * */
 function totalsRowClicked (id){
     var reg = $("#"+id+" .reg-cell").text();
     if(totalsRowSelectedID === id){// Clicked on the same row so unselect
@@ -479,16 +485,11 @@ function totalsRowClicked (id){
         return $(this).text() === reg;
     }).parent().addClass("row-selected"); // Selects edb row in all tables
 
-
-
-
     // if id ends with letter set to id
     totalsRowSelectedID = id;
 
     $('.table-tot').each(function(){
-        //var idTable = this.id.slice(-1);
         var idTable = (!(this.id.slice(-2).indexOf("l") > -1) ? this.id.slice(-2) : this.id.slice(-1));
-
 
         var unit = "";
         for(var i = 0; i < dataStructure.selectionTable.length; i++){
@@ -496,15 +497,10 @@ function totalsRowClicked (id){
                 unit = dataStructure.selectionTable[i].unit;
             }
         }
-
         var rowNumb = totalsRowSelectedID.slice(-1);
-
         var id = "row-tot-"+idTable+rowNumb;
-
         showBarWithRowElem(id,reg,"#tot-bar-"+idTable,"#head-row-totals-"+idTable,"#table-total"+idTable,unit);
     });
-
-    //showBarWithRowElem(id,reg,"#tot-bar-a","#head-row-totals-a","#table-totala");
 }
 
 function showBarWithRowElem(rowID, edb, div, headRow, tableID,unit){
@@ -635,19 +631,6 @@ function loadInSections(fromURL, userSelections){ // if from url false selection
         searchData.selections.forEach(function (selection, i) {
           addOptionsToSelector("#section-select"+selection.id,data.sections,fromURL ? userSelections[i].section : "");
         });
-
-        // Go through each row and add the sections in
-        //for(var i = 0; i < searchData.selections.length; i++){
-        //    for(var j = 0; j < data.sections.length; j++){
-        //        if(fromURL && userSelections[i].section === data.sections[j]){
-        //            $("#section-select"+searchData.selections[i].id+"").append('<option selected>' + data.sections[j] + '</option>');
-        //        } else {
-        //
-        //            $("#section-select"+searchData.selections[i].id+"").append('<option>' + data.sections[j] + '</option>');
-        //        }
-        //    }
-        //    $(".selectpicker").selectpicker('refresh');
-        //}
     });
 }
 
@@ -737,7 +720,7 @@ function addSection(numberSections,searchData){
         var idNumb = event.target.id.charAt(event.target.id.length-1); // Grab the last character of the id that generated the event to work out correct id
 
         // First empty out all options for sub selections
-        $('#category-select'+idNumb,'#subsection-select'+idNumb,'#description-select'+idNumb).html(''); // Empty temp options
+        $('#category-select'+idNumb+',#subsection-select'+idNumb+',#description-select'+idNumb).html(''); // Empty temp options
 
         searchData.selections[idNumb] = {id : numberSections, section : "", category : "", subCategory : "", description : ""};
         searchData.validOptions[idNumb] = false;
