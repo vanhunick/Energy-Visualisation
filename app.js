@@ -13,7 +13,6 @@ var SQLProtection = require('./routes/SQLProtection');
 var index = require('./routes/index');
 var sections = require('./routes/sections');
 var compare = require('./routes/compare');
-var core = require('./routes/core');
 var test = require('./routes/testrunner');
 
 
@@ -50,7 +49,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', index);
 app.use('/sections',sections);
 app.use('/compare',compare);
-//app.use('/core',core);
 //app.use('/test',test);
 
 SQLProtection.createValidSelectionData();

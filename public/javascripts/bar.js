@@ -20,6 +20,7 @@ function BarGraph(id){
     this.svg = null;
 }
 
+var red = '#FF2626'
 
 // If the bargraph does not exists creates a new one and places it in the div else updates already existing graph
 function createBarGraph(divID, tableMax, data, edb, yLabel){
@@ -40,6 +41,18 @@ function createBarGraph(divID, tableMax, data, edb, yLabel){
 function createNewGraph(divID, tableMax, data,edb, yLabel){
   var barGraph = new BarGraph(divID);
   singlebarGraphs.push(barGraph);
+console.log(data)
+  var positive = false;
+  var negative = false;
+  data.forEach(function(d){
+    console.log(d.value);
+    if(d.value >= 0)positive = true;
+    else negative = true;
+  });
+  var mixed = (positive && negative);
+  mixed = true;
+  console.log(mixed)
+
 
   barGraph.svg = d3.select(divID).append("svg")// Create and add the svg
       .attr("width", barWidth + barMargin.left + barMargin.right)
@@ -62,8 +75,9 @@ function createNewGraph(divID, tableMax, data,edb, yLabel){
         .attr("class", "bar single-bar") // add the class attribute
         .attr("x", function(d) { return barGraph.x(d.category); }) // set the x value
         .attr("width", barGraph.x.bandwidth()) // set the barWidth of the bar
-        .attr("y", function(d) { return barGraph.y(d.value); }) // set the y value according to the value
-        .attr("height", function(d) { return barHeight - barGraph.y(d.value); }); // set the barHeight
+        .attr("y", function(d) { return barGraph.y(mixed ?  Math.abs(d.value) : d.value); }) // set the y value according to the value
+        .attr("height", function(d) { return barHeight - barGraph.y((mixed ?  Math.abs(d.value) : d.value)); }) // set the barHeight
+        .attr("fill", function(d) { return d.value > 0 ? 'lightgreen' : red;})
 
         //create the x and y axis
   barGraph.svg.append("g")
@@ -102,12 +116,22 @@ function createNewGraph(divID, tableMax, data,edb, yLabel){
 
 // We do not need table max and the axis should never be updated for a graph
 function updateGraph(barGraph, data, edb){
+  var positive = false;
+  var negative = false;
+  data.forEach(function(d){
+    if(d.value >= 0)positive = true;
+    else negative = true;
+  });
+  var mixed = (positive && negative);
+
   barGraph.svg.selectAll(".bar") // None exist yet but will be created with enter
       .data(data) // enter the data array
       .transition()
       .duration(750)
-      .attr("y", function(d) { return barGraph.y(d.value); }) // set the y value according to the value
-      .attr("height", function(d) { return barHeight - barGraph.y(d.value); }); // set the barHeight
+      .attr("y", function(d) { return barGraph.y((mixed ?  Math.abs(d.value) : d.value)); }) // set the y value according to the value
+      .attr("height", function(d) { return barHeight - barGraph.y((mixed ?  Math.abs(d.value) : d.value)); }) // set the barHeight
+      .attr("fill", function(d) { return d.value > 0 ? 'lightgreen' : red;})
+
 
   barGraph.svg.select("#bar-title").text(edb); // Update the title
 }
