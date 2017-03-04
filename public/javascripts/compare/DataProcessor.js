@@ -359,7 +359,6 @@ DataProcessor.prototype.createDataForGroupedGraph = function(rows){
         } else {
             for(var j = 0; j < data.length; j++){
                 if(data[j].edb === rows[i].edb){
-                    //var value = +rows[i].value;
                     data[j][rows[i].obs_yr] = +rows[i].value;
                 }
             }

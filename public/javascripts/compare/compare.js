@@ -526,7 +526,15 @@ function showBarWithRowElem(rowID, edb, div, headRow, tableID,unit){
         var val = +$(this).attr("origValue");
         max = val > max ? val : max;
     });
-    createBarGraph(div, max, data, edb,unit);
+
+    var min = Infinity;
+    $('.cell', tableID).each(function(){ //cell or th
+      var val = +$(this).attr("origValue");
+      min = val < min ? val : min;
+    });
+
+
+    createBarGraph(div, max,min, data, edb,unit);
 }
 
 

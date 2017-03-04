@@ -23,7 +23,7 @@ function BarGraph(id){
 var red = '#FF2626'
 
 // If the bargraph does not exists creates a new one and places it in the div else updates already existing graph
-function createBarGraph(divID, tableMax, data, edb, yLabel){
+function createBarGraph(divID, tableMax,tableMin, data, edb, yLabel){
   var barGraph = null;
   singlebarGraphs.forEach(function(barElem){
     if(barElem.id === divID){
@@ -32,27 +32,27 @@ function createBarGraph(divID, tableMax, data, edb, yLabel){
   });
 
   if(barGraph === null){
-    createNewGraph(divID, tableMax, data,edb, yLabel);
+    createNewGraph(divID, tableMax, tableMin, data,edb, yLabel);
   } else {
-    updateGraph(barGraph, data,edb);
+    updateGraph(barGraph,tableMax,tableMin,data,edb);
   }
 }
 
-function createNewGraph(divID, tableMax, data,edb, yLabel){
+function createNewGraph(divID, tableMax,tableMin, data,edb, yLabel){
   var barGraph = new BarGraph(divID);
   singlebarGraphs.push(barGraph);
-console.log(data)
-  var positive = false;
-  var negative = false;
-  data.forEach(function(d){
-    console.log(d.value);
-    if(d.value >= 0)positive = true;
-    else negative = true;
-  });
-  var mixed = (positive && negative);
-  mixed = true;
-  console.log(mixed)
 
+  var mixed = (tableMin < 0 && tableMax > 0);
+  var max = 0;
+  if(!mixed && tableMin < 0){
+    max = tableMin; // The top of the graph should be the least number
+  } else if(!mixed) {
+    max = tableMax;
+  }
+
+  if(mixed){
+    max = tableMax;
+  }
 
   barGraph.svg = d3.select(divID).append("svg")// Create and add the svg
       .attr("width", barWidth + barMargin.left + barMargin.right)
@@ -63,7 +63,7 @@ console.log(data)
 
     // Goes through every element in the array and grabs the category (2011,2012,2013 etc)
     barGraph.x.domain(data.map(function(d) { return d.category; }));// The domain represents the min and max values of the data goes through all values and finds max
-    barGraph.y.domain([0, tableMax]); // object should contain a value
+    barGraph.y.domain([0, max]); // object should contain a value
     barGraph.y.nice(); // Rounds up to the nearest whole number
     barGraph.yAxis.scale(barGraph.y);
 
@@ -77,7 +77,7 @@ console.log(data)
         .attr("width", barGraph.x.bandwidth()) // set the barWidth of the bar
         .attr("y", function(d) { return barGraph.y(mixed ?  Math.abs(d.value) : d.value); }) // set the y value according to the value
         .attr("height", function(d) { return barHeight - barGraph.y((mixed ?  Math.abs(d.value) : d.value)); }) // set the barHeight
-        .attr("fill", function(d) { return d.value > 0 ? 'lightgreen' : red;})
+        .attr("fill", function(d) { return  mixed ?  (d.value > 0 ? 'lightgreen' : red) : 'lightgreen';})
 
         //create the x and y axis
   barGraph.svg.append("g")
@@ -115,14 +115,8 @@ console.log(data)
 }
 
 // We do not need table max and the axis should never be updated for a graph
-function updateGraph(barGraph, data, edb){
-  var positive = false;
-  var negative = false;
-  data.forEach(function(d){
-    if(d.value >= 0)positive = true;
-    else negative = true;
-  });
-  var mixed = (positive && negative);
+function updateGraph(barGraph,tableMax, tableMin, data, edb){
+  var mixed = (tableMin < 0 && tableMax > 0);
 
   barGraph.svg.selectAll(".bar") // None exist yet but will be created with enter
       .data(data) // enter the data array
@@ -130,7 +124,7 @@ function updateGraph(barGraph, data, edb){
       .duration(750)
       .attr("y", function(d) { return barGraph.y((mixed ?  Math.abs(d.value) : d.value)); }) // set the y value according to the value
       .attr("height", function(d) { return barHeight - barGraph.y((mixed ?  Math.abs(d.value) : d.value)); }) // set the barHeight
-      .attr("fill", function(d) { return d.value > 0 ? 'lightgreen' : red;})
+      .attr("fill", function(d) { return  mixed ?  (d.value > 0 ? 'lightgreen' : red) : 'lightgreen';}); // If mixed check if negative or not if not mixed just lightgreen
 
 
   barGraph.svg.select("#bar-title").text(edb); // Update the title
