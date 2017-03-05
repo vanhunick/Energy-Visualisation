@@ -1,6 +1,3 @@
-/**
- * Created by Nicky on 23/01/2017.
- */
 // Internet Explorer compatibility
 if (!String.prototype.includes) {
     String.prototype.includes = function() {
@@ -36,9 +33,10 @@ function Data(){
 
 var searchData; // An instance of the Data object
 var dataStructure; // Contains arrays for tables, graphs and combined graphs
+var rowSelected = ""; // Holds the id of the currently selected row in the edb table
+var totalsRowSelectedID = ""; // Holds the id of the selected row in the totals table
+var noCPICells = []; // Hold the original cpi values
 
-var rowSelected = ""; // Holds the id of the currently selected row
-var totalsRowSelectedID = "";
 
 // Object to hold which company belongs to a specific region
 var regions = {
@@ -84,7 +82,6 @@ function loadFromURL(urlSelections){
         // Queries the db for each of the secions and finds and inserts the sub sections as options
         var lastSearch = new Selection(urlSelections[0],urlSelections[1],urlSelections[2],urlSelections[3]); // Set the last search
         var dataTables = dp.filterRowsToTables(data.rows, lastSearch); // Filter the rows into their tables
-        //searchData = new Data(data.rows, lastSearch, dataTables);
         searchData.rows = data.rows;
         searchData.tables = dataTables;
 
@@ -126,7 +123,11 @@ function highlightGraphsOnLoad(selectionsTables){
 function showTables(selectionTablesArray){
     selectionTablesArray.forEach(function (tableData) {
         // Add in the title using the id and the tile / subtitle for each table
-        $('#title-'+tableData.id).append('<h2 class="title">'+tableData.title+'</h2>').append('<h4 class="subTitle">'+tableData.subTitle+'</h4>');
+        if(tableData.id === 'ab' || tableData.id === 'cd'){
+          $('#title-'+tableData.id).append('<h3 class="subTitle">'+tableData.title+'</h3><h3>Over</h3>').append('<h3 class="subTitle">'+tableData.subTitle+'</h3>');
+        } else {
+          $('#title-'+tableData.id).append('<h2 class="title">'+tableData.title+'</h2>').append('<h4 class="subTitle">'+tableData.subTitle+'</h4>');
+        }
         insertTable(tableData.rows,'table'+tableData.id);
         insertTotalsTable(tableData.rows, 'table-total'+tableData.id, regions,false,false); // Creates and inserts the total table
     })
@@ -172,7 +173,7 @@ function showAllCombinedGraphs(selectionData, showTitle){
             $('#title-'+selection.id+'-box').append('<h4 class="combined-title">'+selection.title1+' <br><span class="over">over</span><br>'+selection.title2+'</h4>');
             $('#title-'+selection.id+'-vector').append('<h4 class="combined-title">'+selection.title1+'<br><span class="over">over</span><br>'+selection.title2+'</h4>');
         }
-        // Create data for bar, box and vector graphs and isert into divs
+        // Create data for bar, box and vector graphs and insert into divs
         var tableABData = dp.createDataForGroupedGraph(selection.rows);
         createdGroupedBarGraph(tableABData.data, tableABData.keys, selection.unit1 + " / " + selection.unit2, "#grouped-bar-"+selection.id);
         createBoxPlot(dp.createDataForBoxPlot(selection.rows), "#boxplot"+selection.id+"-div", selection.unit1 + " / " + selection.unit2);
@@ -455,8 +456,6 @@ function updateTotalsBarGraph(){
 }
 
 
-
-
 /**
  * Called when the user clicks on a row in a totals table
  *
@@ -503,6 +502,14 @@ function totalsRowClicked (id){
     });
 }
 
+
+/**
+ * Shows the bar graph on the screen
+ *
+ * @param rowID {String} the id of the row to show with the data for the bar graph
+ * @param edb {String} the edb of the row
+ * @param div {String} the id of the div to put the bar graph in
+ * */
 function showBarWithRowElem(rowID, edb, div, headRow, tableID,unit){
     var data = [];
 
@@ -511,7 +518,6 @@ function showBarWithRowElem(rowID, edb, div, headRow, tableID,unit){
             data.push({category : $(element).text(), value : 0}); // 0 is temp
         }
     });
-
 
     $('#'+rowID).find('th').each(function (index, element) {
         if(index != 0){
@@ -532,13 +538,16 @@ function showBarWithRowElem(rowID, edb, div, headRow, tableID,unit){
       var val = +$(this).attr("origValue");
       min = val < min ? val : min;
     });
-
-
     createBarGraph(div, max,min, data, edb,unit);
 }
 
 
-// highlights the cell based on the percentage of the max value in the table unless already a percentage
+/**
+ * highlights the cell based on the percentage of the max value in the table unless already a percentage
+ *
+ * @param cellValues {Object[]} value of a cell and the table cell id
+ * @param percent {Boolean} if not a percent it should be highlighted based on the percentage of the max value in the cell
+ * */
 function applyGradientCSS(cellValues, percent){
     // Find the max value
     var maxCellValue = -Infinity;
@@ -556,6 +565,10 @@ function applyGradientCSS(cellValues, percent){
     }
 }
 
+
+/**
+ * Called when user clicks search, checks if the search is valid if so creates url and searches.
+ * */
 function search(){
   if(!dp.validateSearchParams(searchData.selections,searchData.validOptions)){
       $('#error-div').append('<h4 style="color : red;">Partial Row Selected</h4>');
@@ -571,11 +584,15 @@ function search(){
         rows["d"+selection.id] = selection.description;
     }
   });
-
   window.location.replace("compare?" + serialise(rows)); // Replace the url with the selections url
 }
 
-// Turns object in url string
+
+/**
+ * Turns object in url string
+ *
+ * @param obj {Object} the object to turn into url
+ * */
 function serialise(obj) {
     var str = [];
     for(var p in obj)
@@ -585,7 +602,13 @@ function serialise(obj) {
     return str.join("&");
 }
 
-// Loads in a selection from the user by grabbing the possible sections, categories, sub categories and descriptions from the DB
+
+/**
+ * Loads in options for each selection drop down from a search.
+ * When the page is loaded from a search the option for that search need to be inserted
+ *
+ * @param selection {Object} one row of selections (section, category etc)
+ * */
 function setSelectionsFromURL(selection){
     // Find all the categories associated with selected section
     getCategoriesFromDatabase(selection.section, function (categories,noResult) {
@@ -608,10 +631,12 @@ function setSelectionsFromURL(selection){
 }
 
 
-// Loads in sections along with the rows of selection boxes
 /**
+ * Loads in the sections along with creating the rows of drop down selection boxes.
+ * Also sets previously selected searches.
  *
- *
+ * @param fromURL {Boolean} if it is called with a query or not
+ * @param userSelections {Object[]} The search from the user (section, category, sub category, and description for each selected row)
  * */
 function loadInSections(fromURL, userSelections){ // if from url false selections is null
     if(!fromURL){
@@ -642,6 +667,7 @@ function loadInSections(fromURL, userSelections){ // if from url false selection
     });
 }
 
+
 /**
  *  Grabs all the categories for a specific section
  *
@@ -664,6 +690,7 @@ function getCategoriesFromDatabase(section, callback){
  *
  * @param section {String} The section to look for distinct categories in
  * @param category {String} The category to look for distinct sub categories in
+ * @param callback {function} The function to call once the query has a result
  * */
 function getSubCategoriesFromDatabase(section, category, callback){
   $.post("/sections/sc",{section : section, category : category}, function(data){
@@ -675,6 +702,16 @@ function getSubCategoriesFromDatabase(section, category, callback){
   });
 }
 
+
+/**
+ * Grabs all description for a specific section, category and sub category if sub category
+ * is not an empty string.
+ *
+ * @param section {String} The section to look for distinct categories in
+ * @param category {String} The category to look for distinct sub categories in
+ * @param subCategory {String} The sub category to look for distinct sub categories in
+ * @param callback {function} The function to call once the query has a result
+ * */
 function getDescriptionsFromDatabase(section,category,subCategory,callback){
   // Find all descriptions for the currently selected sub category
   $.post("/sections/desc",{category : category,section : section, subCategory : subCategory}, function(data){
@@ -686,6 +723,13 @@ function getDescriptionsFromDatabase(section,category,subCategory,callback){
 }
 
 
+/**
+ * Adds the drop down options to one of the selectors
+ *
+ * @param selectorID {String} the id of the drop down
+ * @param options {String[]} the options to add
+ * @param selectedOption {String} the option that should be set as selected
+ * */
 function addOptionsToSelector(selectorID, options, selectedOption){
   $(selectorID).html(''); // Empty temp options
   for(var i = 0; i < options.length; i++){
@@ -787,7 +831,11 @@ function addSection(numberSections,searchData){
 }
 
 
-// Clears a row of selections
+/**
+ * Clears a row of selections
+ *
+ * @param idNumb {Number} the id of the row
+ * */
 function clearSelection(idNumb){
   searchData.selections[idNumb] = {id : idNumb, section : "", category : "", subCategory : "", description : ""};
   searchData.validOptions[idNumb] = false;
@@ -797,7 +845,9 @@ function clearSelection(idNumb){
 }
 
 
-// Set up rules for validating the CPI fields
+/**
+ * Sets up rules for validating CPI fields. Must be a number 1-100
+ * */
 function cpiValidationSetup(){
     $.validator.setDefaults({
             errorClass : 'help-block',
@@ -805,7 +855,7 @@ function cpiValidationSetup(){
             unhighlight :function (element) {$(element).closest('.form-group').removeClass('has-error')}
         }
     );
-    var cpiRules = {required : true, number : true, min : 0, max : 100};
+    var cpiRules = {required : true, number : true, min : 1, max : 100};
     var messageSet = {
         required : "Please enter a percentage",
         number : "Please enter a valid number",
@@ -819,6 +869,11 @@ function cpiValidationSetup(){
     });
 }
 
+
+/**
+ * Called when the apply button for CPI is clicked, calls a number of functions to add cpi to
+ * all graphs and tables where is it applicable.
+ * */
 function applyCPI(){
     if($('#cpi-form').valid()){
         if(noCPICells.length > 0){
@@ -857,8 +912,15 @@ function applyCPI(){
     }
 }
 
-// Applies the CPI to rows of data
+
+/**
+ * Applies cpi values to the rows by chaning the value in each row with the compounded cpi values
+ *
+ * @param rows {Object[]} the rows
+ * @param cpiValues {Object[]} contains the cpi for each year
+ * */
 function applyCPIToTableRows(rows, cpiValues){
+
     // Find the min and max year from the data
     var minYear = rows.reduce(function(prev, curr) {
         return prev.disc_yr < curr.disc_yr ? prev : curr;
@@ -871,7 +933,6 @@ function applyCPIToTableRows(rows, cpiValues){
     for(var cur = minYear; cur <=maxYear; cur++){ // Go through each possible year
         rows.forEach(function(elem, index){ // Grab every Row
             var year = rows[index].obs_yr; // Grab the year of the cell by checking the class
-
             var valueOfCell = rows[index].value;
 
             for(var i = 0; i < cpiValues.length; i++){
@@ -886,9 +947,13 @@ function applyCPIToTableRows(rows, cpiValues){
     }
 }
 
-var noCPICells = []; // Hold the original cpi values
 
-// Applies cpi values to the table with div id table
+/**
+ * Applies cpi values to the table
+ *
+ * @param table {String} the id of the div
+ * @param cpiValues {Object[]} contains the cpi for each year
+ * */
 function applyCPIToTable(table, cpiValues){
     $('.cell', table).each(function(){ // Backup the values from the cells
         noCPICells.push({id : $(this).attr('id'), value : $(this).text()});
@@ -904,7 +969,7 @@ function applyCPIToTable(table, cpiValues){
     });
 
     for(var cur = minYear; cur <=maxYear; cur++){ // Go through each possible year
-        $('.cell', table).each(function(index){ // Grab every cell
+        $('.cell', table).each(function(){ // Grab every cell
             var year = +$(this).attr("class").split(' ')[1]; // Grab the year of the cell by checking the class
             var valueOfCell = $(this).attr("origvalue");
             for(var i = 0; i < cpiValues.length; i++){
@@ -912,7 +977,6 @@ function applyCPIToTable(table, cpiValues){
                     if(year <= cur){
                         valueOfCell = valueOfCell * (1 + (cpiValues[i].value / 100));
                         valueOfCell = searchData.dpFormat(valueOfCell);
-
                     }
                 }
             }
@@ -922,6 +986,10 @@ function applyCPIToTable(table, cpiValues){
     applyGradientCSS(noCPICells); // Highlights the cell based on the value compared to the max in the table
 }
 
+
+/**
+ * Sets the value of cells back to the original value
+ * */
 function revertCPI(){
     noCPICells.forEach(function(e){
         $('#'+e.id).text(searchData.dpFormat(e.value));
