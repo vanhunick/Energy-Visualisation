@@ -1,6 +1,3 @@
-/**
- * Created by Nicky on 15/01/2017.
- */
 var express = require('express');
 var router = express.Router();
 var pg = require('pg');
@@ -10,16 +7,17 @@ var SQLProtection = require("./SQLProtection");
 // finds all categories that match a section
 router.post('/s', function(req, res, next) {
 
+    // Check that the section exists in the database before putting it in a query
     if(!SQLProtection.validSection(req.body.selected)){
         res.send({categories: []});
         return;
     }
 
+    // Construct the query
     var queryString = squel.select()
         .from("large_strata_energy")
         .field("category").distinct()
         .where("section = '"+req.body.selected+"'").toString();
-
 
     // Connect to the database
     pg.connect(global.databaseURI, function (err, client, done) {
@@ -34,9 +32,7 @@ router.post('/s', function(req, res, next) {
 
         client.query(queryString, function (error, result) {
             done();
-
             var categories = [];
-
             if (error) {
                 console.error('Failed to execute query');
                 console.error(error);
@@ -56,7 +52,6 @@ router.post('/s', function(req, res, next) {
 
 // Finds all sub categories
 router.post('/sc', function(req, res, next) {
-
     if(!SQLProtection.validCategory(req.body.category)){
         res.send({subCategories: []});
         return;
@@ -90,7 +85,6 @@ router.post('/sc', function(req, res, next) {
         client.query(queryString.toString(), function (error, result) {
             done();
             var subCategories = [];
-
             if (error) {
                 console.error('Failed to execute query');
                 console.error(error);
@@ -101,13 +95,11 @@ router.post('/sc', function(req, res, next) {
                     subCategories.push(c);
                 }
                 res.send({subCategories: subCategories});
-
                 return;
             }
         })
     });
 });
-
 
 
 // Finds all descriptions
@@ -124,7 +116,6 @@ router.post('/desc', function(req, res, next) {
         return;
     }
 
-
     var queryString = squel.select()
         .from("large_strata_energy")
         .field("description").distinct();
@@ -140,13 +131,11 @@ router.post('/desc', function(req, res, next) {
             res.send({descriptions: []});
             return;
         }
-
         queryString = queryString.where("section = '"+ req.body.section + "'")
             .where("sub_category = '"+ req.body.subCategory+ "'").toString(); // Adds subcategory clause
     } else {
         queryString = queryString.where("section = '"+ req.body.section + "'").toString();
     }
-
 
     // Connect to the database
     pg.connect(global.databaseURI, function (err, client, done) {
@@ -180,7 +169,7 @@ router.post('/desc', function(req, res, next) {
     });
 });
 
-
+// Finds all companies
 router.get('/company', function(req, res) {
 
     var queryString = squel.select()
@@ -198,12 +187,9 @@ router.get('/company', function(req, res) {
             console.error(err);
             return;
         }
-
         client.query(queryString, function (error, result) {
             done();
-
             var companies = [];
-
             if (error) {
                 console.error('Failed to execute query');
                 console.error(error);
@@ -220,7 +206,7 @@ router.get('/company', function(req, res) {
     });
 });
 
-
+// Returns all sections
 router.get('/sections', function(req, res) {
     var queryString = squel.select()
         .from("large_strata_energy")
@@ -237,12 +223,9 @@ router.get('/sections', function(req, res) {
             console.error(err);
             return;
         }
-
         client.query(queryString, function (error, result) {
             done();
-
             var sections = [];
-
             if (error) {
                 console.error('Failed to execute query');
                 console.error(error);
@@ -259,6 +242,7 @@ router.get('/sections', function(req, res) {
     });
 });
 
+// Returns all rows for a search
 router.post('/search', function(req, res, next) {
     // Check valid section
     if(!SQLProtection.validSection(req.body.section)){
