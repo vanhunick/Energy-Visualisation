@@ -20,9 +20,6 @@
   },
   "devDependencies": {
     "chai": "^3.5.0",
-    "grunt": "^1.0.1",
-    "grunt-contrib-cssmin": "^2.0.0",
-    "grunt-contrib-uglify": "^2.1.0",
     "gulp": "^3.9.1",
     "gulp-clean-css": "^3.0.3",
     "gulp-concat": "^2.6.1",

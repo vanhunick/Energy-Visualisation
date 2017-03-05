@@ -4,9 +4,9 @@
 var labels = false; // show the text labels beside individual boxplots?
 
 // Margins and graph width / height
-var boxMargin = {top: 0, right: 0, bottom: 80, left: 100},
-    boxWidth = 700 - boxMargin.left - boxMargin.right,
-    boxHeight = 550  - boxMargin.top  - boxMargin.bottom;
+var boxMargin = {top: 0, right: 100, bottom: 80, left: 100},
+    boxWidth = 600 - boxMargin.left - boxMargin.right,
+    boxHeight = 350  - boxMargin.top  - boxMargin.bottom;
 
 
 // Encapsulate all properties of graph
@@ -118,7 +118,7 @@ function createBoxPlot(dataObject,divID,unit){
             .data(scatterData)
             .enter().append("circle")
             .attr("class",function(d){return "dot "+d.edb.replace(/ /g , "");})
-            .attr("r", 1.75)
+            .attr("r", 2)
             .attr("cx", function(d) { return boxPlotObjects.x(d.year) + whiskBoxWidth/2; })
             .attr("cy", function(d) { return boxPlotObjects.y(d.value); })
             .on('mouseover', tip.show)

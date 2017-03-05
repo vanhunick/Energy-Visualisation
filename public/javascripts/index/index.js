@@ -137,7 +137,7 @@ $(document).ready( function() {
 
 
 
-
+var maxTableValue = 0;
 
 // Creates a table with the given rows
 function insertDataTable(rows){
@@ -243,20 +243,21 @@ function insertDataTable(rows){
         }
     }
 
-    // Apllie css to each cell
+
+    var max = -Infinity;
+    // apllys css to each cell
     for(var i = 0; i < cellValues.length; i++){
-        $(cellValues[i].id).css(
-            {
-                "background" : "-webkit-gradient(linear, left top, right top, color-stop(" + cellValues[i].value +"%,#F00), color-stop(" + cellValues[i].value +"%,#FFF))",
-            }
+        if(+cellValues[i].value > max){max = +cellValues[i].value;}
+        $(cellValues[i].id).css({
+              "background" : "-webkit-gradient(linear, left top, right top, color-stop(" + cellValues[i].value +"%,#F00), color-stop(" + cellValues[i].value +"%,#FFF))",
+          }
         );
     }
-
+    maxTableValue = max;
 }
 
 function showBarWithRowElem(rowID){
     var data = [];
-
 
     // set the row selected
     $('#results-table').find('tr').removeClass('row-selected');
@@ -279,7 +280,8 @@ function showBarWithRowElem(rowID){
         }
     });
 
-    createBarGraph(title, data);
+    console.log(maxTableValue);
+    createBarGraph("#graph-div", maxTableValue, data);
 }
 
 
@@ -295,7 +297,3 @@ function insertCompanies(){
         $(".selectpicker").selectpicker('refresh');
     });
 }
-
-
-// New potentially for changing the url when search is clicked
-

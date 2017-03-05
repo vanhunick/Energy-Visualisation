@@ -12,6 +12,17 @@ body {
   background: #F6F4F3;
 }
 
+.table-edb {
+  /*margin-left: 2%;*/
+  /*margin-right: 2%;*/
+}
+
+.table-tot {
+  /*margin-left: 2%;*/
+  /*margin-right: 10%;*/
+  margin-top: 4%;
+}
+
 .page-title {
   font-size: 400%;
   color: #376996;
@@ -19,6 +30,9 @@ body {
 }
 
 
+.single-bar {
+  /*fill : lightgreen;*/
+}
 
 a {
   color: #00B7FF;
@@ -48,7 +62,7 @@ a {
 }
 
 .subTitle {
-  margin-bottom: 2px;
+  margin-bottom: 10px;
   color: black;
   font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
@@ -126,6 +140,8 @@ a {
   /*font: 10px sans-serif;*/
 }
 
+
+
 /*.box circle*/
 .box line,
 .box rect {
@@ -201,6 +217,7 @@ a {
 
 .tab-background {
   background: #376996;
+  background: lightgrey;
 }
 
 .g-text {
@@ -215,6 +232,12 @@ a {
   shape-rendering: crispEdges;
 }
 
+/*Each table has this class to space from the border*/
+.table-col {
+  margin-right: 1%;
+  margin-left: 1%;
+}
+
 /*D3 TIP CSS*/
 .d3-tip {
   line-height: 1;
@@ -223,6 +246,10 @@ a {
   background: rgba(0, 0, 0, 0.8);
   color: #fff;
   border-radius: 2px;
+}
+
+.total-title {
+  margin-top: 10%;
 }
 
 /* Creates a small triangle extender for the tooltip */

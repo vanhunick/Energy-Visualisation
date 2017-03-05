@@ -1,33 +1,27 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <title>Mocha Tests</title>
     <% include ../views/templates/head %>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mocha/3.2.0/mocha.min.js"></script>
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/mocha/3.2.0/mocha.min.js.map"></script> -->
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mocha/3.2.0/mocha.min.css">
-    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mocha/3.2.0/mocha.min.css.map"> -->
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chai/3.5.0/chai.min.js"></script>
+</head>
+<body>
+<div id="mocha"></div>
+<script>mocha.setup('bdd')</script>
 
-  </head>
-  <body>
-    <div id="mocha"></div>
-
-
-    <script>mocha.setup('bdd')</script>
-
-    <!-- load code you want to test here -->
-    <script src="javascripts/compare.js"></script>
+<!-- load code you want to test here -->
+<script src="javascripts/compare/DataProcessor.js"></script>
+<script src="javascripts/compare/compare.js"></script>
 
 
-    <!-- load your test files here -->
-    <script src="tests/compareTests.js"></script>
+<!-- load your test files here -->
+<script src="tests/DataProcessorTests.js"></script>
+<script src="tests/CompareTests.js"></script>
 
-    <script>
-      mocha.run();
-    </script>
-  </body>
+<script>
+    mocha.run();
+</script>
+</body>
 </html>

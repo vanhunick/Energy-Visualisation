@@ -1,7 +1,7 @@
 //  Margins and width / height for the graph
-var margin = { top: 35, right: 85, bottom: 150, left: 50 },
+var margin = { top: 25, right: 85, bottom: 150, left: 50 },
     width = 850 - margin.left - margin.right,
-    height = 550 - margin.top - margin.bottom;
+    height = 500 - margin.top - margin.bottom;
 
 // The array that holds the GroupedBarData objects for every graph on the page
 var barGraphs = [];
@@ -144,7 +144,7 @@ function createdGroupedBarGraph(data,keys,yLabel, divID){
         .attr("dy", ".35em")
         .attr("class", "axis-text")
         .attr("transform", "rotate(55)")
-        .style("font-size", "8px")
+        .style("font-size", "11px")
         .style("text-anchor", "start");
 
     // Update y axis or create it

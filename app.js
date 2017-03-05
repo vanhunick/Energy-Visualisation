@@ -1,3 +1,4 @@
+// Modules
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -5,16 +6,17 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var postgres = require('pg');
+var auth = require('http-auth');
 
-
+// Routes
 var SQLProtection = require('./routes/SQLProtection');
-
 var index = require('./routes/index');
 var sections = require('./routes/sections');
 var compare = require('./routes/compare');
-var core = require('./routes/core');
+var test = require('./routes/testrunner');
 
-var auth = require('http-auth');
+
+// Authentication
 var basic = auth.basic({
     realm: "Private Area",
     file: __dirname + "/htpasswd",
@@ -23,20 +25,21 @@ var basic = auth.basic({
 
 var app = express();
 
+// Use authentication
 app.use(auth.connect(basic));
 
 // Local db
 global.databaseURI = "postgres://Admin:admin@localhost:5432/Energy";
 
 // Heroku db
-global.databaseURI = process.env.DATABASE_URL;
+// global.databaseURI = process.env.DATABASE_URL;
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 // uncomment after placing your favicon in /public
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+app.use(favicon(path.join(__dirname, 'public','images', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -46,7 +49,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', index);
 app.use('/sections',sections);
 app.use('/compare',compare);
-app.use('/core',core);
+//app.use('/test',test);
 
 SQLProtection.createValidSelectionData();
 
