@@ -565,13 +565,17 @@ function applyGradientCSS(cellValues, percent){
     }
 }
 
+var error = false;
 
 /**
  * Called when user clicks search, checks if the search is valid if so creates url and searches.
  * */
 function search(){
   if(!dp.validateSearchParams(searchData.selections,searchData.validOptions)){
-      $('#error-div').append('<h4 style="color : red;">Partial Row Selected</h4>');
+      if(!error){
+        $('#error-div').append('<h4 style="color : red;">Partial Row Selected</h4>');
+        error = true;
+      }
       return; // First check if the selection is valid
   }
 
