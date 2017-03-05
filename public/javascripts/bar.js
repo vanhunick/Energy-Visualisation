@@ -4,8 +4,8 @@
 
 // Specifies the barMargins and barWidth/barHeight of the svg
 var barMargin = { top: 60, right: 20, bottom: 50, left: 50 },
-    barWidth = 450 - barMargin.left - barMargin.right,
-    barHeight = 400 - barMargin.top - barMargin.bottom;
+    barWidth = 550 - barMargin.left - barMargin.right,
+    barHeight = 500 - barMargin.top - barMargin.bottom;
 
 
 var singlebarGraphs = [];

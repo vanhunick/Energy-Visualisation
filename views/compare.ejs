@@ -17,8 +17,6 @@
     <div class="col-md-12 text-center">
         <h1 class="page-title">Core Metrics</h1>    
     </div>
-    
-
     <!-- Row for company select -->
     <!--<div class="row">-->
         <!--<div class="col-md-12">-->
@@ -28,7 +26,6 @@
             <!--</select>-->
         <!--</div>-->
     <!--</div>-->
-
     <!-- Div that hold the rows of selections -->
     <div id="compare-div"></div>
 
@@ -116,18 +113,19 @@
                                 <div class="row">
                                     <h2 class="table-title"><b>Selection A</b></h2>
                                     <div id="title-a" class="text-center"></div>
-                                    <div class="col-md-6 text-center ">
+                                    <div class="col-md-5 text-center table-col" style="margin-right: 3%;">
                                         <table class="table table-edb" id="tablea"></table>
                                     </div>
-                                    <div class="col-md-6 text-left" id="bar-a"></div>
+                                    <div class="col-md-6 text-center" id="bar-a"></div>
                                 </div>
 
                                 <!-- Row for table totals -->
                                 <div class="row">
-                                    <div class="col-md-6 text-center ">
+                                    <div class="col-md-5 text-center table-col">
+                                        <h2 class="total-title">Region Averages</h2>
                                         <table class="table table-tot" id="table-totala"></table>
                                     </div>
-                                    <div class="col-md-6 text-left" id="tot-bar-a"></div>
+                                    <div class="col-md-6 text-center" id="tot-bar-a"></div>
                                 </div>
 
                                 <!-- Row for bar graph -->
@@ -139,7 +137,7 @@
                                 <!-- Row for box and whisker graph -->
                                 <div class="row text-center whisk-row">
                                     <div id="title-a-box" class="text-center"></div>
-                                    <div class="col-lg-12 text-center" id="boxplota-div"></div>
+                                    <div class="col-lg-12 text-center" style=" margin-left: 10%;" id="boxplota-div"></div>
                                 </div>
                             </div>
                         </div>
@@ -152,18 +150,19 @@
                                 <div class="row">
                                     <h2 class="table-title"><b>Selection B</b></h2>
                                     <div id="title-b" class="text-center"></div>
-                                    <div class="col-md-6 text-center">
+                                    <div class="col-md-5 text-center table-col">
                                         <table class="table table-edb" id="tableb"></table>
                                     </div>
-                                    <div class="col-md-6 text-left" id="bar-b"></div>
+                                    <div class="col-md-6 text-center" id="bar-b"></div>
 
                                 </div>
                                 <!-- Row for table totals -->
                                 <div class="row">
-                                    <div class="col-md-6 text-center ">
+                                    <div class="col-md-5 text-center table-col">
+                                        <h2 class="total-title">Region Averages</h2>
                                         <table class="table table-tot" id="table-totalb"></table>
                                     </div>
-                                    <div class="col-md-6 text-left" id="tot-bar-b"></div>
+                                    <div class="col-md-6 text-center" id="tot-bar-b"></div>
                                 </div>
                                 <div class="row group-row">
                                     <div id="title-b-bar" class="text-center"></div>
@@ -184,17 +183,18 @@
                                 <div class="row">
                                     <h2 class="table-title"><b>Selection C</b></h2>
                                     <div id="title-c" class="text-center"></div>
-                                    <div class="col-md-6 text-center">
+                                    <div class="col-md-5 text-center table-col">
                                         <table class="table table-edb" id="tablec"></table>
                                     </div>
-                                    <div class="col-md-6 text-left" id="bar-c"></div>
+                                    <div class="col-md-6 text-center" id="bar-c"></div>
                                 </div>
                                 <!-- Row for table totals -->
                                 <div class="row">
-                                    <div class="col-md-6 text-center ">
+                                    <div class="col-md-5 text-center table-col">
+                                        <h2 class="total-title">Region Averages</h2>
                                         <table class="table table-tot" id="table-totalc"></table>
                                     </div>
-                                    <div class="col-md-6 text-left" id="tot-bar-c"></div>
+                                    <div class="col-md-6 text-center" id="tot-bar-c"></div>
                                 </div>
                                 <div class="row group-row">
                                     <div id="title-c-bar" class="text-center"></div>
@@ -215,17 +215,18 @@
                                 <div class="row">
                                     <h2 class="table-title"><b>Selection D</b></h2>
                                     <div id="title-d" class="text-center"></div>
-                                    <div class="col-md-6 text-center">
+                                    <div class="col-md-5 text-center table-col">
                                         <table class="table table-edb" id="tabled"></table>
                                     </div>
-                                    <div class="col-md-6 text-left" id="bar-d"></div>
+                                    <div class="col-md-6 text-center" id="bar-d"></div>
                                 </div>
                                 <!-- Row for table totals -->
                                 <div class="row">
-                                    <div class="col-md-6 text-center ">
+                                    <div class="col-md-5 text-center table-col">
+                                        <h2 class="total-title">Region Averages</h2>
                                         <table class="table table-tot" id="table-totald"></table>
                                     </div>
-                                    <div class="col-md-6 text-left" id="tot-bar-d"></div>
+                                    <div class="col-md-6 text-center" id="tot-bar-d"></div>
                                 </div>
                                 <div class="row group-row">
                                     <div id="title-d-bar" class="text-center"></div>
@@ -247,17 +248,18 @@
                                 <div class="row">
                                     <h2 class="table-title"><b>Table selection  A over  selection B</b></h2>
                                     <div id="title-ab" class="text-center"></div>
-                                    <div class="col-md-6 text-center">
+                                    <div class="col-md-5 text-center table-col">
                                         <table class="table table-edb" id="tableab"></table>
                                     </div>
-                                    <div class="col-md-6 text-left" id="bar-ab"></div>
+                                    <div class="col-md-6 text-center" id="bar-ab"></div>
                                 </div>
                                 <!-- Row for table totals -->
                                 <div class="row">
-                                    <div class="col-md-6 text-center ">
+                                    <div class="col-md-5 text-center table-col">
+                                        <h2 class="total-title">Region Averages</h2>
                                         <table class="table table-tot" id="table-totalab"></table>
                                     </div>
-                                    <div class="col-md-6 text-left" id="tot-bar-ab"></div>
+                                    <div class="col-md-6 text-center" id="tot-bar-ab"></div>
                                 </div>
                                 <div class="row group-row">
                                     <div id="title-ab-bar" class="row text-center graph-title"></div>
@@ -285,18 +287,18 @@
                                 <div class="row">
                                     <h2 class="table-title "><b>Table selection  C over selection D</b></h2>
                                     <div id="title-cd" class="text-center"></div>
-                                    <div class="col-md-6 text-center">
+                                    <div class="col-md-5 text-center table-col">
                                         <table class="table table-edb" id="tablecd"></table>
                                     </div>
-                                    <div class="col-md-6 text-left" id="bar-cd"></div>
-                                    <!--<div class="col-md-2"></div>-->
+                                    <div class="col-md-6 text-center" id="bar-cd"></div>
                                 </div>
                                 <!-- Row for table totals -->
                                 <div class="row">
-                                    <div class="col-md-6 text-center ">
+                                    <div class="col-md-5 text-center table-col">
+                                        <h2 class="total-title">Region Averages</h2>
                                         <table class="table table-tot" id="table-totalcd"></table>
                                     </div>
-                                    <div class="col-md-6 text-left" id="tot-bar-cd"></div>
+                                    <div class="col-md-6 text-center" id="tot-bar-cd"></div>
                                 </div>
                                 <div class="row group-row">
                                     <div id="title-cd-bar" class="text-center  graph-title"></div>
