@@ -1,52 +1,53 @@
 body {
   padding: 50px;
-  /*font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;*/
   font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
-
   background: #F6F7F8;
 }
+/* Core metrics*/
 
-/*The div that contains the table and the graphs*/
-.full-table{
-  background:#F0F0F0;
-  background: #F6F4F3;
+/*Container that holds all content on the core metrics page*/
+#compare-container {
+  margin-left: 0.5%;
+  margin-right: 0.5%;
 }
 
-.table-edb {
-  /*margin-left: 2%;*/
-  /*margin-right: 2%;*/
-}
-
-.table-tot {
-  /*margin-left: 2%;*/
-  /*margin-right: 10%;*/
-  margin-top: 4%;
-}
-
+/* The core metrics title at the very top of the page*/
 .page-title {
   font-size: 400%;
   color: #376996;
   font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
-
-.single-bar {
-  /*fill : lightgreen;*/
+/* Class for wrapper divs that contains the table and the graphs*/
+.full-table{
+  background: #F6F4F3;
 }
 
-a {
-  color: #00B7FF;
+/* Class for the region totals table */
+.table-tot {
+  margin-top: 4%; /*Align the table better with the bar graph**/
 }
 
-/*The selection for a table Section and category*/
+/*The selection for a table description and category*/
 .title {
   color: steelblue;
-  font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
-/*The text for graph axis*/
-.axis-text {
-  fill : black;
+/* The subtitle for a table*/
+.subTitle {
+  margin-bottom: 10px;
+  color: black;
+}
+
+/*The div the grouped bar graph is inserted*/
+.group-row {
+  margin-top: 2%;
+}
+
+/*The div the box and whisker plot is inserted*/
+.whisk-row {
+  margin-top: 2%;
+  padding-bottom: 2%;
 }
 
 /*For span with 'over' in graph titles*/
@@ -55,22 +56,10 @@ a {
   font-weight: bold;
 }
 
-/*The graph titles inserted*/
+/*The graph titles div*/
 .graph-title {
   margin-left: 15%;
   margin-right: 15%;
-}
-
-.subTitle {
-  margin-bottom: 10px;
-  color: black;
-  font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
-}
-
-/*Container that holds all content on the compare page*/
-#compare-container {
-  margin-left: 0.5%;
-  margin-right: 0.5%;
 }
 
 /*The titles above selection boxes*/
@@ -89,43 +78,48 @@ a {
   width: 100%;
 }
 
+/*CPI title*/
+#cpi-header {
+  margin-top: 0.5%;
+}
+
 /*Holds the rows of selections*/
 #compare-div {
   margin-top: 1%;
   margin-bottom: 1%;
 }
 
-/*CPI title*/
-#cpi-header {
-  margin-top: 0.5%;
-}
-
-/*Each of the selection dropdown menus*/
+/*Each of the selection drop down menus*/
 .select-compare {
   margin-right: 0.2%;
 }
 
-/*The title that says which selection the tab is for*/
+/*The title that says which selection the tab is for 'selection A' for example*/
 .table-title {
   color: black;
 }
 
-/*A cell in the tables*/
+/*A cell in a table*/
 .cell {
   border: 1px solid darkgrey;
   padding-right: 0px;
-  margin-right: 200px;
-
+  margin-right: 200px; //TODO why
 }
 
-/*The rows in the table*/
+/*The rows in the tables*/
 .table-row {
   border: 1px solid lightgrey;
   color: black;
   background-color: white;
 }
 
-/*tHe class added and removed from table rows when they are clicked on*/
+/*Each table has this class to space from the border*/
+.table-col {
+  margin-right: 1%;
+  margin-left: 1%;
+}
+
+/*The class added and removed from table rows when they are clicked on*/
 .row-selected {
   color: green;
 }
@@ -135,119 +129,19 @@ a {
   display: none;
 }
 
-/*Box plot CSS*/
-.box {
-  /*font: 10px sans-serif;*/
-}
-
-
-
-/*.box circle*/
-.box line,
-.box rect {
-  fill: #64B5F6;
-  stroke: #000; /* circle stroke*/
-  stroke-width: 1px;
-}
-
-/*Dot for scatter plot*/
-.dot {
-  fill : #FFFF66;
-  stroke: #000;
-  stroke-width: 1px;
-}
-
-/*A selected point on the vector graph*/
-.vec-dot-selected {
-  stroke-width : 2;
-  stroke : green;
-  fill : #90EE90;
-}
-
-.box .center {
-  stroke-dasharray: 3,3;
-}
-
-.group-row {
-  margin-top: 2%;
-}
-
-.whisk-row {
-  margin-top: 2%;
-  padding-bottom: 2%;
-}
-
-.box .outlier {
-  fill: none;
-  stroke: #000;
-}
-
-.cap {
-  font-size: 24px;
-  color: steelblue;
-}
-
-
 /*The top row of each table with EBD header and years*/
 .table-head {
-  font-size: 16px;
+  font-size: 1.2em;
   color: black;
-  /*font-weight: bold;*/
   background: lightgrey;
 }
 
-
-.axis {
-  font: 8px sans-serif;
-  shape-rendering: crispEdges;
-}
-
-.axis path,
-.axis line {
-  fill: none;
-  stroke: black;
-  shape-rendering: crispEdges;
-}
-
-.x.axis path {
-  fill: none;
-  stroke: black;
-  shape-rendering: crispEdges;
-}
-
+/* The background of the tabs, creates a border*/
 .tab-background {
-  background: #376996;
   background: lightgrey;
 }
 
-.g-text {
-  stroke: none;
-  fill: black;
-  shape-rendering: crispEdges;
-
-}
-
-.unit-text {
-  fill: steelblue;
-  shape-rendering: crispEdges;
-}
-
-/*Each table has this class to space from the border*/
-.table-col {
-  margin-right: 1%;
-  margin-left: 1%;
-}
-
-/*D3 TIP CSS*/
-.d3-tip {
-  line-height: 1;
-  font-weight: bold;
-  padding: 12px;
-  background: rgba(0, 0, 0, 0.8);
-  color: #fff;
-  border-radius: 2px;
-}
-
+/* The title 'Region totals'*/
 .total-title {
   margin-top: 10%;
 }
@@ -265,51 +159,8 @@ a {
   text-align: center;
 }
 
-/* Style northward tooltips differently */
-.d3-tip.n:after {
-  margin: -1px 0 0 0;
-  top: 100%;
-  left: 0;
-}
-
-.line-selected {
-  stroke-width : 5;
-}
-
-.line-selected-table {
-  stroke-width : 5;
-}
-
-.y-group {
-  font: 8px sans-serif;
-  fill : #fff;
-}
-
-/*Used to make svg responsive*/
-.svg-container {
-	display: inline-block;
-	position: relative;
-  text-align: center;
-	width: 85%;
-	padding-bottom: 0.5%;
-	vertical-align: middle;
-	overflow: hidden;
-}
-
-/*Used to make svg responsive*/
-.svg-container-box {
-	display: inline-block;
-  text-align: center;
-	position: relative;
-	width: 65%;
-	padding-bottom: 2%;
-	vertical-align: middle;
-	overflow: hidden;
-}
-
 /*Nav bar css*/
 /*https://work.smarchal.com/twbscolor/css/e74c3cc0392becf0f1ffbbbc0*/
-
 .navbar-default {
   background-color: #e74c3c;
   border-color: #c0392b;

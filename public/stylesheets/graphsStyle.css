@@ -1,0 +1,130 @@
+/*The text for graph axis*/
+.axis-text {
+    fill : black;
+}
+
+/*The text for scaled graph axis*/
+.axis-text-scaled {
+    fill : black;
+    font-size: 1em;
+}
+
+/*The text for the units on the graphs*/
+.unit-text {
+    fill: steelblue;
+    shape-rendering: crispEdges;
+    font-family: sans-serif;
+    font-size: 1em;
+}
+
+/*The text for the units on the scaled graphs*/
+.unit-text-scaled {
+    fill: steelblue;
+    shape-rendering: crispEdges;
+    font-family: sans-serif;
+    font-size: 0.6em;
+}
+
+/*Box plot CSS*/
+/*.box circle*/
+.box line,
+.box rect {
+    fill: #64B5F6;
+    stroke: #000; /* circle stroke*/
+    stroke-width: 1px;
+}
+
+
+/*Dot for scatter plot*/
+.dot {
+    fill : #FFFF66;
+    stroke: #000;
+    stroke-width: 1px;
+}
+
+/*A selected point on the vector graph*/
+.vec-dot-selected {
+    stroke-width : 2;
+    stroke : green;
+    fill : #90EE90;
+}
+
+/* The vertical center line of the box plot*/
+.box .center {
+    stroke-dasharray: 3,3;
+}
+
+/* The outliers of the box plot points*/
+.box .outlier {
+    fill: none;
+    stroke: #000;
+}
+
+/* The font size of the axis*/
+.axis {
+    font: 8px sans-serif;
+    shape-rendering: crispEdges;
+}
+
+/*The axis line and path*/
+.axis path,
+.axis line {
+    fill: none;
+    stroke: black;
+    shape-rendering: crispEdges;
+}
+
+/*The text of the vector graph key*/
+.vector-key-text {
+    font-family: sans-serif;
+    font-size: 12px;
+}
+
+/*d3 tip css*/
+.d3-tip {
+    line-height: 1;
+    font-weight: bold;
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    border-radius: 2px;
+}
+
+/* Style northward tooltips differently */
+.d3-tip.n:after {
+    margin: -1px 0 0 0;
+    top: 100%;
+    left: 0;
+}
+
+/* Line selected in vector graph by hovering over key*/
+.line-selected {
+    stroke-width : 5;
+}
+
+/* Line selected in vector graph by clicking on a edb in a table*/
+.line-selected-table {
+    stroke-width : 5;
+}
+
+/*Used to make svg responsive*/
+.svg-container {
+    display: inline-block;
+    position: relative;
+    text-align: center;
+    width: 80%;
+    padding-bottom: 0.5%;
+    vertical-align: middle;
+    overflow: hidden;
+}
+
+/*Used to make svg responsive*/
+.svg-container-box {
+    display: inline-block;
+    text-align: center;
+    position: relative;
+    width: 65%;
+    padding-bottom: 2%;
+    vertical-align: middle;
+    overflow: hidden;
+}
