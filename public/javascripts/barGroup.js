@@ -76,6 +76,11 @@ function createdGroupedBarGraph(data,keys,yLabel, divID){
     // Set the domains
     curBarGraph.x0.domain(data.map(function(d) { return d.edb; }));
     curBarGraph.x1.domain(keys).rangeRound([0, curBarGraph.x0.bandwidth()]);
+
+  if(divID.includes('ab')){
+    console.log(d3.max(data, function(d) { return d3.max(keys, function(key) { return Math.abs(d[key]); }); }));
+  }
+
     curBarGraph.y.domain([0, d3.max(data, function(d) { return d3.max(keys, function(key) { return Math.abs(d[key]); }); })]).nice();
     var g = curBarGraph.svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
@@ -142,9 +147,8 @@ function createdGroupedBarGraph(data,keys,yLabel, divID){
         .attr("y", 0)
         .attr("x", 9)
         .attr("dy", ".35em")
-        .attr("class", "axis-text")
+        .attr("class", "axis-text-scaled")
         .attr("transform", "rotate(55)")
-        .style("font-size", "11px")
         .style("text-anchor", "start");
 
     // Update y axis or create it
@@ -153,7 +157,7 @@ function createdGroupedBarGraph(data,keys,yLabel, divID){
     } else {
         g.append("g")
             .attr("class", "axis yAxis y-group")
-            .call(curBarGraph.yAxis.scale(curBarGraph.y).ticks(null, "s"))
+            .call(curBarGraph.yAxis.scale(curBarGraph.y))//.ticks(null, "s")
             .append("text")
             .attr("x", 2)
             .attr("y", curBarGraph.y(curBarGraph.y.ticks().pop()) + 0.5)
@@ -163,9 +167,8 @@ function createdGroupedBarGraph(data,keys,yLabel, divID){
 
     curBarGraph.svg.append("text")
         .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-        .attr("transform", "translate("+ (margin.left/2-5) +","+( margin.top+8)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
-        .style("font-size", "10px")
-        .attr("class", "unit-text")
+        .attr("transform", "translate("+ (margin.left/2-10) +","+(height/2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
+        .attr("class", "unit-text-scaled")
         .text(yLabel);
 
     // Create the legend
