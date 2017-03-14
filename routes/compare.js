@@ -2,7 +2,9 @@ var express = require('express');
 var router = express.Router();
 var pg = require('pg');
 var squel = require("squel");
+var auth = require('http-auth');
 
+// , auth.connect(global.basic) add to line 9 to secure just this route 
 // Renders the compare page
 router.get('/', function(req, res, next) {
     if(Object.keys(req.query).length === 0){

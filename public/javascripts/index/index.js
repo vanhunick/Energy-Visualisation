@@ -133,7 +133,54 @@ $(document).ready( function() {
             }
         });
     });
+
+    createAnimatingBar();
 });
+
+var selection = {section : "1(i): Expenditure metrics", category : "Operational expenditure", subCategory : "Network", description : "Expenditure per average no. of ICPs ($/ICP)", id : 0};
+
+var curDataIndex = 0;
+var barData;
+var unit;
+
+function createAnimatingBar(){
+        // Send category, section, sub category and company
+        $.post("/compare/search",{company : "", selections : JSON.stringify([selection])}, function(data){
+            if(data.rows.length > 0){
+                var dp = new DataProcessor();
+                barData = dp.createDataForGroupedGraph(data.rows);
+                unit = data.rows[0].units
+                
+                var max = -Infinity;
+                data.rows.forEach(function(r){
+                    max = +r.value > max ? +r.value : max;   
+                });
+
+                $('#animating-bar').append('<h4 class="title">'+ selection.subCategory + ', ' + selection.description+'</h4>')
+                $('#animating-bar').append('<h5 class="subTitle">'+ selection.section + ', ' + selection.subCategory+'</h5>')
+                var data = [];   
+                    for(var propertyName in barData.data[curDataIndex]) {
+                         if(propertyName !== "edb"){
+                            data.push({category : propertyName, value : barData.data[curDataIndex][propertyName]});  
+                        }
+                    }
+                createBarGraph('#animating-bar',max,0, data,barData.data[curDataIndex].edb,unit);
+                curDataIndex++;
+                 d3.interval(function() {
+                    var data = [];   
+                    for(var propertyName in barData.data[curDataIndex]) {
+                         if(propertyName !== "edb"){
+                            data.push({category : propertyName, value : barData.data[curDataIndex][propertyName]});  
+                        }
+                    }
+                    createBarGraph('#animating-bar',max,0, data,barData.data[curDataIndex].edb,unit);
+                    curDataIndex = (curDataIndex+1 >= barData.data.length) ? 0 : curDataIndex+1;   
+                    }, 2000);   
+                } else {
+                    console.log("No results");
+                }
+        });   
+}
 
 
 

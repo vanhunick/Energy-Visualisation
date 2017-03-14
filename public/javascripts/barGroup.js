@@ -156,7 +156,7 @@ function createdGroupedBarGraph(data,keys,yLabel, divID){
         curBarGraph.svg.select('.yAxis').call(curBarGraph.yAxis);
     } else {
         g.append("g")
-            .attr("class", "axis yAxis y-group")
+            .attr("class", "axis yAxis")
             .call(curBarGraph.yAxis.scale(curBarGraph.y))//.ticks(null, "s")
             .append("text")
             .attr("x", 2)

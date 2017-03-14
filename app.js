@@ -8,25 +8,23 @@ var bodyParser = require('body-parser');
 var postgres = require('pg');
 var auth = require('http-auth');
 
-// Routes
-var SQLProtection = require('./routes/SQLProtection');
-var index = require('./routes/index');
-var sections = require('./routes/sections');
-var compare = require('./routes/compare');
-var test = require('./routes/testrunner');
-
-
 // Authentication
-var basic = auth.basic({
+global.basic = auth.basic({
     realm: "Private Area",
     file: __dirname + "/htpasswd",
 });
 
+// Routes
+var SQLProtection = require('./routes/SQLProtection');
+var sections = require('./routes/sections');
+var compare = require('./routes/compare');
+var test = require('./routes/testrunner');
+var index = require('./routes/index');
 
 var app = express();
 
 // Use authentication
-app.use(auth.connect(basic));
+app.use(auth.connect(global.basic));
 
 // Local db
 global.databaseURI = "postgres://Admin:admin@localhost:5432/Energy";

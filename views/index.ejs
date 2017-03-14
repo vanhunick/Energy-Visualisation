@@ -6,14 +6,31 @@
   </head>
   <body>
   <% include ../views/templates/nav%>
-  <div class="row"><h1>Energy Data</h1></div>
-  <% include ../views/templates/filter%>
+  <script src="/javascripts/compare/DataProcessor.js"></script>
+
+  
   <div class="row" style="margin-top: 2%;">
-    <div class="col-md-6 text-center">
+    <div class="col-md-12 text-center">
+        <h1 class="page-title">Strata Statistics</h1>
+        <h3 id="index-subTitle">Statistics on electricity distribution businesses in New Zealand</h3>
+    </div>
+  </div>
+
+  <div class="row text-center" style="margin-top: 4%;">
+    <div class="col-md-12 " id="animating-bar"></div>
+  </div>
+
+  <div class="row text-center">
+    <div class="col-md-12">
+      <h3>For full Access contact....</h3>
+    </div>
+  </div>
+    
+    <!--<div class="col-md-6 text-center">
       <table class="table" id="results-table"></table>
     </div>
     <div class="col-md-6" id="graph-div"></div>
-  </div>
+  </div>-->
   </body>
   <!-- Scipts -->
   <script src="/javascripts/bar.js"></script>

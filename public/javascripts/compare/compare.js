@@ -74,6 +74,7 @@ $(document).ready( function() {
  * @param urlSelections{Object[]} contains the user selections for each row
  * */
 function loadFromURL(urlSelections){
+    console.log(urlSelections)
     searchData = new Data();
     loadInSections(true,urlSelections); // First load in the section rows and set the searched selections
 
@@ -124,7 +125,7 @@ function showTables(selectionTablesArray){
     selectionTablesArray.forEach(function (tableData) {
         // Add in the title using the id and the tile / subtitle for each table
         if(tableData.id === 'ab' || tableData.id === 'cd'){
-          $('#title-'+tableData.id).append('<h3 class="subTitle">'+tableData.title+'</h3><h3>Over</h3>').append('<h3 class="subTitle">'+tableData.subTitle+'</h3>');
+          $('#title-'+tableData.id).append('<h4 class="title">'+tableData.title+'</h4>').append('<h4 class="title">'+tableData.subTitle+'</h4>');
         } else {
           $('#title-'+tableData.id).append('<h2 class="title">'+tableData.title+'</h2>').append('<h4 class="subTitle">'+tableData.subTitle+'</h4>');
         }
@@ -538,6 +539,7 @@ function showBarWithRowElem(rowID, edb, div, headRow, tableID,unit){
       var val = +$(this).attr("origValue");
       min = val < min ? val : min;
     });
+    console.log(data);
     createBarGraph(div, max,min, data, edb,unit);
 }
 

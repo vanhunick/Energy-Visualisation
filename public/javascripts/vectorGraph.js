@@ -1,7 +1,3 @@
-/**
- * Created by Nicky on 3/02/2017.
- */
-
 var vMargin = {top: 30, right: 20, bottom: 180, left: 70},
     vWidth = 1000 - vMargin.left - vMargin.right,
     vHeight = 800 - vMargin.top - vMargin.bottom;
@@ -26,7 +22,6 @@ function createVectorGraph(data,xLabel, yLabel, divID){
         if (elem.id === divID){vectorGraph = elem;}
     });
 
-
     if(vectorGraph === null){
         vectorGraph = new VectorGraphData(divID);
         vectorGraphs.push(vectorGraph);
@@ -40,7 +35,6 @@ function createVectorGraph(data,xLabel, yLabel, divID){
 
     var color = d3.scaleOrdinal().domain(edbs)
         .range(["#e69a61", "#9817ff", "#18c61a", "#33b4ff", "#c9167e", "#297853", "#d7011b", "#7456c7", "#7e6276", "#afb113", "#fd879c", "#fb78fa", "#24c373", "#45bbc5", "#766b21", "#abad93", "#c19ce3", "#fd8f11", "#2f56ff", "#307a11", "#b3483c", "#0d7396", "#94b665", "#9d4d91", "#b807c8", "#086cbf", "#a2abc5", "#a35702", "#d3084b"]);
-
 
     var allValues =[];
     data.forEach(function (e) {
@@ -70,7 +64,6 @@ function createVectorGraph(data,xLabel, yLabel, divID){
     var maxX = d3.max(xValues, function(d) { return d;} );
     var maxY = d3.max(yValues, function(d) { return d;} );
 
-
     // Set the domain for x and y
     vectorGraph.x.domain([maxX,0]).nice();
     vectorGraph.y.domain([0,maxY]).nice();
@@ -87,9 +80,7 @@ function createVectorGraph(data,xLabel, yLabel, divID){
     vectorGraph.svg.append("g")
         .attr("class","xAxis")
         .attr("transform", "translate(0," + vHeight + ")")
-        .attr("stroke", "#black")
         .call(vectorGraph.xAxis.scale(vectorGraph.x));
-
         var dpFormat = d3.format(".2f");
 
     // add the y Axis
@@ -104,10 +95,7 @@ function createVectorGraph(data,xLabel, yLabel, divID){
           .html(function(d) {
             return "<strong>EDB:</strong> <span style='color:lightgreen'>" + d.edb + "</span><br><br><strong>Year:</strong> <span style='color:lightgreen'>" + d.year + "</span><br><br><strong>Value:</strong> <span style='color:lightgreen'>[" + dpFormat(d.valueA)	 + ", " + dpFormat(d.valueB) +"]</span>";
           });
-
-      vectorGraph.svg.call(tip);
-
-
+  vectorGraph.svg.call(tip);
 
     if(vectorGraph.created){
         vectorGraph.svg.selectAll(".dotm")
@@ -137,8 +125,8 @@ function createVectorGraph(data,xLabel, yLabel, divID){
     // Next create the lines between them
     for(var i =0; i < data.length; i++){
         for(var j = 0; j < data[i].years.length-1; j++){ // -1 because we add
-            lines.push( {end :  data[i].years[j].year  === 2016 || data[i].years[j+1].year === 2016,edb : data[i].edb, x : data[i].years[j].valueB, y : data[i].years[j].valueA , x1 : data[i].years[j+1].valueB , y1 : data[i].years[j+1].valueA});
-        } //TODO change 2016 to actual value
+            lines.push( {end :  true,edb : data[i].edb, x : data[i].years[j].valueB, y : data[i].years[j].valueA , x1 : data[i].years[j+1].valueB , y1 : data[i].years[j+1].valueA});
+        }
     }
 
     // Build arrow
@@ -197,28 +185,37 @@ function createVectorGraph(data,xLabel, yLabel, divID){
     }
 
 
-    // Add X label
-    vectorGraph.svg.append("text")
-        .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-        .attr("transform", "translate("+ -(vMargin.left/2 +15) +","+( vMargin.top*2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
-        .style("font-size", "18px")
-        .attr("font-family", "sans-serif")
-        .attr("class", "unit-text")
-        .text(yLabel);
+  var xMetricLabel = "";
+  var yMetricLabel = "";
+  if(divID.includes("abcd")){
+    xMetricLabel = "C / D";
+    yMetricLabel = "A / B";
+  } else if(divID.includes("ab")){
+    xMetricLabel = "B";
+    yMetricLabel = "A"
+  } else if(divID.includes("cd")) {
+    xMetricLabel = "D";
+    yMetricLabel = "C";
+  }
 
     // Add Y label
     vectorGraph.svg.append("text")
         .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-        .attr("transform", "translate("+ vWidth/2 +","+( vHeight+35) + ")")  // text is drawn off the screen top left, move down and out and rotate
-        .style("font-size", "18px")
-        .attr("font-family", "sans-serif")
+        .attr("transform", "translate("+ -(vMargin.left/2) +","+ ( +vHeight/2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
         .attr("class", "unit-text")
-        .text(xLabel);
+        .text(yMetricLabel + "     (" + yLabel + ")");
+
+    // Add X label
+    vectorGraph.svg.append("text")
+        .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
+        .attr("transform", "translate("+ (vWidth/2) +","+ +(vHeight + vMargin.bottom/4) + ")")  // text is drawn off the screen top left, move down and out and rotate
+        .attr("class", "unit-text")
+        .text(xMetricLabel+ "     (" + xLabel + ")");
+
 
     if(!vectorGraph.created){
         var legend = vectorGraph.svg.append("g")
-            .attr("font-family", "sans-serif")
-            .attr("font-size", 10)
+            .attr('class', 'vector-key-text')
             .attr("text-anchor", "end")
             .selectAll("g")
             .data(edbs)
@@ -226,11 +223,8 @@ function createVectorGraph(data,xLabel, yLabel, divID){
             .append("svg:a")
             .attr("transform", function(d, i) {
                 var y = Math.floor(i / 5) * 20;
-
                 var x = (i - (Math.floor((i / 5)) * 5)) * 160;
-
                 x = x + vMargin.left;
-
                 return "translate("+ x +"," + (y +vHeight +vMargin.bottom/3 ) + ")";
             })
             .on('mouseover', function(d){

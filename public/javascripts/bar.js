@@ -100,8 +100,7 @@ function createNewGraph(divID, tableMax,tableMin, data,edb, yLabel){
 
     barGraph.svg.append("text")
         .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-        .attr("transform", "translate("+ -(barMargin.left/2+10) +","+( barMargin.top-50)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
-        .style("font-size", "16px")
+        .attr("transform", "translate("+ -(barMargin.left/2+10) +","+(barHeight/2 )+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
         .attr("class", "unit-text")
         .text(yLabel);
 
@@ -109,7 +108,6 @@ function createNewGraph(divID, tableMax,tableMin, data,edb, yLabel){
     barGraph.svg.append("text")
         .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
         .attr("transform", "translate("+ +(barWidth/2) +","+( barMargin.top + barHeight -barMargin.bottom + 20 )+")")  // text is drawn off the screen top left, move down and out and rotate
-        .style("font-size", "16px")
         .attr("class", "unit-text")
         .text("Year");
 }

@@ -67,7 +67,6 @@ function createBoxPlot(dataObject,divID,unit){
          .append("svg")
          //responsive SVG needs these 2 attributes and no width and height attr
          .attr("preserveAspectRatio", "xMinYMin meet")
-        //  .attr("viewBox", "0 0 600 400")
          .attr("viewBox", "0 0 "+ (boxWidth + boxMargin.left + boxMargin.right) +" "+ (boxHeight + boxMargin.top + boxMargin.bottom) + "")
          .attr("class", "box")
          .append("g") // group allows us to move everything together
@@ -76,13 +75,6 @@ function createBoxPlot(dataObject,divID,unit){
          //class to make it responsive
          .classed("svg-content-responsive", true);
 
-    //
-    // boxPlotObjects.svg = d3.select(divID).append("svg")
-    //         .attr("width", boxWidth + boxMargin.left + boxMargin.right)
-    //         .attr("height", boxHeight + boxMargin.top + boxMargin.bottom)
-    //         .attr("class", "box")
-    //         .append("g")
-    //         .attr("transform", "translate(" + boxMargin.left + "," + boxMargin.top + ")");
 
     boxPlotObjects.x.domain( data.map(function(d) {return d[0] } ) );
     boxPlotObjects.xAxis = d3.axisBottom(boxPlotObjects.x);
@@ -151,17 +143,15 @@ function createBoxPlot(dataObject,divID,unit){
     // Add the y axis unit
     boxPlotObjects.svg.append("text")
         .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-        .attr("transform", "translate("+ -(boxMargin.left/2-10) +","+( boxMargin.top*2+10)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
-        .style("font-size", "12px")
-        .attr("class", "unit-text")
+        .attr("transform", "translate("+ -(boxMargin.left/2-10) +","+(boxHeight/2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
+        .attr("class", "unit-text-scaled")
         .text(unit);
 
     // Add year as the x-axis label
     boxPlotObjects.svg.append("text")
         .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
         .attr("transform", "translate("+ +(boxWidth/2) +","+( boxMargin.top + 40 + boxHeight)+")")  // text is drawn off the screen top left, move down and out and rotate
-        .style("font-size", "12px")
-        .attr("class", "unit-text")
+        .attr("class", "unit-text-scaled")
         .text("Year");
 
     boxPlotObjects.created = true; // Set the plot to created for the ID
