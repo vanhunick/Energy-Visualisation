@@ -62,9 +62,9 @@ $(document).ready( function() {
     $('#search-btn-compare').click(function(){ // Listener to search button
         search(); // Search encodes the selections into the url and sends to server
     });
-    if($('.cpi-form').length > 0 ){
-        cpiValidationSetup(); // Set up cpi validation rules
-    }
+    //if($('.cpi-form').length > 0 ){
+        //cpiValidationSetup(); // Set up cpi validation rules
+    //}
 });
 
 
@@ -612,26 +612,26 @@ function serialise(obj) {
 /**
  * Sets up rules for validating CPI fields. Must be a number 1-100
  * */
-function cpiValidationSetup(){
-    $.validator.setDefaults({
-            errorClass : 'help-block',
-            highlight: function (element) {$(element).closest('.form-group').addClass('has-error')},
-            unhighlight :function (element) {$(element).closest('.form-group').removeClass('has-error')}
-        }
-    );
-    var cpiRules = {required : true, number : true, min : 1, max : 100};
-    var messageSet = {
-        required : "Please enter a percentage",
-        number : "Please enter a valid number",
-        min : "Please enter a percentage greater than 0",
-        max : "Please enter a percentage less than 100"
-    };
-
-    $('#cpi-form').validate({
-        rules : {Y2012 : cpiRules,Y2013 : cpiRules,Y2014 : cpiRules,Y2015 : cpiRules,Y2016 : cpiRules},
-        messages : {Y2012 : messageSet,Y2013 : messageSet,Y2014 : messageSet,Y2015 : messageSet,Y2016 : messageSet}
-    });
-}
+// function cpiValidationSetup(){
+//     $.validator.setDefaults({
+//             errorClass : 'help-block',
+//             highlight: function (element) {$(element).closest('.form-group').addClass('has-error')},
+//             unhighlight :function (element) {$(element).closest('.form-group').removeClass('has-error')}
+//         }
+//     );
+//     var cpiRules = {required : true, number : true, min : 1, max : 100};
+//     var messageSet = {
+//         required : "Please enter a percentage",
+//         number : "Please enter a valid number",
+//         min : "Please enter a percentage greater than 0",
+//         max : "Please enter a percentage less than 100"
+//     };
+//
+//     $('#cpi-form').validate({
+//         rules : {Y2012 : cpiRules,Y2013 : cpiRules,Y2014 : cpiRules,Y2015 : cpiRules,Y2016 : cpiRules},
+//         messages : {Y2012 : messageSet,Y2013 : messageSet,Y2014 : messageSet,Y2015 : messageSet,Y2016 : messageSet}
+//     });
+// }
 
 
 /**
@@ -639,14 +639,15 @@ function cpiValidationSetup(){
  * all graphs and tables where is it applicable.
  * */
 function applyCPI(){
-    if($('#cpi-form').valid()){
+    if(CPIModule.isValid()){//$('#cpi-form').valid()
         if(noCPICells.length > 0){
             revertCPI(); // Reverts cpi before instead of saving values with cpi already applied
             var copyOfDataTables = dp.copyDataTables(searchData.tables); // Use the original data and create a copy of it
             dataStructure = dp.createDataStructuresWithCopy(copyOfDataTables);
         }
         // CPI for 2012 - 2016
-        var cpiValues = [{year : 2012, value : +$('#Y2012').val()},{year : 2013, value : +$('#Y2013').val()},{year : 2014, value : +$('#Y2014').val()},{year : 2015, value : +$('#Y2015').val()},{year : 2016, value : +$('#Y2016').val()}];
+        var cpiValues = CPIModule.getCPIValues();
+        // var cpiValues = [{year : 2012, value : +$('#Y2012').val()},{year : 2013, value : +$('#Y2013').val()},{year : 2014, value : +$('#Y2014').val()},{year : 2015, value : +$('#Y2015').val()},{year : 2016, value : +$('#Y2016').val()}];
 
         // Applies CPI to all selected tables
         dataStructure.selectionTable.forEach(function (table) {
