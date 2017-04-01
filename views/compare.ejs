@@ -5,13 +5,15 @@
 
     <!--The head template containing the required scripts-->
     <% include ../views/templates/head %>
-    
+
     <!--Form validation plugin-->
     <script src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.15.0/jquery.validate.min.js"></script>
 
     <!--Page specific scripts-->
-    <script src="/javascripts/compare/DataProcessor.js"></script>
+    <!-- <script src="/javascripts/compare/DataProcessor.js"></script> -->
     <script src="/javascripts/compare/compare.js"></script>
+
+    <!-- <script src="/javascripts/compare/SelectionRows.js"></script> -->
     <script src="/javascripts/d3-tip.js"></script>
   </head>
   <body>
@@ -25,7 +27,10 @@
     </div>
 
     <!-- The selection drop downs are inserted here -->
-    <div id="compare-div"></div>
+    <div id="compare-div">
+      <% include ../views/templates/SelectionRows %>
+
+    </div>
 
     <!-- Holds the search button for selections and a div for errors -->
     <div class="row">
@@ -162,7 +167,7 @@
                                       <div class="col-md-6 text-center" id="bar-b"></div>
 
                                   </div>
-                                  
+
                                   <!-- Row for table totals -->
                                   <div class="row">
                                       <div class="col-md-5 text-center table-col">
@@ -356,16 +361,23 @@
   <script src="/javascripts/box.js"></script>
   <script src="/javascripts/boxPlot.js"></script>
   <script src="/javascripts/vectorGraph.js"></script>
+  <script src="/javascripts/compare/SelectionRowsController.js"></script>
+
 
   <script>
+      $('.clear').on('click', function(event){
+        var idNumb = event.target.id.charAt(event.target.id.length-1);
+        selectionRows.clear(idNumb);
+      });
+
       var s =  <%- JSON.stringify(selections) %>;
       if('<%- selections %>' !== ""){
 
           if(s.length > 0){
               loadFromURL(s);
+          } else {
+            selectionRows.init([],false);
           }
-      }  else {
-          loadInSections(false,null);
       }
   </script>
 

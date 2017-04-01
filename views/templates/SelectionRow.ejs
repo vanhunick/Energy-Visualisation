@@ -1,0 +1,14 @@
+<div class="row" id="titleRow<%= data.numberSections %>">
+  <div class="col-md-12">
+    <h5  class="selection-title">Make a selection for table <%= data.name %></h5>
+  </div>
+</div>
+<div class="row" id="row<%= data.numberSections %>">
+  <div class="col-md-12 compare-col" id="col<%= data.numberSections %>">
+      <button type="button" id="clear-<%= data.numberSections %>" class="btn btn-danger clear">Clear</button>
+      <select data-width="250px" class="selectpicker select-section"  title="Section" id="section-select<%= data.numberSections %>"></select>
+      <select data-width="190px" class="selectpicker select-category" title="Category" id="category-select<%= data.numberSections %>"></select>
+      <select data-width="190px" class="selectpicker select-subcategory" title="Subsection" id="subcategory-select<%= data.numberSections %>"></select>
+      <select data-width="190px" class="selectpicker select-description" title="Description" id="description-select<%= data.numberSections %>"></select>
+  </div>
+</div>
