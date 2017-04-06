@@ -15,7 +15,6 @@ var events = {
     }
   },
   emit: function (eventName, data) {
-    console.log("Emiting " + eventName)
     if (this.events[eventName]) {
       this.events[eventName].forEach(function(fn) {
         fn(data);

@@ -70,10 +70,26 @@ var Database = (function(){
       }});
   }
 
+
+  /**
+   * Returns all of the rows associated with the selected sections, categories, subCategories
+   * and descriptions for multiple rows.
+   *
+   * @param selections {Object} Contains all the selections the user made
+   * @param callback {function} The function to call once the query has a result
+   * */
+  function getRowsForSearch(selections, callback) {
+    $.post("/compare/search",{company : "", selections : JSON.stringify(selections)}, function(data){
+      callback(data.rows);
+    });
+
+  }
+
   return {
       getCategoriesFromDatabase : getCategoriesFromDatabase,
       getSubCategoriesFromDatabase : getSubCategoriesFromDatabase,
       getDescriptionsFromDatabase : getDescriptionsFromDatabase,
-      getSectionsFromDatabase : getSectionsFromDatabase
+      getSectionsFromDatabase : getSectionsFromDatabase,
+      getRowsForSearch : getRowsForSearch
   }
 })();

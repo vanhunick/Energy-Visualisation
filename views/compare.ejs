@@ -89,8 +89,8 @@
       <!--CPI Buttons apply and revert -->
     <div class="row">
       <div class="col-sm-12">
-        <button type ="button" class ="btn btn-primary" onclick="applyCPI()">Apply cpi</button>
-        <button type="button" class="btn btn-warning" onclick="revertCPI()">Revert</button>
+        <button type ="button" class ="btn btn-primary" onclick="CompareModule.applyCPI()">Apply cpi</button>
+        <button type="button" class="btn btn-warning" onclick="CompareModule.revertCPI()">Revert</button>
       </div>
     </div>
 
@@ -100,12 +100,12 @@
               <div class="panel with-nav-tabs panel-default tab-background">
                   <div class="panel-heading">
                       <ul class="nav nav-tabs">
-                          <li class="active"><a href="#tab1default" data-toggle="tab">Selection A</a></li>
-                          <li><a href="#tab2default" data-toggle="tab">Selection B</a></li>
-                          <li><a href="#tab3default" data-toggle="tab">Selection C</a></li>
-                          <li><a href="#tab4default" data-toggle="tab">Selection D</a></li>
-                          <li><a href="#tab5default" data-toggle="tab">A over B</a></li>
-                          <li><a href="#tab6default" data-toggle="tab">C over D</a></li>
+                          <li class="active"><a href="#tab-a" data-toggle="tab">Selection A</a></li>
+                          <li><a href="#tab-b" data-toggle="tab">Selection B</a></li>
+                          <li><a href="#tab-c" data-toggle="tab">Selection C</a></li>
+                          <li><a href="#tab-d" data-toggle="tab">Selection D</a></li>
+                          <li><a href="#tab-ab" data-toggle="tab">A over B</a></li>
+                          <li><a href="#tab-cd" data-toggle="tab">C over D</a></li>
                           <li><a href="#tab7default" data-toggle="tab">Vector Graph A/B over C/D </a></li>
                       </ul>
                   </div>
@@ -115,226 +115,41 @@
                       <div class="tab-content">
 
                           <!--Table A content-->
-                          <div class="tab-pane fade in active" id="tab1default">
-                              <!--Wrapped in a div for table A to easily hide it-->
-                              <div id="full-table-a-div" class="full-table full">
-
-                                  <!-- Row for table -->
-                                  <div class="row">
-                                      <h2 class="table-title"><b>Selection A</b></h2>
-                                      <div id="title-a" class="text-center"></div>
-                                      <div class="col-md-5 text-center table-col">
-                                          <table class="table table-edb" id="tablea"></table>
-                                      </div>
-                                      <div class="col-md-6 text-center" id="bar-a"></div>
-                                  </div>
-
-                                  <!-- Row for table totals -->
-                                  <div class="row">
-                                      <div class="col-md-5 text-center table-col">
-                                          <h2 class="total-title">Region Averages</h2>
-                                          <table class="table table-tot" id="table-totala"></table>
-                                      </div>
-                                      <div class="col-md-6 text-center" id="tot-bar-a"></div>
-                                  </div>
-
-                                  <!-- Row for bar graph -->
-                                  <div class="row group-row" >
-                                      <div id="title-a-bar" class="text-center"></div>
-                                      <div class="col-lg-12 text-center" id="grouped-bar-a" ></div>
-                                  </div>
-
-                                  <!-- Row for box and whisker graph -->
-                                  <div class="row text-center whisk-row">
-                                      <div id="title-a-box" class="text-center"></div>
-                                      <div class="col-lg-12 text-center" style=" margin-left: 10%;" id="boxplota-div"></div>
-                                  </div>
-                              </div>
-                          </div>
+                          <% var data= { tableID : 'a'}; %>
+                          <% include ../views/templates/dashboard.ejs %>
 
                           <!--Table B Content-->
-                          <div class="tab-pane fade" id="tab2default">
-                              <div id="full-table-b-div" class="full-table full">
-
-                                  <!--Row for table-->
-                                  <div class="row">
-                                      <h2 class="table-title"><b>Selection B</b></h2>
-                                      <div id="title-b" class="text-center"></div>
-                                      <div class="col-md-5 text-center table-col">
-                                          <table class="table table-edb" id="tableb"></table>
-                                      </div>
-                                      <div class="col-md-6 text-center" id="bar-b"></div>
-
-                                  </div>
-
-                                  <!-- Row for table totals -->
-                                  <div class="row">
-                                      <div class="col-md-5 text-center table-col">
-                                          <h2 class="total-title">Region Averages</h2>
-                                          <table class="table table-tot" id="table-totalb"></table>
-                                      </div>
-                                      <div class="col-md-6 text-center" id="tot-bar-b"></div>
-                                  </div>
-                                  <div class="row group-row">
-                                      <div id="title-b-bar" class="text-center"></div>
-                                      <div class="col-lg-12 text-center" id="grouped-bar-b"></div>
-                                  </div>
-                                  <div class="row text-center whisk-row">
-                                      <div id="title-b-box" class="text-center"></div>
-                                      <div class="col-lg-12 text-center" id="boxplotb-div"></div>
-                                  </div>
-                              </div>
-                          </div>
+                          <% var data= { tableID : 'b'}; %>
+                          <% include ../views/templates/dashboard.ejs %>
 
                           <!--Table C content-->
-                          <div class="tab-pane fade" id="tab3default">
-                              <div id="full-table-c-div" class="full-table full">
-
-                                  <!--Row for table C-->
-                                  <div class="row">
-                                      <h2 class="table-title"><b>Selection C</b></h2>
-                                      <div id="title-c" class="text-center"></div>
-                                      <div class="col-md-5 text-center table-col">
-                                          <table class="table table-edb" id="tablec"></table>
-                                      </div>
-                                      <div class="col-md-6 text-center" id="bar-c"></div>
-                                  </div>
-                                  <!-- Row for table totals -->
-                                  <div class="row">
-                                      <div class="col-md-5 text-center table-col">
-                                          <h2 class="total-title">Region Averages</h2>
-                                          <table class="table table-tot" id="table-totalc"></table>
-                                      </div>
-                                      <div class="col-md-6 text-center" id="tot-bar-c"></div>
-                                  </div>
-                                  <div class="row group-row">
-                                      <div id="title-c-bar" class="text-center"></div>
-                                      <div class="col-lg-12 text-center" id="grouped-bar-c"></div>
-                                  </div>
-                                  <div class="row text-center whisk-row">
-                                      <div id="title-c-box" class="text-center"></div>
-                                      <div class="col-lg-12 text-center" id="boxplotc-div"></div>
-                                  </div>
-                              </div>
-                          </div>
+                          <% var data= { tableID : 'c'}; %>
+                          <% include ../views/templates/dashboard.ejs %>
 
                           <!--Table D Content-->
-                          <div class="tab-pane fade" id="tab4default">
-                              <div id="full-table-d-div" class="full-table full">
-
-                                  <!--Row for table-->
-                                  <div class="row">
-                                      <h2 class="table-title"><b>Selection D</b></h2>
-                                      <div id="title-d" class="text-center"></div>
-                                      <div class="col-md-5 text-center table-col">
-                                          <table class="table table-edb" id="tabled"></table>
-                                      </div>
-                                      <div class="col-md-6 text-center" id="bar-d"></div>
-                                  </div>
-                                  <!-- Row for table totals -->
-                                  <div class="row">
-                                      <div class="col-md-5 text-center table-col">
-                                          <h2 class="total-title">Region Averages</h2>
-                                          <table class="table table-tot" id="table-totald"></table>
-                                      </div>
-                                      <div class="col-md-6 text-center" id="tot-bar-d"></div>
-                                  </div>
-                                  <div class="row group-row">
-                                      <div id="title-d-bar" class="text-center"></div>
-                                      <div class="col-lg-12 text-center" id="grouped-bar-d"></div>
-                                  </div>
-                                  <div class="row whisk-row">
-                                      <div id="title-d-box" class="text-center"></div>
-                                      <div class="col-lg-12 text-center" id="boxplotd-div"></div>
-                                  </div>
-                              </div>
-                          </div>
+                          <% var data= { tableID : 'd'}; %>
+                          <% include ../views/templates/dashboard.ejs %>
 
                           <!--Table AB content-->
-                          <div class="tab-pane fade" id="tab5default">
-                              <!--Wrapped in a div for table A/B to easily hide it-->
-                              <div class="full-table full" id="full-table-ab-div">
-                                  <div class="row">
-                                      <div class="col-md-12 text-left">
-                                          <h2 class="table-title table-col"><b>Selection  A over  selection B</b></h2>
-                                          <div id="title-ab" class="text-left table-col"></div>
-                                      </div>
-                                  </div>
+                          <% var data= { tableID : 'ab'}; %>
+                          <% include ../views/templates/dashboard.ejs %>
 
-                                  <!--Row for table-->
-                                  <div class="row">
-                                      <!--<h2 class="table-title"><b>selection  A over  selection B</b></h2>-->
-                                      <!--<div id="title-ab" class="text-left table-col"></div>-->
-                                      <div class="col-md-5 text-center table-col">
-                                          <table class="table table-edb" id="tableab"></table>
-                                      </div>
-                                      <div class="col-md-6 text-center" id="bar-ab"></div>
-                                  </div>
-                                  <!-- Row for table totals -->
-                                  <div class="row">
-                                      <div class="col-md-5 text-center table-col">
-                                          <h2 class="total-title">Region Averages</h2>
-                                          <table class="table table-tot" id="table-totalab"></table>
-                                      </div>
-                                      <div class="col-md-6 text-center" id="tot-bar-ab"></div>
-                                  </div>
-                                  <div class="row group-row">
-                                      <div id="title-ab-bar" class="row text-center graph-title"></div>
-                                      <div class="col-lg-12 text-center" id="grouped-bar-ab"></div>
-                                  </div>
-                                  <div class="row whisk-row">
-                                      <div class="row text-center  graph-title" id="title-ab-box"></div>
-                                      <div class="col-lg-12 text-center" id="boxplotab-div"></div>
-                                  </div>
-
-                                  <!-- Div for vectorGraph -->
-                                  <div class="row text-center" >
-                                      <div class="row text-center  graph-title" id="title-ab-vector"></div>
-                                      <div class="col-lg-12 text-center" id="vector-graph-div-ab" style="margin-bottom: 2%"></div>
-                                  </div>
-                              </div>
+                            <!-- Div for vectorGraph -->
+                            <div class="row text-center" >
+                                <div class="row text-center  graph-title" id="title-ab-vector"></div>
+                                <div class="col-lg-12 text-center" id="vector-graph-div-ab" style="margin-bottom: 2%"></div>
+                            </div>
                           </div>
 
                           <!-- Table CD content -->
                           <div class="tab-pane fade" id="tab6default">
-                              <!--Wrapped in a div for table C/D to easily hide it-->
-                              <div id="full-table-cd-div" class="full-table full">
-                                  <div class="row">
-                                      <div class="col-md-12 text-left">
-                                          <h2 class="table-title table-col"><b>Selection  C over  selection D</b></h2>
-                                          <div id="title-cd" class="text-left table-col"></div>
-                                      </div>
-                                  </div>
-                                  <!--Row for table-->
-                                  <div class="row">
-                                      <!--<h2 class="table-title "><b>Table selection  C over selection D</b></h2>-->
-                                      <!--<div id="title-cd" class="text-center"></div>-->
-                                      <div class="col-md-5 text-center table-col">
-                                          <table class="table table-edb" id="tablecd"></table>
-                                      </div>
-                                      <div class="col-md-6 text-center" id="bar-cd"></div>
-                                  </div>
-                                  <!-- Row for table totals -->
-                                  <div class="row">
-                                      <div class="col-md-5 text-center table-col">
-                                          <h2 class="total-title">Region Averages</h2>
-                                          <table class="table table-tot" id="table-totalcd"></table>
-                                      </div>
-                                      <div class="col-md-6 text-center" id="tot-bar-cd"></div>
-                                  </div>
-                                  <div class="row group-row">
-                                      <div id="title-cd-bar" class="text-center  graph-title"></div>
-                                      <div class="col-lg-12 text-center" id="grouped-bar-cd"></div>
-                                  </div>
-                                  <div class="row whisk-row">
-                                      <div id="title-cd-box" class="text-center  graph-title"></div>
-                                      <div class="col-lg-12 text-center" id="boxplotcd-div"></div>
-                                  </div>
-                                  <div class="row text-center" >
-                                      <div class="row text-center  graph-title" id="title-cd-vector"></div>
-                                      <div class="col-lg-12 text-center" id="vector-graph-div-cd" style="margin-bottom: 2%"></div>
-                                  </div>
-                              </div>
+                            <% var data= { tableID : 'cd'}; %>
+                            <% include ../views/templates/dashboard.ejs %>
+
+                            <div class="row text-center" >
+                                <div class="row text-center  graph-title" id="title-cd-vector"></div>
+                                <div class="col-lg-12 text-center" id="vector-graph-div-cd" style="margin-bottom: 2%"></div>
+                            </div>
                           </div>
 
                           <!-- ABCD Vector Graph content -->
@@ -361,6 +176,9 @@
   <script src="/javascripts/boxPlot.js"></script>
   <script src="/javascripts/vectorGraph.js"></script>
   <script src="/javascripts/compare/CPIModule.js"></script>
+  <script src="/javascripts/compare/Table.js"></script>
+  <script src="/javascripts/compare/GraphModule.js"></script>
+  <script src="/javascripts/compare/CompareModule.js"></script>
   <script src="/javascripts/compare/compare.js"></script>
   <script src="/javascripts/compare/SelectionRowsController.js"></script>
 
@@ -375,7 +193,8 @@
       if('<%- selections %>' !== ""){
 
           if(s.length > 0){
-              loadFromURL(s);
+              console.log("loading from url")
+              CompareModule.loadSearchFromURL(s);
           } else {
             selectionRows.init([],false);
           }

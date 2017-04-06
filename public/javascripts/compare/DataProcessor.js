@@ -28,6 +28,18 @@ DataProcessor.prototype.copyDataTables = function(dataTables) {
   return new DataTables(tables[0],tables[1],tables[2],tables[3],tables[4],tables[5]); // Return the copy
 }
 
+DataProcessor.prototype.copyRows = function (rows) {
+    var newRows = [];
+
+    rows.forEach(function(r){
+      newRows.push({category :r.category, description : r.description,disc_yr: r.disc_yr,edb: r.edb,
+          fcast_yr: r.fcast_yr,network: r.network,note:  r.note,obs_yr: r.obs_yr,p_key: r.p_key,sch_ref: r.sch_ref,
+          schedule: r.schedule,section: r.section,sub_category: r.sub_category,units: r.units,value: r.value})
+    });
+
+    return newRows;
+}
+
 
 /**
  * Creates and object with three arrays that are used to iterate over and add the data to the page. The structure simplifies
@@ -149,6 +161,11 @@ DataProcessor.prototype.filterRowsToTables = function (rows, search) {
   cRows.forEach(function(e){if(e.value === null){e.value = 0;}});
   dRows.forEach(function(e){if(e.value === null){e.value = 0;}});
 
+  var tables = [];
+  if(aRows.length > 0){
+    tables.push({ id : 'a', rows : aRows, search : search.aTable});
+  }
+
   // Create combined tables if possible
   if(aRows.length > 0 && bRows.length > 0){
       var abRows = dp.combineTables(aRows,bRows);
@@ -157,8 +174,85 @@ DataProcessor.prototype.filterRowsToTables = function (rows, search) {
   if(cRows.length > 0 && dRows.length > 0){
       var cdRows = dp.combineTables(cRows,dRows);
   }
+
+
+
   return new DataTables(aRows,bRows,cRows,dRows, abRows, cdRows);
 }
+
+
+
+// START NEW
+/**
+ * Takes rows from database query result and splits into corresponding table. Uses the matchDBRow function to match
+ * a row to a selection. Once filtered creates and object containing each table and the rows
+ *
+ * Also creates the combined tables by using the combineTable function and adds the combined tables to the returned
+ * object.
+ *
+ * Note any null values in the rows are changed to 0
+ *
+ * @param rows {Object} All the rows from the users selections
+ * @param search {Object} object that contains the four different selections the user may have made
+ * @returns {Object} An object that contains a property for each table which is an array with the corresponding rows
+ * */
+DataProcessor.prototype.filterRowsToTablesAndCopy = function (rows, search) {
+
+  // Create four arrays for the different rows that belong to each of the searches
+  var aRows = rows.filter(function(e){return dp.matchDBRow(e,search.aTable);});
+  var bRows = rows.filter(function(e){return dp.matchDBRow(e,search.bTable);});
+  var cRows = rows.filter(function(e){return dp.matchDBRow(e,search.cTable);});
+  var dRows = rows.filter(function(e){return dp.matchDBRow(e,search.dTable);});
+
+  // Set all null values in rows to 0
+  aRows.forEach(function(e){if(e.value === null){e.value = 0;}});
+  bRows.forEach(function(e){if(e.value === null){e.value = 0;}});
+  cRows.forEach(function(e){if(e.value === null){e.value = 0;}});
+  dRows.forEach(function(e){if(e.value === null){e.value = 0;}});
+
+  // Create combined tables if possible
+  if(aRows.length > 0 && bRows.length > 0){
+      var abRows = dp.combineTables(aRows,bRows);
+  }
+
+  if(cRows.length > 0 && dRows.length > 0){
+      var cdRows = dp.combineTables(cRows,dRows);
+  }
+
+  var copy = this.copyDataTables(new DataTables(aRows,bRows,cRows,dRows,abRows,cdRows));
+
+  var tables = [];
+  if(aRows.length > 0){
+    tables.push({ id : 'a', rows : copy.tableA, search : search.aTable, combined : false});
+  }
+
+  if(bRows.length > 0){
+    tables.push({ id : 'b', rows : copy.tableB, search : search.bTable, combined : false});
+  }
+
+  if(cRows.length > 0){
+    tables.push({ id : 'c', rows : copy.tableC, search : search.cTable, combined : false});
+  }
+
+  if(dRows.length > 0){
+    tables.push({ id : 'd', rows : copy.tableC, search : search.dTable, combined : false});
+  }
+
+
+
+  // Create combined tables if possible
+  if(aRows.length > 0 && bRows.length > 0){
+      tables.push({ id : 'ab', rows : copy.tableAB, table1Rows : copy.tablA, table2Rows : copy.tableB, search : search.aTable, search2 : search.bTable, combined : true});
+  }
+
+  if(cRows.length > 0 && dRows.length > 0){
+      var cdRows = dp.combineTables(cRows,dRows);
+      tables.push({ id : 'cd', rows : copy.tableCD, table1Rows : copy.tablC, table2Rows : copy.tableD, search : search.cTable, search2 : search.dTable, combined : true});
+  }
+  return tables;
+}
+// END NEW
+
 
 
 /**
@@ -426,7 +520,7 @@ DataProcessor.prototype.applyCPIToTableRows = function(rows, cpiValues){
  * @param selections {Object[]} The array of rows to set the selection in
  * */
 DataProcessor.prototype.addToSelection = function (id,type,data,selections) {
-    
+
     for(var i = 0; i < selections.length; i++){
         if(selections[i].id+"" === id+""){ // Convert them both to strings
             if(type === "section"){

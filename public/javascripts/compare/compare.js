@@ -24,10 +24,8 @@ var dp = new DataProcessor();
 
 function Data(){
     this.rows = []; // All the rows from a search
-    this.selections = []; // The selected sections (section, category, sub category, description for each row)
     this.tables = null; // The rows filtered into the separate tables
     this.copyOfTables = null; // tables copied so modifications can be made
-    this.validOptions = [false,false,false,false]; // Array to show if a sub category exists for a row true if it does
     this.dpFormat = d3.format(".4r"); // Used to format numbers displayed
 }
 
@@ -55,17 +53,17 @@ var regions = {
 
 
 // Called when the document is loaded
-$(document).ready( function() {
-    // Highlight the selected link
-    $(".nav-link").removeClass('active');
-    $("#benchmarks-link").addClass('active');
-    $('#search-btn-compare').click(function(){ // Listener to search button
-        search(); // Search encodes the selections into the url and sends to server
-    });
-    //if($('.cpi-form').length > 0 ){
-        //cpiValidationSetup(); // Set up cpi validation rules
-    //}
-});
+// $(document).ready( function() {
+//     // Highlight the selected link
+//     $(".nav-link").removeClass('active');
+//     $("#benchmarks-link").addClass('active');
+//     $('#search-btn-compare').click(function(){ // Listener to search button
+//         search(); // Search encodes the selections into the url and sends to server
+//     });
+//     if($('.cpi-form').length > 0 ){
+//         cpiValidationSetup(); // Set up cpi validation rules
+//     }
+// });
 
 
 /**
@@ -73,32 +71,28 @@ $(document).ready( function() {
  *
  * @param urlSelections{Object[]} contains the user selections for each row
  * */
-function loadFromURL(urlSelections){
-    console.log(urlSelections)
-    searchData = new Data();
-    // loadInSections(true,urlSelections); // First load in the section rows and set the searched selections
-
-
-    selectionRows.init(urlSelections,true);
-
-    // Send array of selected sections to server and the company
-    $.post("/compare/search",{company : "", selections : JSON.stringify(urlSelections)}, function(data){
-        // Queries the db for each of the secions and finds and inserts the sub sections as options
-        var lastSearch = new Selection(urlSelections[0],urlSelections[1],urlSelections[2],urlSelections[3]); // Set the last search
-        var dataTables = dp.filterRowsToTables(data.rows, lastSearch); // Filter the rows into their tables
-        searchData.rows = data.rows;
-        searchData.tables = dataTables;
-
-        searchData.copyOfTables = dp.copyDataTables(dataTables);
-
-        dataStructure = dp.createDataStructuresWithCopy(searchData.copyOfTables); // Sets up the data so it can easily be iterated over to create the tables and graphs
-
-        showTables(dataStructure.selectionTable); // Show the tables
-        showAllRegularGraphs(dataStructure.selectionData, true); // Show all but combined and vector graphs true indicates it should add titles in
-        showAllCombinedGraphs(dataStructure.combineData, true); // Show the combined and vector graphs
-        highlightGraphsOnLoad(dataStructure.selectionTable);
-    });
-}
+// function loadFromURL(urlSelections){
+//     searchData = new Data();
+//     selectionRows.init(urlSelections,true);
+//
+//     // Send array of selected sections to server and the company
+//     $.post("/compare/search",{company : "", selections : JSON.stringify(urlSelections)}, function(data){
+//         // Queries the db for each of the secions and finds and inserts the sub sections as options
+//         var lastSearch = new Selection(urlSelections[0],urlSelections[1],urlSelections[2],urlSelections[3]); // Set the last search
+//         var dataTables = dp.filterRowsToTables(data.rows, lastSearch); // Filter the rows into their tables
+//         searchData.rows = data.rows;
+//         searchData.tables = dataTables;
+//
+//         searchData.copyOfTables = dp.copyDataTables(dataTables);
+//
+//         dataStructure = dp.createDataStructuresWithCopy(searchData.copyOfTables); // Sets up the data so it can easily be iterated over to create the tables and graphs
+//
+//         showTables(dataStructure.selectionTable); // Show the tables
+//         showAllRegularGraphs(dataStructure.selectionData, true); // Show all but combined and vector graphs true indicates it should add titles in
+//         showAllCombinedGraphs(dataStructure.combineData, true); // Show the combined and vector graphs
+//         highlightGraphsOnLoad(dataStructure.selectionTable);
+//     });
+// }
 
 
 /**
@@ -511,6 +505,7 @@ function totalsRowClicked (id){
  * @param div {String} the id of the div to put the bar graph in
  * */
 function showBarWithRowElem(rowID, edb, div, headRow, tableID,unit){
+  console.log("Showing bar")
     var data = [];
 
     $(headRow).find('th').each(function (index, element) {
@@ -518,6 +513,7 @@ function showBarWithRowElem(rowID, edb, div, headRow, tableID,unit){
             data.push({category : $(element).text(), value : 0}); // 0 is temp
         }
     });
+
 
     $('#'+rowID).find('th').each(function (index, element) {
         if(index != 0){
@@ -538,7 +534,6 @@ function showBarWithRowElem(rowID, edb, div, headRow, tableID,unit){
       var val = +$(this).attr("origValue");
       min = val < min ? val : min;
     });
-    console.log(data);
     createBarGraph(div, max,min, data, edb,unit);
 }
 
@@ -612,26 +607,26 @@ function serialise(obj) {
 /**
  * Sets up rules for validating CPI fields. Must be a number 1-100
  * */
-// function cpiValidationSetup(){
-//     $.validator.setDefaults({
-//             errorClass : 'help-block',
-//             highlight: function (element) {$(element).closest('.form-group').addClass('has-error')},
-//             unhighlight :function (element) {$(element).closest('.form-group').removeClass('has-error')}
-//         }
-//     );
-//     var cpiRules = {required : true, number : true, min : 1, max : 100};
-//     var messageSet = {
-//         required : "Please enter a percentage",
-//         number : "Please enter a valid number",
-//         min : "Please enter a percentage greater than 0",
-//         max : "Please enter a percentage less than 100"
-//     };
-//
-//     $('#cpi-form').validate({
-//         rules : {Y2012 : cpiRules,Y2013 : cpiRules,Y2014 : cpiRules,Y2015 : cpiRules,Y2016 : cpiRules},
-//         messages : {Y2012 : messageSet,Y2013 : messageSet,Y2014 : messageSet,Y2015 : messageSet,Y2016 : messageSet}
-//     });
-// }
+function cpiValidationSetup(){
+    $.validator.setDefaults({
+            errorClass : 'help-block',
+            highlight: function (element) {$(element).closest('.form-group').addClass('has-error')},
+            unhighlight :function (element) {$(element).closest('.form-group').removeClass('has-error')}
+        }
+    );
+    var cpiRules = {required : true, number : true, min : 1, max : 100};
+    var messageSet = {
+        required : "Please enter a percentage",
+        number : "Please enter a valid number",
+        min : "Please enter a percentage greater than 0",
+        max : "Please enter a percentage less than 100"
+    };
+
+    $('#cpi-form').validate({
+        rules : {Y2012 : cpiRules,Y2013 : cpiRules,Y2014 : cpiRules,Y2015 : cpiRules,Y2016 : cpiRules},
+        messages : {Y2012 : messageSet,Y2013 : messageSet,Y2014 : messageSet,Y2015 : messageSet,Y2016 : messageSet}
+    });
+}
 
 
 /**
@@ -639,15 +634,14 @@ function serialise(obj) {
  * all graphs and tables where is it applicable.
  * */
 function applyCPI(){
-    if(CPIModule.isValid()){//$('#cpi-form').valid()
+    if($('#cpi-form').valid()){
         if(noCPICells.length > 0){
             revertCPI(); // Reverts cpi before instead of saving values with cpi already applied
             var copyOfDataTables = dp.copyDataTables(searchData.tables); // Use the original data and create a copy of it
             dataStructure = dp.createDataStructuresWithCopy(copyOfDataTables);
         }
         // CPI for 2012 - 2016
-        var cpiValues = CPIModule.getCPIValues();
-        // var cpiValues = [{year : 2012, value : +$('#Y2012').val()},{year : 2013, value : +$('#Y2013').val()},{year : 2014, value : +$('#Y2014').val()},{year : 2015, value : +$('#Y2015').val()},{year : 2016, value : +$('#Y2016').val()}];
+        var cpiValues = [{year : 2012, value : +$('#Y2012').val()},{year : 2013, value : +$('#Y2013').val()},{year : 2014, value : +$('#Y2014').val()},{year : 2015, value : +$('#Y2015').val()},{year : 2016, value : +$('#Y2016').val()}];
 
         // Applies CPI to all selected tables
         dataStructure.selectionTable.forEach(function (table) {

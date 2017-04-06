@@ -395,7 +395,7 @@ describe('Filter rows to table function tests', function() {
 
 
 
-// 
+//
 describe('Copy of table data function tests', function() {
   it('Length of copy should all one', function () {
 
@@ -969,4 +969,39 @@ describe('Data Structure creation tests', function() {
   it('Test min and max positive', function () {
 
   });
+});
+
+
+describe('Testing Filter and copy functions', function() {
+
+
+  it('Test copy is the same', function () {
+
+        var search = {
+          aTable: {id: 0, section: "i0", category: "a0", subCategory: "j0", description: "b0"},
+          bTable: {id: 1, section: "i1", category: "a1", subCategory: "j1", description: "b1"},
+          cTable: {id: 2, section: "i2", category: "a2", subCategory: "j2", description: "b2"},
+          dTable: {id: 3, section: "i3", category: "a3", subCategory: "j3", description: "b3"}
+        };
+        var rows = [];
+        for (var i = 0; i < 4; i++) {
+          rows.push(
+              {
+                category: "a" + i, description: "b" + i, disc_yr: 1 + i, edb: "c" + i,
+                fcast_yr: 10 + i, network: "d" + i, note: "e" + i, obs_yr: "f" + i, p_key: 20 + i, sch_ref: "g" + i,
+                schedule: "h" + i, section: "i" + i, sub_category: "j" + i, units: "h" + i, value: 30 + i
+              }
+          );
+        }
+
+
+        var dataStructure = dp.filterRowsToTablesAndCopy(rows,search);
+        console.log(dataStructure);
+  });
+
+  it('Test editing original does not mess with copy', function () {
+
+  });
+
+
 });

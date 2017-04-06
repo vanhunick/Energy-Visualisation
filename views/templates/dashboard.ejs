@@ -1,0 +1,36 @@
+<!--Wrapped in a div for table A to easily hide it-->
+<div class="tab-pane fade in active" id="tab-<%= data.tableID %>">
+<div id="full-dash-<%= data.tableID %>" class="full-table full">
+
+    <!-- Row for table -->
+    <div class="row">
+        <h2 class="table-title"><b>Selection A</b></h2>
+        <div id="title-<%= data.tableID %>" class="text-center"></div>
+        <div class="col-md-5 text-center table-col">
+            <table class="table table-edb" id="table-<%= data.tableID %>"></table>
+        </div>
+        <div class="col-md-6 text-center" id="bar-<%= data.tableID %>"></div>
+    </div>
+
+    <!-- Row for table totals -->
+    <div class="row">
+        <div class="col-md-5 text-center table-col">
+            <h2 class="total-title">Region Averages</h2>
+            <table class="table table-tot" id="table-total-<%= data.tableID %>"></table>
+        </div>
+        <div class="col-md-6 text-center" id="bar-total-<%= data.tableID %>"></div>
+    </div>
+
+    <!-- Row for bar graph -->
+    <div class="row group-row" >
+        <div id="title-bar-<%= data.tableID %>" class="text-center"></div>
+        <div class="col-lg-12 text-center" id="grouped-bar-<%= data.tableID %>" ></div>
+    </div>
+
+    <!-- Row for box and whisker graph -->
+    <div class="row text-center whisk-row">
+        <div id="title-box-<%= data.tableID %>" class="text-center"></div>
+        <div class="col-lg-12 text-center" style=" margin-left: 10%;" id="boxplot-<%= data.tableID %>"></div>
+    </div>
+</div>
+</div>
