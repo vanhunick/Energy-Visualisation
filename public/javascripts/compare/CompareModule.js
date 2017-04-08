@@ -70,10 +70,12 @@ var CompareModule = (function(){
       backup.rows = rows
       backup.sortedRows = dp.filterRowsToTablesAndCopy(rows,backup.selection);
 
-      backup.sortedRows.forEach(function(t){
-        $('#full-dash-'+ t.id).show();
-      });
 
+      backup.sortedRows.forEach(function(t){
+        if(t.id === 'a'){
+          $('#full-dash-'+ t.id).show();
+        }
+      });
       // Emit an event with the data
       events.emit("INIT_DATA", {data : backup.sortedRows});
     });
