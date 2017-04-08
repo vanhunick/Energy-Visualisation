@@ -3,34 +3,100 @@
 * @param id the id of the table a, b, c, d
 * @param rows the rows of data for the table
 * @param unit the unit of the data
-* @param selection the selection made by the user to find the data
+* @param selection {Object} if not combined else {Object[]} the selection made by the user to find the data
 */
-function Table(id, rows, unit, selection){
+function Table(id, rows, selection, isCombined){
   this.id = id;
+  this.isCombined = isCombined;
   this.rows = rows;
   this.unit = rows[0].units;
   this.selection = selection;
+
+  // Create the titles
+  this.title = this.getTitle();
+  this.subTitle = this.getSubTitle();
+
+  // Used to format numbers displayed
+  this.dpFormat = d3.format(".4r");
+
+  // Find the available years
+  this.availableYears = this.getAvailableYears();
+
+  // Used to store original cell values
+  this.noCPICells = [];
+
+  // Cache DOM elements
   this.$table = $('#table-'+id);
   this.$totalsTable = $('#table-total-'+id);
   this.$title = $('#title-'+id);
-  this.title = "Table title fix later use selection";
-  this.subTitle = "Table sub title fix later selection";
-  this.dpFormat = d3.format(".4r"); // Used to format numbers displayed
-  this.availableYears = this.getAvailableYears();
-  this.noCPICells = [];
-
-  // Cache all the dom elemnts we need for the table
-  var rowClicked = this.rowClicked;
-  // events.on("ROW_CLICKED", rowClicked);
 }
 
+
+/**
+ * Returns the title for the table
+ *
+ * @return {String} title
+ * */
+Table.prototype.getTitle = function () {
+  if(this.isCombined){
+    var subCategory = this.selection[0] === null ? "" : this.selection[0].subCategory;
+    return this.selection[0].section + ", " + this.selection[0].category + ", " + subCategory + ", "+ this.selection[0].description;
+  } else {
+    return (this.selection === null ? "" : this.selection.subCategory) + ", "+ this.selection.description;
+  }
+}
+
+
+/**
+ * Returns the subtitle for the table
+ *
+ * @return {String} subtitle
+ * */
+Table.prototype.getSubTitle = function () {
+  if(this.isCombined){
+    var subCategory = this.selection[1] === null ? "" : this.selection[1].subCategory;
+    return this.selection[1].section + ", " + this.selection[1].category + ", " + subCategory + ", "+ this.selection[1].description;
+  } else {
+    return this.selection.section + ", " + this.selection.category;
+  }
+}
+
+
+/**
+ * Updates the rows and the recalculates total table
+ *
+ * @param rows the new rows for the table
+ * */
+Table.prototype.update = function (rows) {
+  this.rows = rows;
+  this.createTotalsTable(true);
+}
+
+
+/**
+ * Shows a bar graph with the values from the selected row
+ *
+ * @param {Object} update the object to hold information about the row clicked
+ * */
 Table.prototype.totalsRowSelected = function (update) {
-  var id = update.rowID;
-  var rowNumber = update.rowNumb;
-  var region = update.region;
-  showBarWithRowElem(id,region,"#bar-total-"+this.id,"#head-row-totals-"+this.id,"#table-total-"+this.id,this.unit);
+  showBarWithRowElem(update.rowID,update.region,"#bar-total-"+this.id,"#head-row-totals-"+this.id,"#table-total-"+this.id,this.unit);
 }
 
+
+/**
+ * Shows a bar graph with the values from the selected row
+ *
+ * @param {Object} update the object to hold information about the row clicked
+ * */
+Table.prototype.rowClicked = function (event) {
+  showBarWithRowElem(event.rowID,event.edb,"#bar-"+this.id,"#head-row-"+this.id,"#table-"+this.id,this.unit);
+}
+
+/**
+ * Returns the years of data in the table
+ *
+ * @return {String[]} The array of years
+ * */
 Table.prototype.getAvailableYears = function () {
   availableYears = [];
   var availableYears = [];
@@ -43,16 +109,28 @@ Table.prototype.getAvailableYears = function () {
   return availableYears;
 }
 
+
+/**
+ * Returns if CPI can be applied to the table
+ *
+ * @return {Boolean} can apply cpi or not
+ * */
 Table.prototype.canApplyCPI = function () {
+  if(this.isCombined)return false;
   return this.unit.contains('$'); // TODO check if this is right later
 }
 
-// Applies CPI to all values in the table
+
+/**
+ * Applies CPI to all values in the table
+ *
+ * @param {Object} Holds percentage of CPI for each year
+ * */
 Table.prototype.applyCPI = function (cpiValues) {
   if(this.noCPICells.length > 0){
       this.revertCPI();
   }
-  // var $cachedCells = $('#table-'+id).find('.cell');
+
   var $cachedCells = this.$table.find('.cell');
 
   // First backup the cpiCells
@@ -66,7 +144,6 @@ Table.prototype.applyCPI = function (cpiValues) {
   var maxYear = -Infinity;
 
   $cachedCells.each(function(){ //cell or th
-    console.log("Looping ")
       var year = +$(this).attr("class").split(' ')[1];
       minYear = year < minYear ? year : minYear;
       maxYear = year > maxYear ? year : maxYear;
@@ -99,17 +176,22 @@ Table.prototype.revertCPI = function () {
   }
 }
 
+Table.prototype.insertTitles = function() {
+  if(this.isCombined){
+    this.$title.append('<h4 class="title">'+this.title+'</h4><h4 class="title">'+this.subTitle+'</h4>');
+  } else {
+    this.$title.append('<h2 class="title">'+this.title+'</h2>').append('<h4 class="subTitle">'+this.subTitle+'</h4>');
+  }
+}
+
+
 
 // Only called once to create the table
 Table.prototype.create = function () {
   var tableData = this.createTableData (this.rows); // Grab the data in the form we want
 
   // First insert the title
-  if(this.combined){
-    this.$title.append('<h4 class="title">'+this.title+'</h4><h4 class="title">'+this.subTitle+'</h4>');
-  } else {
-    this.$title.append('<h2 class="title">'+this.title+'</h2><h4 class="subTitle">'+this.subTitle+'</h4>');
-  }
+
 
   // create the years cells
   var years = "";
@@ -134,7 +216,7 @@ Table.prototype.create = function () {
 
     for(var j = 0; j < years.length; j++){
       var yearData = years[j];
-      row += "<th origValue='"+ yearData.value +"' class='cell "+yearData.year+"' id='t"+this.id+""+cellCount+"'>" + yearData.value + "</th>";
+      row += "<th origValue='"+ yearData.value +"' class='cell "+yearData.year+"' id='t"+this.id+""+cellCount+"'>" + this.dpFormat(yearData.value) + "</th>";
       cellValues.push({ id : "#t"+this.id+""+cellCount, value : yearData.value });
       cellCount++;
     }
@@ -155,7 +237,7 @@ Table.prototype.create = function () {
 }
 
 Table.prototype.createTotalsTable = function(update) {
-  var totals = dp.createTableTotals(this.rows,regions, this.availableYears);
+  var totals = dp.createTableTotals(this.rows, regions, this.availableYears);
   var names = {n : "North Island", uni : "Upper North Island", eni : "Eastern North Island", swni : "South-West North Island", s : "South Island", usi : "Upper South Island", lsi : "Lower South Island", nz : "New Zealand"};
 
   var totalCells = [];
@@ -184,6 +266,7 @@ Table.prototype.createTotalsTable = function(update) {
           //TODO (Note when updated origValue will be the updated value not the original)
 
           // Insert name in column and assign an id to the row
+          var format = this.dpFormat;
           row += "<th class='reg-cell'>" + names[property] + "</th>";
           var passID = this.id;
           totals[property].forEach(function(value){
@@ -194,7 +277,7 @@ Table.prototype.createTotalsTable = function(update) {
                   avg = value / regions[property].length;
               }
 
-              row += "<th id='t-total"+passID+""+cellCount+"' origValue='"+ avg +"' class='cell'>" + avg + "</th>";
+              row += "<th id='t-total"+passID+""+cellCount+"' origValue='"+ avg +"' class='cell'>" + format(avg) + "</th>";
               totalCells.push({id : "#t-total"+passID+""+cellCount, value :avg});
 
               // TODO check if better way
@@ -214,13 +297,8 @@ Table.prototype.createTotalsTable = function(update) {
   this.totalCellValues = totalCells;
 }
 
-Table.prototype.rowClicked = function (event) {
-  var id = event.rowID;
-  var rowNumber = event.rowNumb;
-  var edb = event.edb;
 
-  showBarWithRowElem(id,edb,"#bar-"+this.id,"#head-row-"+this.id,"#table-"+this.id,this.unit);
-}
+
 
 Table.prototype.createTableData = function (rows) {
   // Create array with unique EDBS
@@ -246,7 +324,7 @@ Table.prototype.createTableData = function (rows) {
         return a.year > b.year;
       })
 
-      data.push({ edb : edbs[edb], years});
+      data.push({ edb : edbs[edb], years : years});
     }
   }
   return data;
@@ -254,8 +332,7 @@ Table.prototype.createTableData = function (rows) {
 
 
 // Called when values in the table update
-Table.prototype.render = function (values) {
-
+Table.prototype.render = function () {
   this.applyGradientCSS(this.cellValues);
   this.applyGradientCSS(this.totalCellValues);
 }

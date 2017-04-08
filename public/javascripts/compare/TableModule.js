@@ -1,5 +1,6 @@
 var TablesModule = (function(){
 
+  // The EDBs that belong to each region
   var regions = {
     n : ["Centralines","Counties Power","Eastland Network","Electra","Horizon Energy","Northpower",
          "Powerco","Scanpower","The Lines Company","Top Energy","Unison Networks","Vector Lines",
@@ -14,21 +15,33 @@ var TablesModule = (function(){
     lsi : ["Aurora Energy","Electricity Ashburton","Electricity Invercargill","Network Waitaki","OtagoNet","The Power Company"]
   };
 
+  // The id of the currently selected row in the main table
   var selectedRow = "";
+
+  // The id of the currently selected row in the totals
   var selectedTotalRow = "";
 
   // Holds the table objects
   var tables = [];
-  var dp = new DataProcessor();
 
-  // Creates the tables using the table data
+
+  /**
+   * Creates the tables using the table data
+   *
+   * @param {Object} the object containing the tables data
+   * */
   var init = function (update) {
     update.data.forEach (function(tableData){
-      tables.push(new Table(tableData.id,tableData.rows,tableData.search));
+      if(tableData.combined){
+        tables.push(new Table(tableData.id, tableData.rows, [tableData.search, tableData.search2 ], true));
+      } else {
+        tables.push(new Table(tableData.id,tableData.rows,tableData.search,false));
+      }
     });
 
   // Create each of the tables along with a the totals table
   tables.forEach(function(table){
+      table.insertTitles();
       table.create();
       table.createTotalsTable(false);
     });
@@ -39,17 +52,17 @@ var TablesModule = (function(){
 
   // Called when a row clicked event occours
   var rowClicked = function (update) {
-    if(this.selectedRow === update.rowID){
+    if(selectedRow === update.rowID){
       $('.table-row').find(".edb-cell:contains('"+update.edb+"')").parent().removeClass("row-selected"); // Selects edb row in all tables
-      this.rowSelected = "";
+      rowSelected = "";
       return;
     }
 
-    if(this.selectedRow !== ""){
-      var text = $("#"+this.selectedRow+" .edb-cell").text();
+    if(selectedRow !== ""){
+      var text = $("#"+selectedRow+" .edb-cell").text();
       $('.table-row').find(".edb-cell:contains('"+text+"')").parent().removeClass("row-selected"); // Selects edb row in all tables
     }
-    this.selectedRow = update.rowID;
+    selectedRow = update.rowID;
 
     $('.table-row').find(".edb-cell:contains('"+update.edb+"')").parent().addClass("row-selected"); // Selects edb row in all tables
 
@@ -61,18 +74,18 @@ var TablesModule = (function(){
   var totalRowClicked = function (update) {
     var region = update.region;
 
-    if(this.selectedTotalRow === update.rowID){
+    if(selectedTotalRow === update.rowID){
       var oldReg = $("#"+update.rowID+" .reg-cell").text();
 
       $('.table-row').find(".reg-cell:contains('"+reg+"')").filter(function() {
           return $(this).text() === reg;
       }).parent().removeClass("row-selected"); // Selects edb row in all tables
-      this.selectedTotalRow = "";
+      selectedTotalRow = "";
       return;
     }
 
-    if(this.selectedTotalRow !== ""){
-        var oldReg = $("#"+this.selectedTotalRow+" .reg-cell").text();
+    if(selectedTotalRow !== ""){
+        var oldReg = $("#"+selectedTotalRow+" .reg-cell").text();
         $('.table-row').find(".reg-cell:contains('"+oldReg+"')").filter(function() {
             return $(this).text() === oldReg;
         }).parent().removeClass("row-selected"); // Selects edb row in all tables
@@ -83,7 +96,7 @@ var TablesModule = (function(){
     }).parent().addClass("row-selected"); // Selects edb row in all tables
 
     // if id ends with letter set to id
-    this.selectedTotalRow = update.rowID;
+    selectedTotalRow = update.rowID;
 
     tables.forEach(function(table){
       table.totalsRowSelected(update);
@@ -103,12 +116,29 @@ var TablesModule = (function(){
     });
   }
 
+  var update = function (update) {
+    update.data.forEach(function(tableData){
+      tables.forEach(function(g){
+        if(g.id === tableData.id){
+          if(g.isCombined){
+            g.update(tableData.rows, tableData.table1Rows, tableData.table2Rows);
+          } else {
+            console.log("Updating")
+            g.update(tableData.rows);
+          }
+        }
+      });
+    });
+  }
+
   // Listen to events
   events.on("INIT_DATA", init);
   events.on("ROW_CLICKED", rowClicked);
   events.on("TOTAL_ROW_CLICKED", totalRowClicked);
   events.on("APPLY_CPI", applyCPI);
   events.on("REVERT_CPI", applyCPI);
+  events.on("ROW_UPDATE", update);
+
 
   return {
 

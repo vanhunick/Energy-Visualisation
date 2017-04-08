@@ -18,6 +18,7 @@ function SectionSelect(idNumb){
 
       // Grab section from DB and add to dropdown
       Database.getSectionsFromDatabase(function(sections){
+        dp.sortSections({sections : sections});
         addOptionsToSelector(passID,sections,selection.section);
       });
     }
