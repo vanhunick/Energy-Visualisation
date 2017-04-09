@@ -73,8 +73,10 @@ var CompareModule = (function(){
 
       backup.sortedRows.forEach(function(t){
         if(t.id === 'a'){
-          $('#full-dash-'+ t.id).show();
+          $('#tab-a').addClass("in active");
         }
+          $('#full-dash-'+ t.id).show();
+        //}
       });
       // Emit an event with the data
       events.emit("INIT_DATA", {data : backup.sortedRows});

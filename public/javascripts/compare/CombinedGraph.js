@@ -12,14 +12,15 @@
  * */
 function CombinedGraph(id, combinedRows, rows1,rows2,selection1,selection2){
   this.id = id;
-  this.groupedID = '#grouped-bar'+id;
+  this.groupedID = '#grouped-bar-'+id;
   this.boxID = '#boxplot-'+id;
-  this.vectorID = '#vector-'+id;
+  this.vectorID = '#vector-graph-'+id;
   this.rows1 = rows1;
   this.rows2 = rows2;
   this.combinedRows = combinedRows;
   this.selection1 = selection1;
   this.selection2 = selection2;
+  this.unit = this.getUnit();
 
 
   // Cache dom elements
@@ -80,14 +81,34 @@ CombinedGraph.prototype.getSelection2Title = function () {
  * @return {String} the combined units for the selections
  * */
 CombinedGraph.prototype.getUnit = function () {
-  return this.rows1[0].unit + " / " + this.rows2[0].unit;
+  return this.rows1[0].units + " / " + this.rows2[0].units;
 }
+
+/**
+ * Returns the unit for the first selection
+ *
+ * @return {String} the unit for the selections
+ * */
+CombinedGraph.prototype.getUnit1 = function () {
+  return this.rows1[0].units;
+}
+
+/**
+ * Returns the unit for the second selection
+ *
+ * @return {String} the unit for the selections
+ * */
+CombinedGraph.prototype.getUnit2 = function () {
+  return this.rows2[0].units;
+}
+
+
 
 
 /**
  * Inserts the titles for the graphs into the DOM elements
  * */
-CombinedGraph.prototype.inserTitles = function () {
+CombinedGraph.prototype.insertTitles = function () {
   var titleHTML = '<h4 class="combined-title">'+this.getSelection1Title()+'<br><span class="over">over</span><br>'+this.getSelection2Title()+'</h4>'
 
   this.$titleBar.append(titleHTML);
@@ -108,7 +129,7 @@ CombinedGraph.prototype.create = function () {
 
     // Create the grouped bar graph
     var groupedData = dp.createDataForGroupedGraph(this.combinedRows);
-    createdGroupedBarGraph(groupedData.data,groupedData.keys,this.unit, this.graphID);
+    createdGroupedBarGraph(groupedData.data,groupedData.keys,this.unit, this.groupedID);
 
     // Create the box plot graph
     var boxplotData = dp.createDataForBoxPlot(this.combinedRows);
@@ -116,7 +137,7 @@ CombinedGraph.prototype.create = function () {
 
     // Create the vector graph
     var vectorGraphData = dp.createDataForVectorGraph(this.rows1, this.rows2);
-    createVectorGraph(vectorGraphData,selection.unit1,selection.unit2,this.vectorID);
+    createVectorGraph(vectorGraphData,this.getUnit2(),this.getUnit2(),this.vectorID);
 }
 
 /**

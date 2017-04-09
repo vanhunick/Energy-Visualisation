@@ -77,10 +77,6 @@ function createdGroupedBarGraph(data,keys,yLabel, divID){
     curBarGraph.x0.domain(data.map(function(d) { return d.edb; }));
     curBarGraph.x1.domain(keys).rangeRound([0, curBarGraph.x0.bandwidth()]);
 
-  if(divID.includes('ab')){
-    console.log(d3.max(data, function(d) { return d3.max(keys, function(key) { return Math.abs(d[key]); }); }));
-  }
-
     curBarGraph.y.domain([0, d3.max(data, function(d) { return d3.max(keys, function(key) { return Math.abs(d[key]); }); })]).nice();
     var g = curBarGraph.svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
@@ -94,6 +90,7 @@ function createdGroupedBarGraph(data,keys,yLabel, divID){
       .html(function(d) {
         return "<strong>Value:</strong> <span style='color:lightgreen'>" + dpFormat(d.value) + "</span><br><br><strong>Year:</strong> <span style='color:lightgreen'>" + d.key + "</span>";
       });
+
       curBarGraph.svg.call(tip);
 
     if(curBarGraph.created){

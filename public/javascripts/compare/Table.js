@@ -149,6 +149,7 @@ Table.prototype.applyCPI = function (cpiValues) {
       maxYear = year > maxYear ? year : maxYear;
   });
 
+  var format = this.dpFormat;
   for(var cur = minYear; cur <=maxYear; cur++){ // Go through each possible year
       $cachedCells.each(function(){ // Grab every cell
           var year = +$(this).attr("class").split(' ')[1]; // Grab the year of the cell by checking the class
@@ -157,8 +158,7 @@ Table.prototype.applyCPI = function (cpiValues) {
               if(cpiValues[i].year === cur){
                   if(year <= cur){
                       valueOfCell = valueOfCell * (1 + (cpiValues[i].value / 100));
-                      valueOfCell = valueOfCell;
-                      //TODO format
+                      valueOfCell = format(valueOfCell);
                   }
               }
           }

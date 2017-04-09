@@ -242,12 +242,12 @@ DataProcessor.prototype.filterRowsToTablesAndCopy = function (rows, search) {
 
   // Create combined tables if possible
   if(aRows.length > 0 && bRows.length > 0){
-      tables.push({ id : 'ab', rows : copy.tableAB, table1Rows : copy.tablA, table2Rows : copy.tableB, search : search.aTable, search2 : search.bTable, combined : true});
+      tables.push({ id : 'ab', rows : copy.tableAB, table1Rows : copy.tableA, table2Rows : copy.tableB, search : search.aTable, search2 : search.bTable, combined : true});
   }
 
   if(cRows.length > 0 && dRows.length > 0){
       var cdRows = dp.combineTables(cRows,dRows);
-      tables.push({ id : 'cd', rows : copy.tableCD, table1Rows : copy.tablC, table2Rows : copy.tableD, search : search.cTable, search2 : search.dTable, combined : true});
+      tables.push({ id : 'cd', rows : copy.tableCD, table1Rows : copy.tableC, table2Rows : copy.tableD, search : search.cTable, search2 : search.dTable, combined : true});
   }
   return tables;
 }

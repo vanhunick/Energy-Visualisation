@@ -85,6 +85,6 @@ var selectionRows =  (function(){
       setSelectionsFromURL : setSelectionsFromURL,
       init : init,
       clear : clear,
-      canSearch, canSearch
+      canSearch : canSearch
     }
 })();
