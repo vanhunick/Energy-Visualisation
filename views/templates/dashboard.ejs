@@ -1,10 +1,10 @@
 <!--Wrapped in a div for table A to easily hide it-->
-<div class="tab-pane fade in active" id="tab-<%= data.tableID %>">
-<div id="full-dash-<%= data.tableID %>" class="full-table full">
+<div class="tab-pane fade" id="tab-<%= data.tableID %>">
+    <div id="full-dash-<%= data.tableID %>" class="full-table full">
 
     <!-- Row for table -->
     <div class="row">
-        <h2 class="table-title"><b>Selection A</b></h2>
+        <h2 class="table-title"><b>Selection <%= data.tableID.toUpperCase() %></b></h2>
         <div id="title-<%= data.tableID %>" class="text-center"></div>
         <div class="col-md-5 text-center table-col">
             <table class="table table-edb" id="table-<%= data.tableID %>"></table>
@@ -32,5 +32,5 @@
         <div id="title-box-<%= data.tableID %>" class="text-center"></div>
         <div class="col-lg-12 text-center" style=" margin-left: 10%;" id="boxplot-<%= data.tableID %>"></div>
     </div>
-</div>
+    </div>
 </div>
