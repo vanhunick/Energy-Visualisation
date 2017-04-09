@@ -1,4 +1,4 @@
-// DEPENDENCIES : DataProcessor, GroupedBarGraph
+// DEPENDENCIES : DataProcessor, GroupedBarGraphModule, VectorGraphModule, BoxPlotModule
 
 /**
  * Object that handles logic for updating and creating all of the graphs on the dashboard across the tabs
@@ -56,10 +56,7 @@ CombinedGraph.prototype.getID = function () {
  * @return {String} the title of the first selection
  * */
 CombinedGraph.prototype.getSelection1Title = function () {
-   var selection1Title = this.selection1.description + ", " + this.selection1.category;
-
-
-  return selection1Title;
+  return this.selection1.description + ", " + this.selection1.category;
 }
 
 
@@ -69,9 +66,7 @@ CombinedGraph.prototype.getSelection1Title = function () {
  * @return {String} the title of the second selection
  * */
 CombinedGraph.prototype.getSelection2Title = function () {
-  var selection2Title = this.selection2.description + ", " + this.selection2.category;
-
-  return selection2Title;
+  return this.selection2.description + ", " + this.selection2.category;
 }
 
 
@@ -84,6 +79,7 @@ CombinedGraph.prototype.getUnit = function () {
   return this.rows1[0].units + " / " + this.rows2[0].units;
 }
 
+
 /**
  * Returns the unit for the first selection
  *
@@ -92,6 +88,7 @@ CombinedGraph.prototype.getUnit = function () {
 CombinedGraph.prototype.getUnit1 = function () {
   return this.rows1[0].units;
 }
+
 
 /**
  * Returns the unit for the second selection
@@ -119,10 +116,6 @@ CombinedGraph.prototype.insertTitles = function () {
 
 /**
  * Creates the Graphs
- *
- * @param rows the new combined rows
- * @param the new rows for the first selection
- * @param rows2 the new rows for the second selection
  * */
 CombinedGraph.prototype.create = function () {
     // Create the grouped bar graph
@@ -135,8 +128,9 @@ CombinedGraph.prototype.create = function () {
 
     // Create the vector graph
     var vectorGraphData = dp.createDataForVectorGraph(this.rows1, this.rows2);
-    VectorModule.createVectorGraph(vectorGraphData,this.getUnit2(),this.getUnit2(),this.vectorID);
+    VectorModule.createVectorGraph(vectorGraphData,this.getUnit2(),this.getUnit1(),this.vectorID);
 }
+
 
 /**
  * Called when the rows are updated by CPI
