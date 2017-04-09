@@ -79,7 +79,7 @@ Table.prototype.update = function (rows) {
  * @param {Object} update the object to hold information about the row clicked
  * */
 Table.prototype.totalsRowSelected = function (update) {
-  showBarWithRowElem(update.rowID,update.region,"#bar-total-"+this.id,"#head-row-totals-"+this.id,"#table-total-"+this.id,this.unit);
+  SingleBarModule.showBarWithRowElem(update.rowID,update.region,"#bar-total-"+this.id,"#head-row-totals-"+this.id,"#table-total-"+this.id,this.unit);
 }
 
 
@@ -89,7 +89,7 @@ Table.prototype.totalsRowSelected = function (update) {
  * @param {Object} update the object to hold information about the row clicked
  * */
 Table.prototype.rowClicked = function (event) {
-  showBarWithRowElem(event.rowID,event.edb,"#bar-"+this.id,"#head-row-"+this.id,"#table-"+this.id,this.unit);
+  SingleBarModule.showBarWithRowElem(event.rowID,event.edb,"#bar-"+this.id,"#head-row-"+this.id,"#table-"+this.id,this.unit);
 }
 
 /**
@@ -169,9 +169,9 @@ Table.prototype.applyCPI = function (cpiValues) {
 
 Table.prototype.revertCPI = function () {
   if(noCPICells.length > 0){
+    var format = this.dpFormat;
     noCPICells.forEach(function(e){
-        $('#'+e.id).text(e.value);
-        // TODO format
+        $('#'+e.id).text(format(e.value));
     });
   }
 }

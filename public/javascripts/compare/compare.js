@@ -497,45 +497,7 @@ function totalsRowClicked (id){
 }
 
 
-/**
- * Shows the bar graph on the screen
- *
- * @param rowID {String} the id of the row to show with the data for the bar graph
- * @param edb {String} the edb of the row
- * @param div {String} the id of the div to put the bar graph in
- * */
-function showBarWithRowElem(rowID, edb, div, headRow, tableID,unit){
-  console.log("Showing bar")
-    var data = [];
 
-    $(headRow).find('th').each(function (index, element) {
-        if(index != 0){ // 0 is not a year
-            data.push({category : $(element).text(), value : 0}); // 0 is temp
-        }
-    });
-
-
-    $('#'+rowID).find('th').each(function (index, element) {
-        if(index != 0){
-            data[index-1].value = $(element).text();
-        } else {
-            title = data[index].value = $(element).text();
-        }
-    });
-
-    var max = -Infinity;
-    $('.cell', tableID).each(function(){ //cell or th
-        var val = +$(this).attr("origValue");
-        max = val > max ? val : max;
-    });
-
-    var min = Infinity;
-    $('.cell', tableID).each(function(){ //cell or th
-      var val = +$(this).attr("origValue");
-      min = val < min ? val : min;
-    });
-    createBarGraph(div, max,min, data, edb,unit);
-}
 
 
 /**
