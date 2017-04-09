@@ -125,19 +125,17 @@ CombinedGraph.prototype.insertTitles = function () {
  * @param rows2 the new rows for the second selection
  * */
 CombinedGraph.prototype.create = function () {
-    // First insert titles
-
     // Create the grouped bar graph
     var groupedData = dp.createDataForGroupedGraph(this.combinedRows);
-    createdGroupedBarGraph(groupedData.data,groupedData.keys,this.unit, this.groupedID);
+    GroupedBarModule.createdGroupedBarGraph(groupedData.data,groupedData.keys,this.unit, this.groupedID);
 
     // Create the box plot graph
     var boxplotData = dp.createDataForBoxPlot(this.combinedRows);
-    createBoxPlot(boxplotData, this.boxID, this.unit);
+    BoxPlotModule.createBoxPlot(boxplotData, this.boxID, this.unit);
 
     // Create the vector graph
     var vectorGraphData = dp.createDataForVectorGraph(this.rows1, this.rows2);
-    createVectorGraph(vectorGraphData,this.getUnit2(),this.getUnit2(),this.vectorID);
+    VectorModule.createVectorGraph(vectorGraphData,this.getUnit2(),this.getUnit2(),this.vectorID);
 }
 
 /**

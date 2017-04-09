@@ -1,173 +1,180 @@
-/**
- * Created by Nicky on 2/02/2017.
- */
-var labels = false; // show the text labels beside individual boxplots?
+var BoxPlotModule = (function () {
+    var labels = false; // show the text labels beside individual boxplots?
 
 // Margins and graph width / height
-var boxMargin = {top: 0, right: 100, bottom: 80, left: 100},
-    boxWidth = 600 - boxMargin.left - boxMargin.right,
-    boxHeight = 350  - boxMargin.top  - boxMargin.bottom;
+    var boxMargin = {top: 0, right: 100, bottom: 80, left: 100},
+      boxWidth = 600 - boxMargin.left - boxMargin.right,
+      boxHeight = 350  - boxMargin.top  - boxMargin.bottom;
 
 
 // Encapsulate all properties of graph
-var plots = [];
+    var plots = [];
 
 // Object to hold the values for each individual boxplot
-function BoxPlotData(x,y,xAxis,yAxis,svg,chart,created, id){
-    this.x = x;
-    this.y = y;
-    this.xAxis = xAxis;
-    this.yAxis = yAxis;
-    this.svg = svg;
-    this.chart = chart;
-    this.created = created;
-    this.id = id
-}
+    function BoxPlotData(x,y,xAxis,yAxis,svg,chart,created, id){
+        this.x = x;
+        this.y = y;
+        this.xAxis = xAxis;
+        this.yAxis = yAxis;
+        this.svg = svg;
+        this.chart = chart;
+        this.created = created;
+        this.id = id
+    }
 
 
 // Create a box plot graph with the dataObject and place it in the div with divID unit for the the y - axis
-function createBoxPlot(dataObject,divID,unit){
-    var boxPlotObjects = null;
-    var data = dataObject.data;
-    var min = dataObject.min;
-    var max = dataObject.max;
-    var scatterData = dataObject.scatterData;
+    function createBoxPlot(dataObject,divID,unit){
+        var boxPlotObjects = null;
+        var data = dataObject.data;
+        var min = dataObject.min;
+        var max = dataObject.max;
+        var scatterData = dataObject.scatterData;
 
-    // Find the plot that needs to be updated or created
-    plots.forEach(function (plot) {
-        if(plot.id === divID){
-            boxPlotObjects = plot;
+        // Find the plot that needs to be updated or created
+        plots.forEach(function (plot) {
+            if(plot.id === divID){
+                boxPlotObjects = plot;
+            }
+        });
+
+        // The graph has not been created yet
+        if(boxPlotObjects === null){
+            var x = d3.scaleBand().rangeRound([0, boxWidth]).padding(0.7,0.3);
+            boxPlotObjects = new BoxPlotData(x,null,null,null,null,null,false,divID);
+            plots.push(boxPlotObjects);
+        } else {
+            d3.select(divID+' svg').remove();
         }
-    });
 
-    // The graph has not been created yet
-    if(boxPlotObjects === null){
-        var x = d3.scaleBand().rangeRound([0, boxWidth]).padding(0.7,0.3);
-        boxPlotObjects = new BoxPlotData(x,null,null,null,null,null,false,divID);
-        plots.push(boxPlotObjects);
-    } else {
-        d3.select(divID+' svg').remove();
-    }
+        // the y-axis
+        boxPlotObjects.y = d3.scaleLinear()
+          .domain([min, max]).nice()
+          .range([boxHeight + boxMargin.top, 0 + boxMargin.top]);
 
-    // the y-axis
-    boxPlotObjects.y = d3.scaleLinear()
-        .domain([min, max]).nice()
-        .range([boxHeight + boxMargin.top, 0 + boxMargin.top]);
-
-    boxPlotObjects.chart = d3.box()
-        .whiskers(iqr(1.5))
-        .height(boxHeight)
-        .domain(boxPlotObjects.y.domain())
-        .showLabels(labels);
+        boxPlotObjects.chart = d3.box()
+          .whiskers(iqr(1.5))
+          .height(boxHeight)
+          .domain(boxPlotObjects.y.domain())
+          .showLabels(labels);
 
         // Create the responsive SVG
         boxPlotObjects.svg =  d3.select(divID)
-         .append("div")
-         .classed("svg-container-box", true) //container class to make it responsive
-         .append("svg")
-         //responsive SVG needs these 2 attributes and no width and height attr
-         .attr("preserveAspectRatio", "xMinYMin meet")
-         .attr("viewBox", "0 0 "+ (boxWidth + boxMargin.left + boxMargin.right) +" "+ (boxHeight + boxMargin.top + boxMargin.bottom) + "")
-         .attr("class", "box")
-         .append("g") // group allows us to move everything together
-         .attr("transform",
-             "translate(" + margin.left + "," + margin.top + ")") // moves by a x and y value in this c
-         //class to make it responsive
-         .classed("svg-content-responsive", true);
+          .append("div")
+          .classed("svg-container-box", true) //container class to make it responsive
+          .append("svg")
+          //responsive SVG needs these 2 attributes and no width and height attr
+          .attr("preserveAspectRatio", "xMinYMin meet")
+          .attr("viewBox", "0 0 "+ (boxWidth + boxMargin.left + boxMargin.right) +" "+ (boxHeight + boxMargin.top + boxMargin.bottom) + "")
+          .attr("class", "box")
+          .append("g") // group allows us to move everything together
+          .attr("transform",
+            "translate(" + boxMargin.left + "," + boxMargin.top + ")") // moves by a x and y value in this c
+          //class to make it responsive
+          .classed("svg-content-responsive", true);
 
 
-    boxPlotObjects.x.domain( data.map(function(d) {return d[0] } ) );
-    boxPlotObjects.xAxis = d3.axisBottom(boxPlotObjects.x);
-    boxPlotObjects.yAxis = d3.axisLeft(boxPlotObjects.y);
+        boxPlotObjects.x.domain( data.map(function(d) {return d[0] } ) );
+        boxPlotObjects.xAxis = d3.axisBottom(boxPlotObjects.x);
+        boxPlotObjects.yAxis = d3.axisLeft(boxPlotObjects.y);
 
-    boxPlotObjects.svg.selectAll(".box")
-        .data(data)
-        .enter().append("g")
-        .attr("transform", function(d) { return "translate(" +  boxPlotObjects.x(d[0])  + "," + boxMargin.top + ")"; } )
-        .call(boxPlotObjects.chart.width(boxPlotObjects.x.bandwidth())); //V4 Updated
+        boxPlotObjects.svg.selectAll(".box")
+          .data(data)
+          .enter().append("g")
+          .attr("transform", function(d) { return "translate(" +  boxPlotObjects.x(d[0])  + "," + boxMargin.top + ")"; } )
+          .call(boxPlotObjects.chart.width(boxPlotObjects.x.bandwidth())); //V4 Updated
 
-    // draw the boxplots
-    boxPlotObjects.svg.selectAll(".box")
-        .data(data)
-        .enter().append("g")
-        .attr("transform", function(d) { return "translate(" +  boxPlotObjects.x(d[0])  + "," + boxMargin.top + ")"; } )
-        .call(boxPlotObjects.chart.width(boxPlotObjects.x.bandwidth())); //V4 Updated
+        // draw the boxplots
+        boxPlotObjects.svg.selectAll(".box")
+          .data(data)
+          .enter().append("g")
+          .attr("transform", function(d) { return "translate(" +  boxPlotObjects.x(d[0])  + "," + boxMargin.top + ")"; } )
+          .call(boxPlotObjects.chart.width(boxPlotObjects.x.bandwidth())); //V4 Updated
 
-    // The format to display the values in
-    var dpFormat = d3.format(".2f");
+        // The format to display the values in
+        var dpFormat = d3.format(".2f");
 
-    // Create the tip to show up on hover
-    var tip = d3.tip()
-      .attr('class', 'd3-tip')
-      .offset([-10, 0])
-      .html(function(d) {
-        return "<strong>Value:</strong> <span style='color:lightgreen'>" + dpFormat(d.value) + "</span><br><br><strong>EDB:</strong> <span style='color:lightgreen'>" + d.edb + "</span>";
-      });
-    boxPlotObjects.svg.call(tip);
+        // Create the tip to show up on hover
+        var tip = d3.tip()
+          .attr('class', 'd3-tip')
+          .offset([-10, 0])
+          .html(function(d) {
+              return "<strong>Value:</strong> <span style='color:lightgreen'>" + dpFormat(d.value) + "</span><br><br><strong>EDB:</strong> <span style='color:lightgreen'>" + d.edb + "</span>";
+          });
+        boxPlotObjects.svg.call(tip);
 
-    // Add the dots for the scaterplot on top of the box and whisker
-    boxPlotObjects.svg.selectAll(".dot")
-            .data(scatterData)
-            .enter().append("circle")
-            .attr("class",function(d){return "dot "+d.edb.replace(/ /g , "");})
-            .attr("r", 2)
-            .attr("cx", function(d) { return boxPlotObjects.x(d.year) + whiskBoxWidth/2; })
-            .attr("cy", function(d) { return boxPlotObjects.y(d.value); })
-            .on('mouseover', tip.show)
-            .on('mouseout', tip.hide);
+        // Add the dots for the scaterplot on top of the box and whisker
+        boxPlotObjects.svg.selectAll(".dot")
+          .data(scatterData)
+          .enter().append("circle")
+          .attr("class",function(d){return "dot "+d.edb.replace(/ /g , "");})
+          .attr("r", 2)
+          .attr("cx", function(d) { return boxPlotObjects.x(d.year) + whiskBoxWidth/2; })
+          .attr("cy", function(d) { return boxPlotObjects.y(d.value); })
+          .on('mouseover', tip.show)
+          .on('mouseout', tip.hide);
 
-    // draw y axis
-    boxPlotObjects.svg.append("g")
-        .attr("class", "y axis")
-        .call(boxPlotObjects.yAxis)
-        .append("text")
-        .attr("transform", "rotate(-90)")
-        .attr("y", 6)
-        .attr("dy", ".71em")
-        .style("text-anchor", "end")
-        .style("font-size", "8px");
+        // draw y axis
+        boxPlotObjects.svg.append("g")
+          .attr("class", "y axis")
+          .call(boxPlotObjects.yAxis)
+          .append("text")
+          .attr("transform", "rotate(-90)")
+          .attr("y", 6)
+          .attr("dy", ".71em")
+          .style("text-anchor", "end")
+          .style("font-size", "8px");
 
-    // draw x axis
-    boxPlotObjects.svg.append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0," + (boxHeight + boxMargin.top  + 10) + ")")
-        .call(boxPlotObjects.xAxis)
-        .append("text")             // text label for the x axis
-        .attr("x", (boxWidth / 2) )
-        .attr("y",  10 )
-        .attr("dy", ".71em")
-        .style("text-anchor", "middle")
-        .style("font-size", "8px")
-        .text("Quarter");
+        // draw x axis
+        boxPlotObjects.svg.append("g")
+          .attr("class", "x axis")
+          .attr("transform", "translate(0," + (boxHeight + boxMargin.top  + 10) + ")")
+          .call(boxPlotObjects.xAxis)
+          .append("text")             // text label for the x axis
+          .attr("x", (boxWidth / 2) )
+          .attr("y",  10 )
+          .attr("dy", ".71em")
+          .style("text-anchor", "middle")
+          .style("font-size", "8px")
+          .text("Quarter");
 
-    // Add the y axis unit
-    boxPlotObjects.svg.append("text")
-        .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-        .attr("transform", "translate("+ -(boxMargin.left/2-10) +","+(boxHeight/2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
-        .attr("class", "unit-text-scaled")
-        .text(unit);
+        // Add the y axis unit
+        boxPlotObjects.svg.append("text")
+          .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
+          .attr("transform", "translate("+ -(boxMargin.left/2-10) +","+(boxHeight/2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
+          .attr("class", "unit-text-scaled")
+          .text(unit);
 
-    // Add year as the x-axis label
-    boxPlotObjects.svg.append("text")
-        .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-        .attr("transform", "translate("+ +(boxWidth/2) +","+( boxMargin.top + 40 + boxHeight)+")")  // text is drawn off the screen top left, move down and out and rotate
-        .attr("class", "unit-text-scaled")
-        .text("Year");
+        // Add year as the x-axis label
+        boxPlotObjects.svg.append("text")
+          .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
+          .attr("transform", "translate("+ +(boxWidth/2) +","+( boxMargin.top + 40 + boxHeight)+")")  // text is drawn off the screen top left, move down and out and rotate
+          .attr("class", "unit-text-scaled")
+          .text("Year");
 
-    boxPlotObjects.created = true; // Set the plot to created for the ID
-}
+        boxPlotObjects.created = true; // Set the plot to created for the ID
+    }
 
 
 // Returns a function to compute the interquartile range.
-function iqr(k) {
-    return function(d, i) {
-        var q1 = d.quartiles[0],
-            q3 = d.quartiles[2],
-            iqr = (q3 - q1) * k,
-            i = -1,
-            j = d.length;
-        while (d[++i] < q1 - iqr);
-        while (d[--j] > q3 + iqr);
-        return [i, j];
-    };
-}
+    function iqr(k) {
+        return function(d, i) {
+            var q1 = d.quartiles[0],
+              q3 = d.quartiles[2],
+              iqr = (q3 - q1) * k,
+              i = -1,
+              j = d.length;
+            while (d[++i] < q1 - iqr);
+            while (d[--j] > q3 + iqr);
+            return [i, j];
+        };
+    }
+
+
+
+    return {
+        createBoxPlot : createBoxPlot
+    }
+})();
+
+

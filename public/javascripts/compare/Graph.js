@@ -99,11 +99,11 @@ Graph.prototype.insertTitles = function () {
 Graph.prototype.create = function () {
     // Create the data for the grouped graph and display it
     var groupedData = dp.createDataForGroupedGraph(this.rows);
-    createdGroupedBarGraph(groupedData.data,groupedData.keys,this.unit,this.groupedID);
+    GroupedBarModule.createdGroupedBarGraph(groupedData.data,groupedData.keys,this.unit,this.groupedID);
 
     // Create the data for boxplot and show the graph
     var boxData = dp.createDataForBoxPlot(this.rows);
-    createBoxPlot(boxData, this.boxID, this.unit);
+    BoxPlotModule.createBoxPlot(boxData, this.boxID, this.unit);
 }
 
 
