@@ -19,12 +19,11 @@ var GraphModule = (function(){
       } else {
         graphs.push(new Graph(tableData.id,tableData.rows,tableData.search));
       }
-
-      // Insert the titles and create the graphs
-      graphs.forEach(function(g){
-        g.insertTitles();
-        g.create();
-      });
+    });
+    // Insert the titles and create the graphs
+    graphs.forEach(function(g){
+      g.insertTitles();
+      g.create();
     });
   }
 
