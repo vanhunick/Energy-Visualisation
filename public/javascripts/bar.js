@@ -170,8 +170,7 @@ var SingleBarModule = (function(){
   }
 
   return {
-    showBarWithRowElem: showBarWithRowElem
+    showBarWithRowElem: showBarWithRowElem,
+    createBarGraph : createBarGraph
   }
 })();
-
-

@@ -150,36 +150,36 @@ function createAnimatingBar(){
                 var dp = new DataProcessor();
                 barData = dp.createDataForGroupedGraph(data.rows);
                 unit = data.rows[0].units
-                
+
                 var max = -Infinity;
                 data.rows.forEach(function(r){
-                    max = +r.value > max ? +r.value : max;   
+                    max = +r.value > max ? +r.value : max;
                 });
 
                 $('#animating-bar').append('<h4 class="title">'+ selection.subCategory + ', ' + selection.description+'</h4>')
                 $('#animating-bar').append('<h5 class="subTitle">'+ selection.section + ', ' + selection.subCategory+'</h5>')
-                var data = [];   
+                var data = [];
                     for(var propertyName in barData.data[curDataIndex]) {
                          if(propertyName !== "edb"){
-                            data.push({category : propertyName, value : barData.data[curDataIndex][propertyName]});  
+                            data.push({category : propertyName, value : barData.data[curDataIndex][propertyName]});
                         }
                     }
-                createBarGraph('#animating-bar',max,0, data,barData.data[curDataIndex].edb,unit);
+                SingleBarModule.createBarGraph('#animating-bar',max,0, data,barData.data[curDataIndex].edb,unit);
                 curDataIndex++;
                  d3.interval(function() {
-                    var data = [];   
+                    var data = [];
                     for(var propertyName in barData.data[curDataIndex]) {
                          if(propertyName !== "edb"){
-                            data.push({category : propertyName, value : barData.data[curDataIndex][propertyName]});  
+                            data.push({category : propertyName, value : barData.data[curDataIndex][propertyName]});
                         }
                     }
-                    createBarGraph('#animating-bar',max,0, data,barData.data[curDataIndex].edb,unit);
-                    curDataIndex = (curDataIndex+1 >= barData.data.length) ? 0 : curDataIndex+1;   
-                    }, 2000);   
+                    SingleBarModule.createBarGraph('#animating-bar',max,0, data,barData.data[curDataIndex].edb,unit);
+                    curDataIndex = (curDataIndex+1 >= barData.data.length) ? 0 : curDataIndex+1;
+                    }, 2000);
                 } else {
                     console.log("No results");
                 }
-        });   
+        });
 }
 
 
@@ -326,9 +326,7 @@ function showBarWithRowElem(rowID){
             title = data[index].value = $(element).text();
         }
     });
-
-    console.log(maxTableValue);
-    createBarGraph("#graph-div", maxTableValue, data);
+    SingleBarModule.createBarGraph("#graph-div", maxTableValue, data);
 }
 
 
