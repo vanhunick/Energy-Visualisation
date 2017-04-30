@@ -14,7 +14,9 @@ function SelectionRowController(id){
     }
 
     this.validSelection = function () {
-      if(this.rowSelections.section !== "" && this.rowSelections.description === "")return false;
+      if(this.rowSelections.section !== "" && this.rowSelections.description === ""){
+          return false;
+      }
       return true;
     }
 
@@ -30,6 +32,9 @@ function SelectionRowController(id){
 
     this.updateSection = function (update) {
         if(update.id === this.idNumb){
+          this.rowSelections.category = "";
+          this.rowSelections.subCategory = "";
+          this.rowSelections.description = "";
           // Set the new selected section
           this.rowSelections.section = update.section;
           events.emit("NEW_SECTION", {id : this.idNumb, selection : this.rowSelections});
@@ -38,6 +43,9 @@ function SelectionRowController(id){
 
     this.updateCategory = function (update) {
         if(update.id === this.idNumb){
+          this.rowSelections.subCategory = "";
+          this.rowSelections.description = "";
+
           this.rowSelections.category = update.category;
           events.emit("NEW_CATEGORY", {id : this.idNumb, selection : this.rowSelections});
         }
@@ -45,6 +53,8 @@ function SelectionRowController(id){
 
     this.updateSubCategory = function (update) {
         if(update.id === this.idNumb){
+          this.rowSelections.description = "";
+
           this.rowSelections.subCategory = update.subCategory;
           events.emit("NEW_SUBCATEGORY", {id : this.idNumb, selection : this.rowSelections});
         }

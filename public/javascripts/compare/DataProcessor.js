@@ -163,6 +163,7 @@ DataProcessor.prototype.filterRowsToTables = function (rows, search) {
   cRows.forEach(function(e){if(e.value === null){e.value = 0;}});
   dRows.forEach(function(e){if(e.value === null){e.value = 0;}});
 
+
   var tables = [];
   if(aRows.length > 0){
     tables.push({ id : 'a', rows : aRows, search : search.aTable});
@@ -235,7 +236,7 @@ DataProcessor.prototype.filterRowsToTablesAndCopy = function (rows, search) {
   }
 
   if(dRows.length > 0){
-    tables.push({ id : 'd', rows : copy.tableC, search : search.dTable, combined : false});
+    tables.push({ id : 'd', rows : copy.tableD, search : search.dTable, combined : false});
   }
 
 

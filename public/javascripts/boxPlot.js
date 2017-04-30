@@ -73,8 +73,6 @@ var BoxPlotModule = (function () {
             "translate(" + boxMargin.left + "," + boxMargin.top + ")"); // moves by a x and y value in this c
           //class to make it responsive
 
-          console.log((boxWidth) +", "+ (boxHeight) + "")
-
         boxPlotObjects.x.domain( data.map(function(d) {return d[0] } ) );
         boxPlotObjects.xAxis = d3.axisBottom(boxPlotObjects.x);
         boxPlotObjects.yAxis = d3.axisLeft(boxPlotObjects.y);

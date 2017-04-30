@@ -94,7 +94,6 @@ Table.prototype.rowClicked = function (event) {
 if(!isNaN(event.rowID.slice(-2))){
   rowNumb = event.rowID.slice(-2);
 }
-  console.log("Table click " + this.id);
   SingleBarModule.showBarWithRowElem('row'+this.id +''+rowNumb,event.edb,"#bar-"+this.id,"#head-row-"+this.id,"#table-"+this.id,this.unit);
 }
 
