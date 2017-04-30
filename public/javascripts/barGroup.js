@@ -67,13 +67,13 @@ var GroupedBarModule = (function(){
     if(!curBarGraph.created){
       curBarGraph.svg =  d3.select(divID)
         .append("div")
-        .classed("svg-container", true) //container class to make it responsive
+        .classed("svg-container-bar", true) //container class to make it responsive
         .append("svg")
         .attr("preserveAspectRatio", "xMinYMin meet")
         .attr("viewBox", "0 0 "+ (width + margin.left + margin.right) +" "+ (height + margin.top + margin.bottom) + "")
         .append("g")
         .attr("transform","translate(" + margin.left + "," + margin.top + ")") // moves by a x and y value in this c
-        .classed("svg-content-responsive", true);
+        .classed("svg-content-responsive-bar", true);
     }
 
     // Set the domains
@@ -203,5 +203,3 @@ var GroupedBarModule = (function(){
     createdGroupedBarGraph : createdGroupedBarGraph
   }
 })();
-
-

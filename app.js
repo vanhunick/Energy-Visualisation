@@ -47,7 +47,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', index);
 app.use('/sections',sections);
 app.use('/compare',compare);
-//app.use('/test',test);
+app.use('/test',test);
 
 SQLProtection.createValidSelectionData();
 

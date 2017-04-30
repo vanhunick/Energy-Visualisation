@@ -1,3 +1,5 @@
+var dp = new DataProcessor();
+
 /**
  * Object contains a number of functions to manipulate data from the database
  * */
@@ -174,8 +176,6 @@ DataProcessor.prototype.filterRowsToTables = function (rows, search) {
   if(cRows.length > 0 && dRows.length > 0){
       var cdRows = dp.combineTables(cRows,dRows);
   }
-
-
 
   return new DataTables(aRows,bRows,cRows,dRows, abRows, cdRows);
 }

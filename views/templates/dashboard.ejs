@@ -2,10 +2,16 @@
 <div class="tab-pane fade" id="tab-<%= data.tableID %>">
     <div id="full-dash-<%= data.tableID %>" class="full-table full">
 
+    <!-- Row for table heading -->
+    <div class="row selection-header">
+      <div class="col-md-12">
+        <!-- <h2 class="table-title"><b>Selection <%= data.tableID.toUpperCase() %></b></h2> -->
+        <div id="title-<%= data.tableID %>" class="text-left"></div>
+      </div>
+    </div>
+
     <!-- Row for table -->
     <div class="row">
-        <h2 class="table-title"><b>Selection <%= data.tableID.toUpperCase() %></b></h2>
-        <div id="title-<%= data.tableID %>" class="text-center"></div>
         <div class="col-md-5 text-center table-col">
             <table class="table table-edb" id="table-<%= data.tableID %>"></table>
         </div>
@@ -30,7 +36,14 @@
     <!-- Row for box and whisker graph -->
     <div class="row text-center whisk-row">
         <div id="title-box-<%= data.tableID %>" class="text-center"></div>
-        <div class="col-lg-12 text-center" style=" margin-left: 10%;" id="boxplot-<%= data.tableID %>"></div>
+        <div class="col-lg-12 text-center"  id="boxplot-<%= data.tableID %>"></div>
+        <!-- style=" margin-left: 10%;" -->
     </div>
+
+        <!--Will be empty for a, b, c, d-->
+        <div class="row text-center" >
+            <div class="row text-center  graph-title" id="title-vector-<%= data.tableID %>"></div>
+            <div class="col-lg-12 text-center" id="vector-graph-<%= data.tableID %>" style="margin-bottom: 2%"></div>
+        </div>
     </div>
 </div>

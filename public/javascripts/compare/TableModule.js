@@ -123,7 +123,6 @@ var TablesModule = (function(){
           if(g.isCombined){
             g.update(tableData.rows, tableData.table1Rows, tableData.table2Rows);
           } else {
-            console.log("Updating")
             g.update(tableData.rows);
           }
         }
@@ -141,6 +140,6 @@ var TablesModule = (function(){
 
 
   return {
-
+    regions : regions
   }
 })();

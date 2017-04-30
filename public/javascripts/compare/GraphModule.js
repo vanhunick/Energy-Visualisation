@@ -5,6 +5,15 @@ var GraphModule = (function(){
   // Holds the graph objects
   var graphs = [];
 
+  // Blue color scale
+  var z = d3.scaleOrdinal().range(["#BBDEFB", "#64B5F6", "#1976D2", "#1565C0", "#0D47A1", "#d0743c", "#ff8c00"]);
+
+  // Red color scale for negative values
+  var zRed = d3.scaleOrdinal().range(["#FF7373", "#FF4C4C", "#FF2626", "#B20000", "#D90000", "#d0743c", "#ff8c00"]);
+
+  // Green color scale for selected values
+  var zSelected = d3.scaleOrdinal().range(["#C1FFC1", "#90EE90", "#5BC85B", "#31A231", "#137B13", "#d0743c", "#ff8c00"]);
+
   /**
    * Initialises all of the graphs on the page.
    *

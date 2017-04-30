@@ -13,8 +13,7 @@ var CompareModule = (function(){
   var error = false;
 
   // Cache dom elements
-  var $searchError = $('error-div');
-
+  var $searchError = $('#error-div');
 
   /**
    * Turns object in url string
@@ -71,13 +70,23 @@ var CompareModule = (function(){
       backup.sortedRows = dp.filterRowsToTablesAndCopy(rows,backup.selection);
 
 
+      var combinedData = [];
       backup.sortedRows.forEach(function(t){
         if(t.id === 'a'){
           $('#tab-a').addClass("in active");
         }
+        if(t.id === 'ab' || t.id === 'cd'){
+          combinedData.push(t);
+        }
           $('#full-dash-'+ t.id).show();
         //}
       });
+
+      if(combinedData.length === 2){
+        showFullVectorGraph(combinedData);
+      }
+
+      // Check if both AB and CD exist
       // Emit an event with the data
       events.emit("INIT_DATA", {data : backup.sortedRows});
     });
@@ -132,6 +141,14 @@ var CompareModule = (function(){
         rows[index].value = valueOfCell; // CPI Applied value
       });
     }
+  }
+
+
+  // Array with both things in it
+  function showFullVectorGraph(data) {
+        $('#title-vector-abcd').append('A great title');
+        VectorModule.createVectorGraph(dp.createDataForVectorGraph(data[0].rows,data[1].rows),"Unit x  /  Unit x" ," Unit Y / Unit Y " ,"#vector-graph-abcd");
+        $('#vector-full-abcd').show();
   }
 
 

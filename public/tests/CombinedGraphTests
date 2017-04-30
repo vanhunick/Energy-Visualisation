@@ -1,0 +1,11 @@
+var assert = chai.assert;
+
+describe('Combined Graph Object tests', function() {
+
+  // Grab sections test
+  it('', function(done) {
+
+
+
+  });
+});

@@ -3,12 +3,20 @@ body {
   font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
   background: #F6F7F8;
 }
+
+
+.selection-header {
+  margin-bottom: 2%;
+  margin-left: 0.5%;
+}
 /* Core metrics*/
+
+
 
 /*Container that holds all content on the core metrics page*/
 #compare-container {
-  margin-left: 0.5%;
-  margin-right: 0.5%;
+  /*margin-left: 0.5%;
+  margin-right: 0.5%;*/
 }
 
 /* The core metrics title at the very top of the page*/
@@ -71,6 +79,7 @@ body {
 .input-horizontal {
   display: inline-block;
   vertical-align: top;
+  margin-left : 1%;
 }
 
 /*The cpi inputs*/
@@ -85,9 +94,19 @@ body {
 
 /*Holds the rows of selections*/
 #compare-div {
-  margin-top: 1%;
-  margin-bottom: 1%;
+  margin-top: 0.5%;
+  margin-bottom: 2%;
 }
+
+.block {
+  background-color: #e5e5e5;
+  background-color:	#bbbbbb;
+}
+
+.inner-block {
+  margin-top 5%;
+}
+
 
 /*Each of the selection drop down menus*/
 .select-compare {

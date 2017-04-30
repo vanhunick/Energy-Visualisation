@@ -56,7 +56,8 @@ CombinedGraph.prototype.getID = function () {
  * @return {String} the title of the first selection
  * */
 CombinedGraph.prototype.getSelection1Title = function () {
-  return this.selection1.description + ", " + this.selection1.category;
+  var subCategory = this.selection1 === null ? "" : this.selection1.subCategory;
+  return this.selection1.description + ", " + this.selection1.category + ", " + subCategory;
 }
 
 
@@ -66,7 +67,8 @@ CombinedGraph.prototype.getSelection1Title = function () {
  * @return {String} the title of the second selection
  * */
 CombinedGraph.prototype.getSelection2Title = function () {
-  return this.selection2.description + ", " + this.selection2.category;
+  var subCategory = this.selection2 === null ? "" : this.selection2.subCategory;
+  return this.selection2.description + ", " + this.selection2.category + ",  " + subCategory;
 }
 
 
@@ -101,16 +103,28 @@ CombinedGraph.prototype.getUnit2 = function () {
 
 
 
-
 /**
  * Inserts the titles for the graphs into the DOM elements
  * */
 CombinedGraph.prototype.insertTitles = function () {
-  var titleHTML = '<h4 class="combined-title">'+this.getSelection1Title()+'<br><span class="over">over</span><br>'+this.getSelection2Title()+'</h4>'
+  var ratioHTML = '<h4>Ratio '+this.id.charAt(0).toUpperCase()+' / '+this.id.charAt(1).toUpperCase() +'</h4>'
+  var s1 = '<h4 class="title"><span style="Color: black;">'+this.id.charAt(0).toUpperCase()+': </span>'+this.getSelection1Title()+'</h4>';
+  var s2 = '<h4 class="title"><span style="Color: black;">'+this.id.charAt(1).toUpperCase()+': </span>'+this.getSelection2Title()+'</h4>';
 
-  this.$titleBar.append(titleHTML);
-  this.$titleBox.append(titleHTML);
-  this.$titleVector.append(titleHTML);
+  // var titleHTML = '<h4 class="combined-title">'+this.getSelection1Title()+'<br><span class="over">over</span><br>'+this.getSelection2Title()+'</h4>'
+
+  this.$titleBar.append(ratioHTML);
+  this.$titleBar.append(s1);
+  this.$titleBar.append(s2);
+
+  this.$titleBox.append(ratioHTML);
+  this.$titleBox.append(s1);
+  this.$titleBox.append(s2);
+
+
+  this.$titleVector.append(ratioHTML);
+  this.$titleVector.append(s1);
+  this.$titleVector.append(s2);
 }
 
 

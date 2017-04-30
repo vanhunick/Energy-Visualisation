@@ -40,7 +40,7 @@ function Table(id, rows, selection, isCombined){
 Table.prototype.getTitle = function () {
   if(this.isCombined){
     var subCategory = this.selection[0] === null ? "" : this.selection[0].subCategory;
-    return this.selection[0].section + ", " + this.selection[0].category + ", " + subCategory + ", "+ this.selection[0].description;
+    return this.selection[0].category + ", " + subCategory + ", "+ this.selection[0].description;
   } else {
     return (this.selection === null ? "" : this.selection.subCategory) + ", "+ this.selection.description;
   }
@@ -55,7 +55,7 @@ Table.prototype.getTitle = function () {
 Table.prototype.getSubTitle = function () {
   if(this.isCombined){
     var subCategory = this.selection[1] === null ? "" : this.selection[1].subCategory;
-    return this.selection[1].section + ", " + this.selection[1].category + ", " + subCategory + ", "+ this.selection[1].description;
+    return  this.selection[1].category + ", " + subCategory + ", "+ this.selection[1].description;
   } else {
     return this.selection.section + ", " + this.selection.category;
   }
@@ -89,7 +89,13 @@ Table.prototype.totalsRowSelected = function (update) {
  * @param {Object} update the object to hold information about the row clicked
  * */
 Table.prototype.rowClicked = function (event) {
-  SingleBarModule.showBarWithRowElem(event.rowID,event.edb,"#bar-"+this.id,"#head-row-"+this.id,"#table-"+this.id,this.unit);
+  var rowNumb = event.rowID.slice(-1);
+// Need to account for numbers greater than 10
+if(!isNaN(event.rowID.slice(-2))){
+  rowNumb = event.rowID.slice(-2);
+}
+  console.log("Table click " + this.id);
+  SingleBarModule.showBarWithRowElem('row'+this.id +''+rowNumb,event.edb,"#bar-"+this.id,"#head-row-"+this.id,"#table-"+this.id,this.unit);
 }
 
 /**
@@ -178,7 +184,10 @@ Table.prototype.revertCPI = function () {
 
 Table.prototype.insertTitles = function() {
   if(this.isCombined){
-    this.$title.append('<h4 class="title">'+this.title+'</h4><h4 class="title">'+this.subTitle+'</h4>');
+    var s1 = this.id.charAt(0).toUpperCase();
+    var s2 = this.id.charAt(1).toUpperCase();
+    this.$title.append('<h3>Ratio analysis '+s1+' / '+s2+'</h4>');
+    this.$title.append('<h4 class="title"><span style="color: black;">'+s1+': </span>'+this.title+'</h4><h4 class="title"><span style="color: black;">'+s2+': </span>'+this.subTitle+'</h4>');
   } else {
     this.$title.append('<h2 class="title">'+this.title+'</h2>').append('<h4 class="subTitle">'+this.subTitle+'</h4>');
   }
@@ -237,7 +246,7 @@ Table.prototype.create = function () {
 }
 
 Table.prototype.createTotalsTable = function(update) {
-  var totals = dp.createTableTotals(this.rows, regions, this.availableYears);
+  var totals = dp.createTableTotals(this.rows, TablesModule.regions, this.availableYears);
   var names = {n : "North Island", uni : "Upper North Island", eni : "Eastern North Island", swni : "South-West North Island", s : "South Island", usi : "Upper South Island", lsi : "Lower South Island", nz : "New Zealand"};
 
   var totalCells = [];
@@ -267,6 +276,7 @@ Table.prototype.createTotalsTable = function(update) {
 
           // Insert name in column and assign an id to the row
           var format = this.dpFormat;
+        var cells = this.noCPICells;
           row += "<th class='reg-cell'>" + names[property] + "</th>";
           var passID = this.id;
           totals[property].forEach(function(value){
@@ -274,14 +284,14 @@ Table.prototype.createTotalsTable = function(update) {
               if(property === "nz"){
                   avg = value / numberOfCompanies;
               } else {
-                  avg = value / regions[property].length;
+                  avg = value / TablesModule.regions[property].length;
               }
 
               row += "<th id='t-total"+passID+""+cellCount+"' origValue='"+ avg +"' class='cell'>" + format(avg) + "</th>";
               totalCells.push({id : "#t-total"+passID+""+cellCount, value :avg});
 
               // TODO check if better way
-              noCPICells.push({id : "t-total"+passID+""+cellCount, value : avg});
+              cells.push({id : "t-total"+passID+""+cellCount, value : avg});
 
               cellCount++;
 

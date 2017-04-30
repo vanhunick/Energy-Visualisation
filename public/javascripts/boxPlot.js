@@ -2,9 +2,9 @@ var BoxPlotModule = (function () {
     var labels = false; // show the text labels beside individual boxplots?
 
 // Margins and graph width / height
-    var boxMargin = {top: 0, right: 100, bottom: 80, left: 100},
-      boxWidth = 600 - boxMargin.left - boxMargin.right,
-      boxHeight = 350  - boxMargin.top  - boxMargin.bottom;
+    var boxMargin = {top: 25, right: 85, bottom: 150, left:100},
+      boxWidth = 850 - boxMargin.left - boxMargin.right,
+      boxHeight = 500  - boxMargin.top  - boxMargin.bottom;
 
 
 // Encapsulate all properties of graph
@@ -61,18 +61,19 @@ var BoxPlotModule = (function () {
         // Create the responsive SVG
         boxPlotObjects.svg =  d3.select(divID)
           .append("div")
-          .classed("svg-container-box", true) //container class to make it responsive
+          .classed("svg-container-boxplot", true) //container class to make it responsive
           .append("svg")
           //responsive SVG needs these 2 attributes and no width and height attr
           .attr("preserveAspectRatio", "xMinYMin meet")
-          .attr("viewBox", "0 0 "+ (boxWidth + boxMargin.left + boxMargin.right) +" "+ (boxHeight + boxMargin.top + boxMargin.bottom) + "")
+          .attr("viewBox", "0 0 " + (boxWidth + boxMargin.left + boxMargin.right) +" "+ (boxHeight + boxMargin.top + boxMargin.bottom) + "") //
+          .classed("svg-content-responsive-boxplot", true)
           .attr("class", "box")
           .append("g") // group allows us to move everything together
           .attr("transform",
-            "translate(" + boxMargin.left + "," + boxMargin.top + ")") // moves by a x and y value in this c
+            "translate(" + boxMargin.left + "," + boxMargin.top + ")"); // moves by a x and y value in this c
           //class to make it responsive
-          .classed("svg-content-responsive", true);
 
+          console.log((boxWidth) +", "+ (boxHeight) + "")
 
         boxPlotObjects.x.domain( data.map(function(d) {return d[0] } ) );
         boxPlotObjects.xAxis = d3.axisBottom(boxPlotObjects.x);
@@ -120,10 +121,10 @@ var BoxPlotModule = (function () {
           .call(boxPlotObjects.yAxis)
           .append("text")
           .attr("transform", "rotate(-90)")
-          .attr("y", 6)
-          .attr("dy", ".71em")
+          // .attr("y", 6)
+          // .attr("dy", ".71em")
           .style("text-anchor", "end")
-          .style("font-size", "8px");
+          .style("font-size", "12px");
 
         // draw x axis
         boxPlotObjects.svg.append("g")
@@ -135,7 +136,7 @@ var BoxPlotModule = (function () {
           .attr("y",  10 )
           .attr("dy", ".71em")
           .style("text-anchor", "middle")
-          .style("font-size", "8px")
+          .style("font-size", "12px")
           .text("Quarter");
 
         // Add the y axis unit
@@ -176,5 +177,3 @@ var BoxPlotModule = (function () {
         createBoxPlot : createBoxPlot
     }
 })();
-
-

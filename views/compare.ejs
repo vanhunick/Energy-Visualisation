@@ -2,17 +2,11 @@
   <html>
   <head>
     <title>Core Metrics</title>
-
     <!--The head template containing the required scripts-->
     <% include ../views/templates/head %>
 
     <!--Form validation plugin-->
     <script src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.15.0/jquery.validate.min.js"></script>
-
-    <!--Page specific scripts-->
-    <!-- <script src="/javascripts/compare/DataProcessor.js"></script> -->
-
-    <!-- <script src="/javascripts/compare/SelectionRows.js"></script> -->
     <script src="/javascripts/d3-tip.js"></script>
   </head>
   <body>
@@ -21,22 +15,33 @@
   <% include ../views/templates/nav %>
 
   <div class="container-fluid" id="compare-container">
-    <div class="col-md-12 text-center">
-      <h1 class="page-title">Core Metrics</h1>
+    <div class="row">
+      <div class="col-md-12 text-center">
+        <h1 class="page-title">Core Metrics</h1>
+      </div>
+    </div>
+
+    <div class="row">
+      <h2 class="selection-title">Make your section selections</h2>
     </div>
 
     <!-- The selection drop downs are inserted here -->
-    <div id="compare-div">
-      <% include ../views/templates/SelectionRows %>
+    <div class="row block" id="compare-div">
 
-    </div>
-
-    <!-- Holds the search button for selections and a div for errors -->
-    <div class="row">
-      <div class="col-md-12" id="search-div">
+      <div class="col-md-12" style="margin-bottom: 2%;">
+        <% include ../views/templates/SelectionRows %>
+      </div>
+      <div class="col-md-12" id="search-div" style="margin-bottom: 1%;">
         <button type="button" class="btn btn-primary" id="search-btn-compare">Search</button>
       </div>
     </div>
+
+    <!-- Holds the search button for selections and a div for errors -->
+    <!-- <div class="row block">
+      <div class="col-md-12" id="search-div">
+        <button type="button" class="btn btn-primary" id="search-btn-compare">Search</button>
+      </div>
+    </div> -->
 
     <!-- Row for error message when Partial selection made -->
     <div class="row">
@@ -44,55 +49,27 @@
     </div>
 
     <!-- CPI Inputs -->
-    <div class="row" style="margin-top: 2%;">
-      <div class="col-sm-12">
-        <div class="form-group input-horizontal">
-          <h4><b>Set CPI:</b></h4>
-        </div>
 
-        <!-- Form for CPI -->
-        <form id="cpi-form"  onsubmit="return applyCPI()" >
-
-          <!-- 2012 -->
-          <div class="form-group input-horizontal">
-            <label for="inputdefault">2012</label>
-            <input name="Y2012" class="form-control cpi-form" id="Y2012" type="text" value="1.00">
-          </div>
-
-          <!-- 2013 -->
-          <div class="form-group input-horizontal">
-            <label for="inputdefault">2013</label>
-            <input name="Y2013" class="form-control cpi-form" id="Y2013" type="text" value="1.00">
-          </div>
-
-          <!-- 2014 -->
-          <div class="form-group input-horizontal">
-            <label for="inputdefault">2014</label>
-            <input name="Y2014" class="form-control cpi-form" id="Y2014" type="text" value="1.40">
-          </div>
-
-          <!-- 2015 -->
-          <div class="form-group input-horizontal">
-            <label for="inputdefault">2015</label>
-            <input name="Y2015" class="form-control cpi-form" id="Y2015" type="text" value="0.5">
-          </div>
-
-          <!-- 2016 -->
-          <div class="form-group input-horizontal">
-            <label for="inputdefault">2016</label>
-            <input  name="Y2016" class="form-control cpi-form" id="Y2016" type="text" value="1.00">
-          </div>
-        </form>
-      </div>
+    <div class="row text-left">
+      <h3 class="selection-title">Set Consumer Price Index percentages</h3>
     </div>
 
+    <div class="row block" id="compare-div">
+      <div class="col-md-12 inner-block" style="margin-bottom: 1%; margin-top: 1%;">
+        <% include ../views/templates/CPITemplate %>
+      </div>
+
       <!--CPI Buttons apply and revert -->
-    <div class="row">
-      <div class="col-sm-12">
+      <div class="col-md-12" style="margin-bottom: 1%;">
         <button type ="button" class ="btn btn-primary" onclick="CompareModule.applyCPI()">Apply cpi</button>
         <button type="button" class="btn btn-warning" onclick="CompareModule.revertCPI()">Revert</button>
       </div>
     </div>
+
+
+
+
+
 
     <!--Tabs for content -->
     <div class="row text-center" style="margin-top: 2%">
@@ -134,30 +111,18 @@
                           <% var data= { tableID : 'ab'}; %>
                           <% include ../views/templates/dashboard.ejs %>
 
-                            <!-- Div for vectorGraph -->
-                            <div class="row text-center" >
-                                <div class="row text-center  graph-title" id="title-ab-vector"></div>
-                                <div class="col-lg-12 text-center" id="vector-graph-ab" style="margin-bottom: 2%"></div>
-                            </div>
-                          <!--</div>-->
 
                           <!-- Table CD content -->
                           <!--<div class="tab-pane fade" id="tab6default">-->
                             <% var data= { tableID : 'cd'}; %>
                             <% include ../views/templates/dashboard.ejs %>
 
-                            <div class="row text-center" >
-                                <div class="row text-center  graph-title" id="title-cd-vector"></div>
-                                <div class="col-lg-12 text-center" id="vector-graph-cd" style="margin-bottom: 2%"></div>
-                            </div>
-                          <!--</div>-->
-
                           <!-- ABCD Vector Graph content -->
                           <div class="tab-pane fade" id="tab7default">
-                              <div id="vector-full-div-abcd" class="full-table full">
+                              <div id="vector-full-abcd" class="full-table full">
                                   <div class="row text-center" >
-                                      <div id="title-abcd-vec" class="text-center graph-title"></div>
-                                      <div class="col-lg-12 text-center" id="vector-graph-div-abcd" style="margin-bottom: 2%"></div>
+                                      <div id="title-vector-abcd" class="text-center graph-title"></div>
+                                      <div class="col-lg-12 text-center" id="vector-graph-abcd" style="margin-bottom: 2%"></div>
                                   </div>
                               </div>
                           </div>

@@ -26,6 +26,7 @@
     "gulp-concat": "^2.6.1",
     "gulp-minify-css": "^1.2.4",
     "gulp-rename": "^1.2.2",
+    "gulp-sourcemaps": "^2.5.1",
     "gulp-uglify": "^2.0.1",
     "install": "^0.8.7",
     "npm": "^4.4.4",

@@ -192,6 +192,7 @@ function DescriptionSelect(id){
 function clearMyself(update) {
   if(update.id === this.idNumb){
       this.$select.html('');
+      this.$select.selectpicker('refresh'); // Refresh the selections
   }
 }
 
