@@ -69,7 +69,6 @@ var CompareModule = (function(){
       backup.rows = rows
       backup.sortedRows = dp.filterRowsToTablesAndCopy(rows,backup.selection);
 
-
       var combinedData = [];
       backup.sortedRows.forEach(function(t){
         if(t.id === 'a'){
@@ -79,11 +78,10 @@ var CompareModule = (function(){
           combinedData.push(t);
         }
           $('#full-dash-'+ t.id).show();
-        //}
       });
 
       if(combinedData.length === 2){
-        showFullVectorGraph(combinedData);
+        showFullVectorGraph(combinedData, urlSelections, [backup.sortedRows[0].rows[0].units,backup.sortedRows[1].rows[0].units,backup.sortedRows[2].rows[0].units,backup.sortedRows[3].rows[0].units ]);
       }
 
       // Check if both AB and CD exist
@@ -145,9 +143,30 @@ var CompareModule = (function(){
 
 
   // Array with both things in it
-  function showFullVectorGraph(data) {
-        $('#title-vector-abcd').append('A great title');
-        VectorModule.createVectorGraph(dp.createDataForVectorGraph(data[0].rows,data[1].rows),"Unit x  /  Unit x" ," Unit Y / Unit Y " ,"#vector-graph-abcd");
+  function showFullVectorGraph(data, selections, units) {
+
+
+        // Grab a title
+        var atitle = selections[0].category + ", " + selections[0].subCategory + ", " + selections[0].description;
+        var btitle = selections[1].category + ", " + selections[1].subCategory + ", " + selections[1].description;
+        var ctitle = selections[2].category + ", " + selections[2].subCategory + ", " + selections[2].description;
+        var dtitle = selections[3].category + ", " + selections[3].subCategory + ", " + selections[3].description;
+
+        var ratio = '<h3> Ratio (A / B ) over ( C / D ) </h3>'
+        var spanA = '<span class="letter">A: </span>';
+        var spanB = '<span class="letter">B: </span>';
+        var spanC = '<span class="letter">C: </span>';
+        var spanD = '<span class="letter">D: </span>';
+
+
+        var combineA = '<h4 class="title">'+spanA+' '+ atitle +'</h4>';
+        var combineB = '<h4 class="title">'+spanB+' '+ btitle +'</h4>';
+        var combineC = '<h4 class="title">'+spanC+' '+ ctitle +'</h4>';
+        var combineD = '<h4 class="title">'+spanD+' '+ dtitle +'</h4>';
+
+        $('#title-vector-abcd').append(ratio).append(combineA).append(combineB).append(combineC).append(combineD);
+
+        VectorModule.createVectorGraph(dp.createDataForVectorGraph(data[0].rows,data[1].rows), units[0] + " / " + units[1] ,units[2] + " / " + units[3] ,"#vector-graph-abcd");
         $('#vector-full-abcd').show();
   }
 

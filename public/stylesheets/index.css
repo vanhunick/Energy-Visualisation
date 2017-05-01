@@ -178,6 +178,10 @@ body {
   text-align: center;
 }
 
+.letter {
+  color : black;
+}
+
 /*Nav bar css*/
 /*https://work.smarchal.com/twbscolor/css/e74c3cc0392becf0f1ffbbbc0*/
 .navbar-default {
