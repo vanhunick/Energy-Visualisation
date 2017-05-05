@@ -77,8 +77,8 @@ var TablesModule = (function(){
     if(selectedTotalRow === update.rowID){
       var oldReg = $("#"+update.rowID+" .reg-cell").text();
 
-      $('.table-row').find(".reg-cell:contains('"+reg+"')").filter(function() {
-          return $(this).text() === reg;
+      $('.table-row').find(".reg-cell:contains('"+region+"')").filter(function() {
+          return $(this).text() === region;
       }).parent().removeClass("row-selected"); // Selects edb row in all tables
       selectedTotalRow = "";
       return;
