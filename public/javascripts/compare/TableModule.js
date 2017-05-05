@@ -105,6 +105,7 @@ var TablesModule = (function(){
 
 
   var applyCPI = function (update) {
+    console.log("Update CPI  Values ", update.cpiValues);
     var cpiValues = update.cpiValues;
     tables.forEach(function(table){
       table.applyCPI(cpiValues);

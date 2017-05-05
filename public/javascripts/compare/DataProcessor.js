@@ -32,13 +32,11 @@ DataProcessor.prototype.copyDataTables = function(dataTables) {
 
 DataProcessor.prototype.copyRows = function (rows) {
     var newRows = [];
-
     rows.forEach(function(r){
-      newRows.push({category :r.category, description : r.description,disc_yr: r.disc_yr,edb: r.edb,
+      newRows.push({value : r.value, category :r.category, description : r.description,disc_yr: r.disc_yr,edb: r.edb,
           fcast_yr: r.fcast_yr,network: r.network,note:  r.note,obs_yr: r.obs_yr,p_key: r.p_key,sch_ref: r.sch_ref,
-          schedule: r.schedule,section: r.section,sub_category: r.sub_category,units: r.units,value: r.value})
+          schedule: r.schedule,section: r.section,sub_category: r.sub_category,units: r.units})
     });
-
     return newRows;
 }
 

@@ -147,18 +147,20 @@ Table.prototype.applyCPI = function (cpiValues) {
 
   var minYear = Infinity;
   var maxYear = -Infinity;
-
   $cachedCells.each(function(){ //cell or th
       var year = +$(this).attr("class").split(' ')[1];
       minYear = year < minYear ? year : minYear;
       maxYear = year > maxYear ? year : maxYear;
   });
+  console.log("Min ", cpiValues);
 
   var format = this.dpFormat;
-  for(var cur = minYear; cur <=maxYear; cur++){ // Go through each possible year
+
       $cachedCells.each(function(){ // Grab every cell
           var year = +$(this).attr("class").split(' ')[1]; // Grab the year of the cell by checking the class
           var valueOfCell = $(this).attr("origvalue");
+      for(var cur = minYear; cur <=maxYear; cur++){ // Go through each possible year
+          console.log(cpiValues.length);
           for(var i = 0; i < cpiValues.length; i++){
               if(cpiValues[i].year === cur){
                   if(year <= cur){
@@ -167,15 +169,16 @@ Table.prototype.applyCPI = function (cpiValues) {
                   }
               }
           }
+        }
           $(this).text(valueOfCell); // CPI Applied value
       });
-  }
+
 }
 
 Table.prototype.revertCPI = function () {
-  if(noCPICells.length > 0){
+  if(this.noCPICells.length > 0){
     var format = this.dpFormat;
-    noCPICells.forEach(function(e){
+    this.noCPICells.forEach(function(e){
         $('#'+e.id).text(format(e.value));
     });
   }

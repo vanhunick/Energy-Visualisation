@@ -97,8 +97,11 @@ var CompareModule = (function(){
    * */
   var applyCPI = function() {
     if(CPIModule.isValid()){
+      console.log("backup ",backup.rows);
       var copyOfRows  = dp.copyRows(backup.rows);
+      console.log(copyOfRows);
       applyCPIToTableRows(copyOfRows,CPIModule.getCPIValues());
+      console.log("Orig with CPI",copyOfRows);
       var newData = dp.filterRowsToTablesAndCopy(copyOfRows,backup.selection);
 
       // Send event to update table and graphs
