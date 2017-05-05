@@ -247,10 +247,10 @@ function insertDataTable(rows){
     var max = -Infinity;
     // apllys css to each cell
     for(var i = 0; i < cellValues.length; i++){
-      if(+cellValues[i].value > max){max = +cellValues[i].value;}
+        if(+cellValues[i].value > max){max = +cellValues[i].value;}
         $(cellValues[i].id).css({
-                "background" : "-webkit-gradient(linear, left top, right top, color-stop(" + cellValues[i].value +"%,#F00), color-stop(" + cellValues[i].value +"%,#FFF))",
-            }
+              "background" : "-webkit-gradient(linear, left top, right top, color-stop(" + cellValues[i].value +"%,#F00), color-stop(" + cellValues[i].value +"%,#FFF))",
+          }
         );
     }
     maxTableValue = max;
@@ -297,6 +297,3 @@ function insertCompanies(){
         $(".selectpicker").selectpicker('refresh');
     });
 }
-
-
-// New potentially for changing the url when search is clicked
