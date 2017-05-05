@@ -972,10 +972,12 @@ function applyCPIToTable(table, cpiValues){
     maxYear = year > maxYear ? year : maxYear;
   });
 
-  for(var cur = minYear; cur <=maxYear; cur++){ // Go through each possible year
+
     $('.cell', table).each(function(){ // Grab every cell
       var year = +$(this).attr("class").split(' ')[1]; // Grab the year of the cell by checking the class
       var valueOfCell = $(this).attr("origvalue");
+
+  for(var cur = minYear; cur <=maxYear; cur++){ // Go through each possible year
       for(var i = 0; i < cpiValues.length; i++){
         if(cpiValues[i].year === cur){
           if(year <= cur){
@@ -984,9 +986,10 @@ function applyCPIToTable(table, cpiValues){
           }
         }
       }
-      $(this).text(valueOfCell); // CPI Applied value
+    }
+    $(this).text(valueOfCell); // CPI Applied value
     });
-  }
+
   applyGradientCSS(noCPICells); // Highlights the cell based on the value compared to the max in the table
 }
 
