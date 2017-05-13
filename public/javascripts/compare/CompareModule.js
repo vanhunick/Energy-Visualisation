@@ -1,4 +1,26 @@
 // DEPENDENCIES DataProcessor, Database, Events
+
+// Internet Explorer compatibility
+if (!String.prototype.includes) {
+    String.prototype.includes = function() {
+        'use strict';
+        return String.prototype.indexOf.apply(this, arguments) !== -1;
+    };
+}
+
+if (!Array.prototype.includes) {
+    Object.defineProperty(Array.prototype, "includes", {
+        enumerable: false,
+        value: function(obj) {
+            var newArr = this.filter(function(el) {
+                return el == obj;
+            });
+            return newArr.length > 0;
+        }
+    });
+}
+// End Internet explorer compatibility
+
 var CompareModule = (function(){
 
   // Init the data processor

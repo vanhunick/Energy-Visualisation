@@ -12,7 +12,6 @@ var SingleBarModule = (function(){
    * */
   function showBarWithRowElem(rowID, edb, div, headRow, tableID,unit){
     var data = [];
-    console.log(headRow);
 
     $(headRow).find('th').each(function (index, element) {
       if(index != 0){ // 0 is not a year
@@ -20,7 +19,7 @@ var SingleBarModule = (function(){
       }
     });
 
-    console.log(rowID)
+
     $('#'+rowID).find('th').each(function (index, element) {
       if(index != 0){
         data[index-1].value = $(element).text();
