@@ -27,7 +27,14 @@ var app = express();
 app.use(auth.connect(global.basic));
 
 // Local db
-global.databaseURI = "postgres://Admin:admin@localhost:5432/Energy";
+
+
+
+ if(process.env.NODE_ENV === 'production'){
+   global.databaseURI = process.env.DATABASE_URL;
+ } else {
+   global.databaseURI = "postgres://Admin:admin@localhost:5432/Energy";
+ }
 
 // Heroku db
 // global.databaseURI = process.env.DATABASE_URL;
