@@ -152,7 +152,6 @@ Table.prototype.applyCPI = function (cpiValues) {
       minYear = year < minYear ? year : minYear;
       maxYear = year > maxYear ? year : maxYear;
   });
-  console.log("Min ", cpiValues);
 
   var format = this.dpFormat;
 
@@ -160,17 +159,17 @@ Table.prototype.applyCPI = function (cpiValues) {
           var year = +$(this).attr("class").split(' ')[1]; // Grab the year of the cell by checking the class
           var valueOfCell = $(this).attr("origvalue");
       for(var cur = minYear; cur <=maxYear; cur++){ // Go through each possible year
-          console.log(cpiValues.length);
-          for(var i = 0; i < cpiValues.length; i++){
+
+        for(var i = 0; i < cpiValues.length; i++){
               if(cpiValues[i].year === cur){
                   if(year <= cur){
                       valueOfCell = valueOfCell * (1 + (cpiValues[i].value / 100));
                       valueOfCell = format(valueOfCell);
                   }
               }
-          }
         }
-          $(this).text(valueOfCell); // CPI Applied value
+      }
+        $(this).text(valueOfCell); // CPI Applied value
       });
 
 }
@@ -179,6 +178,7 @@ Table.prototype.revertCPI = function () {
   if(this.noCPICells.length > 0){
     var format = this.dpFormat;
     this.noCPICells.forEach(function(e){
+        console.log('reverting', format(e.value));
         $('#'+e.id).text(format(e.value));
     });
   }

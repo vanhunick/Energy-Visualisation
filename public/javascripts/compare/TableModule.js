@@ -105,11 +105,20 @@ var TablesModule = (function(){
 
 
   var applyCPI = function (update) {
-    console.log("Update CPI  Values ", update.cpiValues);
     var cpiValues = update.cpiValues;
     tables.forEach(function(table){
       table.applyCPI(cpiValues);
       table.createTotalsTable(true);
+    });
+
+    tables.forEach(function(table){
+      table.render();
+    });
+  }
+
+  var revertCPI = function () {
+    tables.forEach(function(table){
+      table.revertCPI();
     });
 
     tables.forEach(function(table){
@@ -136,7 +145,7 @@ var TablesModule = (function(){
   events.on("ROW_CLICKED", rowClicked);
   events.on("TOTAL_ROW_CLICKED", totalRowClicked);
   events.on("APPLY_CPI", applyCPI);
-  events.on("REVERT_CPI", applyCPI);
+  events.on("REVERT_CPI", revertCPI); // WHAT?
   events.on("ROW_UPDATE", update);
 
 
