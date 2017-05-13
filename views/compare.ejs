@@ -21,8 +21,9 @@
       </div>
     </div>
 
+    <div class="selection-div">
     <div class="row">
-      <h2 class="selection-title">Make your section selections</h2>
+      <h2 class="selection-title">Make your selections</h2>
     </div>
 
     <!-- The selection drop downs are inserted here -->
@@ -36,22 +37,14 @@
       </div>
     </div>
 
-    <!-- Holds the search button for selections and a div for errors -->
-    <!-- <div class="row block">
-      <div class="col-md-12" id="search-div">
-        <button type="button" class="btn btn-primary" id="search-btn-compare">Search</button>
-      </div>
-    </div> -->
-
     <!-- Row for error message when Partial selection made -->
     <div class="row">
         <div class="col-md-12" id="error-div"></div>
     </div>
 
     <!-- CPI Inputs -->
-
     <div class="row text-left">
-      <h3 class="selection-title">Set Consumer Price Index percentages</h3>
+      <h3 class="selection-title">Set Consumer Price Index</h3>
     </div>
 
     <div class="row block" id="compare-div">
@@ -60,19 +53,15 @@
       </div>
 
       <!--CPI Buttons apply and revert -->
-      <div class="col-md-12" style="margin-bottom: 1%;">
+    <div class="col-md-12 cpi-col">
         <button type ="button" class ="btn btn-primary" onclick="CompareModule.applyCPI()">Apply cpi</button>
         <button type="button" class="btn btn-warning" onclick="CompareModule.revertCPI()">Revert</button>
       </div>
     </div>
-
-
-
-
-
+  </div>
 
     <!--Tabs for content -->
-    <div class="row text-center" style="margin-top: 2%">
+    <div class="row text-center tab-row">
         <div class="col-md-12 text-center">
               <div class="panel with-nav-tabs panel-default tab-background">
                   <div class="panel-heading">
@@ -111,7 +100,6 @@
                           <% var data= { tableID : 'ab'}; %>
                           <% include ../views/templates/dashboard.ejs %>
 
-
                           <!-- Table CD content -->
                           <!--<div class="tab-pane fade" id="tab6default">-->
                             <% var data= { tableID : 'cd'}; %>
@@ -135,41 +123,20 @@
   </body>
   <!-- Scipts -->
   <script src="https://d3js.org/d3-timer.v1.min.js"></script>
-  <!-- <script src="/javascripts/bar.js"></script>
-  <script src="/javascripts/barGroup.js"></script>
-  <script src="/javascripts/box.js"></script>
-  <script src="/javascripts/boxPlot.js"></script>
-  <script src="/javascripts/vectorGraph.js"></script>
-  <script src="/javascripts/compare/CPIModule.js"></script>
-  <script src="/javascripts/compare/Table.js"></script>
-  <script src="/javascripts/compare/TableModule.js"></script>
-  <script src="/javascripts/compare/CombinedGraph.js"></script>
-  <script src="/javascripts/compare/Graph.js"></script>
-  <script src="/javascripts/compare/GraphModule.js"></script>
-  <script src="/javascripts/compare/CompareModule.js"></script>
-  <script src="/javascripts/compare/compare.js"></script>
-  <script src="/javascripts/compare/SelectionRowsController.js"></script> -->
-
   <script src="/dist/scripts.min.js"></script>
   <script src="/dist/compare.min.js"></script>
-
-
   <script>
       $('.clear').on('click', function(event){
         var idNumb = event.target.id.charAt(event.target.id.length-1);
         selectionRows.clear(idNumb);
       });
-
       var s =  <%- JSON.stringify(selections) %>;
       if('<%- selections %>' !== ""){
-
           if(s.length > 0){
-              console.log("loading from url")
               CompareModule.loadSearchFromURL(s);
           } else {
             selectionRows.init([],false);
           }
       }
   </script>
-
-  </html>
+</html>
