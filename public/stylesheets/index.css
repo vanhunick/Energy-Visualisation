@@ -59,10 +59,10 @@ body {
 }
 
 /*For span with 'over' in graph titles*/
-.over {
-  color: black;
-  font-weight: bold;
-}
+/*.over {*/
+  /*color: black;*/
+  /*font-weight: bold;*/
+/*}*/
 
 /*The graph titles div*/
 .graph-title {
@@ -99,8 +99,10 @@ body {
 }
 
 .block {
-  background-color: #e5e5e5;
-  background-color:	#bbbbbb;
+  /*background-color: #e5e5e5;
+  background-color:	#bbbbbb;*/
+  border-style: solid;
+  border-color: #bbbbbb;
 }
 
 .inner-block {
@@ -183,7 +185,12 @@ body {
 }
 
 /*Nav bar css*/
-/*https://work.smarchal.com/twbscolor/css/e74c3cc0392becf0f1ffbbbc0*/
+
+.navbar-default .navbar-nav > li > a:hover, .navbar-default .navbar-nav > li > a:focus {
+    background-color: red;
+    color: red;
+}
+
 .navbar-default {
   background-color: #e74c3c;
   border-color: #c0392b;
@@ -234,6 +241,9 @@ body {
 .navbar-default .navbar-link {
   color: #ecf0f1;
 }
+
+
+
 .navbar-default .navbar-link:hover {
   color: #ffbbbc;
 }
