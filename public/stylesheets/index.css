@@ -6,11 +6,12 @@ body {
 
 .selection-header {
   margin-bottom: 2%;
-  margin-left: 2%;
+  margin-left: 0.5%;
 }
 
 .selection-div {
   margin-left: 1%;
+  margin-right: 1%;
 }
 
 .select-description    {
@@ -33,14 +34,9 @@ body {
 margin-bottom: 5px;
 }
 
-
-
-
 .tab-row {
   margin-top: 2%;
 }
-
-
 
 .cpi-col {
   margin-bottom: 1%;
@@ -85,12 +81,6 @@ margin-bottom: 5px;
   padding-bottom: 2%;
 }
 
-/*For span with 'over' in graph titles*/
-/*.over {*/
-  /*color: black;*/
-  /*font-weight: bold;*/
-/*}*/
-
 /*The graph titles div*/
 .graph-title {
   margin-left: 15%;
@@ -99,7 +89,7 @@ margin-bottom: 5px;
 
 /*The titles above selection boxes*/
 .selection-title{
-  color: #20A4F3;
+  color: #172727;
 }
 
 /*Used to align CPI inputs horizontally*/
@@ -126,8 +116,6 @@ margin-bottom: 5px;
 }
 
 .block {
-  /*background-color: #e5e5e5;
-  background-color:	#bbbbbb;*/
   border-style: solid;
   border-color: #bbbbbb;
 }
@@ -268,8 +256,6 @@ margin-bottom: 5px;
 .navbar-default .navbar-link {
   color: #ecf0f1;
 }
-
-
 
 .navbar-default .navbar-link:hover {
   color: #ffbbbc;
