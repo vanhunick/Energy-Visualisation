@@ -7,13 +7,14 @@ var rename = require('gulp-rename');
 var sourcemaps = require('gulp-sourcemaps');
 
 
-
+// .pipe(rename({
+//         suffix: '.min'
+//     }))
 gulp.task('minify-css', function() {
   return gulp.src('public/stylesheets/*.css')
     .pipe(cleanCSS({compatibility: 'ie8'}))
-    .pipe(rename({
-            suffix: '.min'
-        }))
+    .pipe(concat('index.min.css'))
+
     .pipe(gulp.dest('public/dist'));
 });
 
@@ -51,7 +52,7 @@ gulp.task('min-index', function() {
 });
 
 
-// Without sourcemaps
+// Without sourcemaps for production
 gulp.task('min-scripts-prod', function() {
     return gulp.src('public/javascripts/*.js')
         .pipe(concat('scripts.js'))
@@ -79,6 +80,6 @@ gulp.task('min-index-prod', function() {
         .pipe(gulp.dest('public/dist'));
 });
 
-gulp.task['production-minify', ['min-scripts-prod','min-index-prod','min-compare-prod']];
+gulp.task('production', ['minify-css','min-scripts-prod','min-index-prod','min-compare-prod']);
 
 gulp.task('default', ['minify-css', 'min-scripts','min-index','min-compare']);
