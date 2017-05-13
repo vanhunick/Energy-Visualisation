@@ -51,4 +51,34 @@ gulp.task('min-index', function() {
 });
 
 
+// Without sourcemaps
+gulp.task('min-scripts-prod', function() {
+    return gulp.src('public/javascripts/*.js')
+        .pipe(concat('scripts.js'))
+        .pipe(gulp.dest('public/dist'))
+        .pipe(rename('scripts.min.js'))
+        .pipe(uglify())
+        .pipe(gulp.dest('public/dist'));
+});
+
+gulp.task('min-compare-prod', function() {
+    return gulp.src('public/javascripts/compare/*.js')
+        .pipe(concat('compare.js'))
+        .pipe(gulp.dest('public/dist'))
+        .pipe(rename('compare.min.js'))
+        .pipe(uglify())
+        .pipe(gulp.dest('public/dist'));
+});
+
+gulp.task('min-index-prod', function() {
+    return gulp.src('public/javascripts/index/*.js')
+        .pipe(concat('index.js'))
+        .pipe(gulp.dest('public/dist'))
+        .pipe(rename('index.min.js'))
+        .pipe(uglify())
+        .pipe(gulp.dest('public/dist'));
+});
+
+gulp.task['production-minify', ['min-scripts-prod','min-index-prod','min-compare-prod']];
+
 gulp.task('default', ['minify-css', 'min-scripts','min-index','min-compare']);
