@@ -42,7 +42,7 @@ Table.prototype.getTitle = function () {
     var subCategory = this.selection[0] === null ? "" : this.selection[0].subCategory;
     return this.selection[0].category + ", " + subCategory + ", "+ this.selection[0].description;
   } else {
-    return (this.selection === null ? "" : this.selection.subCategory) + ", "+ this.selection.description;
+    return (this.subCategory === undefined ? "" : this.selection.subCategory + ", ") + " "+ this.selection.description;
   }
 }
 
