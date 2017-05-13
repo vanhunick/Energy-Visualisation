@@ -43,7 +43,7 @@ var TablesModule = (function(){
   tables.forEach(function(table){
       table.insertTitles();
       table.create();
-      table.createTotalsTable(false);
+      table.createTotalsTable(false, selectedTotalRow);
     });
 
     // Render each of the tables
@@ -108,7 +108,7 @@ var TablesModule = (function(){
     var cpiValues = update.cpiValues;
     tables.forEach(function(table){
       table.applyCPI(cpiValues);
-      table.createTotalsTable(true);
+      table.createTotalsTable(true, selectedTotalRow);
     });
 
     tables.forEach(function(table){

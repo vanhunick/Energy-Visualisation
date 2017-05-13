@@ -69,7 +69,7 @@ Table.prototype.getSubTitle = function () {
  * */
 Table.prototype.update = function (rows) {
   this.rows = rows;
-  this.createTotalsTable(true);
+  this.createTotalsTable(true, "");
 }
 
 
@@ -154,7 +154,6 @@ Table.prototype.applyCPI = function (cpiValues) {
   });
 
   var format = this.dpFormat;
-
       $cachedCells.each(function(){ // Grab every cell
           var year = +$(this).attr("class").split(' ')[1]; // Grab the year of the cell by checking the class
           var valueOfCell = $(this).attr("origvalue");
@@ -171,14 +170,12 @@ Table.prototype.applyCPI = function (cpiValues) {
       }
         $(this).text(valueOfCell); // CPI Applied value
       });
-
 }
 
 Table.prototype.revertCPI = function () {
   if(this.noCPICells.length > 0){
     var format = this.dpFormat;
     this.noCPICells.forEach(function(e){
-        console.log('reverting', format(e.value));
         $('#'+e.id).text(format(e.value));
     });
   }
@@ -247,7 +244,8 @@ Table.prototype.create = function () {
   this.cellValues = cellValues;
 }
 
-Table.prototype.createTotalsTable = function(update) {
+Table.prototype.createTotalsTable = function(update, selectedTotalRow) {
+  console.log("Selected", selectedTotalRow);
   var totals = dp.createTableTotals(this.rows, TablesModule.regions, this.availableYears);
   var names = {n : "North Island", uni : "Upper North Island", eni : "Eastern North Island", swni : "South-West North Island", s : "South Island", usi : "Upper South Island", lsi : "Lower South Island", nz : "New Zealand"};
 
@@ -305,6 +303,9 @@ Table.prototype.createTotalsTable = function(update) {
           });
           rowCount++;
       }
+  }
+  if(selectedTotalRow !==""){
+      $('#'+selectedTotalRow).addClass("row-selected");
   }
   this.totalCellValues = totalCells;
 }
