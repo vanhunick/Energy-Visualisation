@@ -107,8 +107,10 @@ var TablesModule = (function(){
   var applyCPI = function (update) {
     var cpiValues = update.cpiValues;
     tables.forEach(function(table){
-      table.applyCPI(cpiValues);
-      table.createTotalsTable(true, selectedTotalRow);
+      if(table.canApplyCPI()){
+        table.applyCPI(cpiValues);
+        table.createTotalsTable(true, selectedTotalRow);
+      }
     });
 
     tables.forEach(function(table){

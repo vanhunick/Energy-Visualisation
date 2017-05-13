@@ -118,19 +118,27 @@ var CompareModule = (function(){
    * @param cpiValues {Object[]} contains the cpi for each year
    * */
   var applyCPIToTableRows = function (rows, cpiValues) {
+    var applicableRows = rows.filter(function(r){
+      return r.units.includes('$');
+    });
+    if(applicableRows.length === 0){
+      return;
+    }
+
+
     // Find the min and max year from the data
-    var minYear = rows.reduce(function(prev, curr) {
+    var minYear = applicableRows.reduce(function(prev, curr) {
       return prev.disc_yr < curr.disc_yr ? prev : curr;
     }).obs_yr;
 
-    var maxYear = rows.reduce(function(prev, curr) {
+    var maxYear = applicableRows.reduce(function(prev, curr) {
       return prev.disc_yr > curr.disc_yr ? prev : curr;
     }).obs_yr;
 
     for(var cur = minYear; cur <=maxYear; cur++){ // Go through each possible year
-      rows.forEach(function(elem, index){ // Grab every Row
-        var year = rows[index].obs_yr; // Grab the year of the cell by checking the class
-        var valueOfCell = rows[index].value;
+      applicableRows.forEach(function(elem, index){ // Grab every Row
+        var year = applicableRows[index].obs_yr; // Grab the year of the cell by checking the class
+        var valueOfCell = applicableRows[index].value;
 
         for(var i = 0; i < cpiValues.length; i++){
           if(cpiValues[i].year === cur){
@@ -139,7 +147,7 @@ var CompareModule = (function(){
             }
           }
         }
-        rows[index].value = valueOfCell; // CPI Applied value
+        applicableRows[index].value = valueOfCell; // CPI Applied value
       });
     }
   }

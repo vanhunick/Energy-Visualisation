@@ -125,7 +125,7 @@ Table.prototype.getAvailableYears = function () {
  * */
 Table.prototype.canApplyCPI = function () {
   if(this.isCombined)return false;
-  return this.unit.contains('$'); // TODO check if this is right later
+  return this.unit.includes('$'); // TODO check if this is right later
 }
 
 
