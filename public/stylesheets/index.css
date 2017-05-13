@@ -1,22 +1,49 @@
 body {
-  padding: 50px;
+  padding-top: 50px;
   font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  background: #F6F7F8;
+  background: #FEFDFB;
 }
-
 
 .selection-header {
   margin-bottom: 2%;
-  margin-left: 0.5%;
+  margin-left: 2%;
 }
-/* Core metrics*/
+
+.selection-div {
+  margin-left: 1%;
+}
+
+.select-description    {
+  margin-bottom: 5px;
+}
+
+.select-subcategory {
+  margin-bottom: 5px;
+}
+
+.select-category {
+  margin-bottom: 5px;
+}
+
+.select-section {
+  margin-bottom: 5px;
+}
+
+.clear {
+margin-bottom: 5px;
+}
 
 
 
-/*Container that holds all content on the core metrics page*/
-#compare-container {
-  /*margin-left: 0.5%;
-  margin-right: 0.5%;*/
+
+.tab-row {
+  margin-top: 2%;
+}
+
+
+
+.cpi-col {
+  margin-bottom: 1%;
 }
 
 /* The core metrics title at the very top of the page*/
