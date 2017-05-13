@@ -79,7 +79,10 @@ Table.prototype.update = function (rows) {
  * @param {Object} update the object to hold information about the row clicked
  * */
 Table.prototype.totalsRowSelected = function (update) {
-  SingleBarModule.showBarWithRowElem(update.rowID,update.region,"#bar-total-"+this.id,"#head-row-totals-"+this.id,"#table-total-"+this.id,this.unit);
+  var rowNumb  = update.rowID.charAt(update.rowID.length-1);
+  var dataRowID = "row-tot-"+this.id+""+rowNumb;
+
+  SingleBarModule.showBarWithRowElem(dataRowID,update.region,"#bar-total-"+this.id,"#head-row-totals-"+this.id,"#table-total-"+this.id,this.unit);
 }
 
 
@@ -198,9 +201,6 @@ Table.prototype.insertTitles = function() {
 Table.prototype.create = function () {
   var tableData = this.createTableData (this.rows); // Grab the data in the form we want
 
-  // First insert the title
-
-
   // create the years cells
   var years = "";
   tableData[0].years.forEach(function(y){
@@ -245,7 +245,7 @@ Table.prototype.create = function () {
 }
 
 Table.prototype.createTotalsTable = function(update, selectedTotalRow) {
-  console.log("Selected", selectedTotalRow);
+
   var totals = dp.createTableTotals(this.rows, TablesModule.regions, this.availableYears);
   var names = {n : "North Island", uni : "Upper North Island", eni : "Eastern North Island", swni : "South-West North Island", s : "South Island", usi : "Upper South Island", lsi : "Lower South Island", nz : "New Zealand"};
 

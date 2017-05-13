@@ -1,9 +1,7 @@
 // DEPENDENCIES DataProcessor, Database, Events
-
-
 var CompareModule = (function(){
 
-  // Init the other stuff required
+  // Init the data processor
   var dp = new DataProcessor();
 
   // Object that holds all the rows for each table along with a copy
@@ -87,6 +85,11 @@ var CompareModule = (function(){
       // Check if both AB and CD exist
       // Emit an event with the data
       events.emit("INIT_DATA", {data : backup.sortedRows});
+
+      // Set default rows selected
+      events.emit('ROW_CLICKED',  {rowID: "rowa0", rowNumb: 0, edb: "Alpine Energy"});
+      events.emit("TOTAL_ROW_CLICKED", {rowID: "row-tot-a0", region: "South Island"});
+
     });
   }
 
@@ -96,12 +99,9 @@ var CompareModule = (function(){
    * if cpi input is valid then copies rows and applies cpi to copy
    * */
   var applyCPI = function() {
-    if(CPIModule.isValid()){
-      console.log("backup ",backup.rows);
+    if(CPIModule.isValid() && backup.selection !== undefined){
       var copyOfRows  = dp.copyRows(backup.rows);
-      console.log(copyOfRows);
       applyCPIToTableRows(copyOfRows,CPIModule.getCPIValues());
-      console.log("Orig with CPI",copyOfRows);
       var newData = dp.filterRowsToTablesAndCopy(copyOfRows,backup.selection);
 
       // Send event to update table and graphs

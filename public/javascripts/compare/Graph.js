@@ -97,6 +97,7 @@ Graph.prototype.insertTitles = function () {
  * Creates the data using data processor and inserts into DOM
  * */
 Graph.prototype.create = function () {
+
     // Create the data for the grouped graph and display it
     var groupedData = dp.createDataForGroupedGraph(this.rows);
     GroupedBarModule.createdGroupedBarGraph(groupedData.data,groupedData.keys,this.unit,this.groupedID);
