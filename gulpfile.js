@@ -6,10 +6,6 @@ var cleanCSS = require('gulp-clean-css');
 var rename = require('gulp-rename');
 var sourcemaps = require('gulp-sourcemaps');
 
-
-// .pipe(rename({
-//         suffix: '.min'
-//     }))
 gulp.task('minify-css', function() {
   return gulp.src('public/stylesheets/*.css')
     .pipe(cleanCSS({compatibility: 'ie8'}))
