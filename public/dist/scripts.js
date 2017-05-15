@@ -142,14 +142,14 @@ var SingleBarModule = (function(){
     barGraph.svg.append("text")
       .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
       .attr("transform", "translate("+ -(barMargin.left/2+10) +","+(barHeight/2 )+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
-      .attr("class", "unit-text")
+      .attr("class", "unit-text-scaled")
       .text(yLabel);
 
     // Add year as the x-axis label
     barGraph.svg.append("text")
       .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
       .attr("transform", "translate("+ +(barWidth/2) +","+( barMargin.top + barHeight -barMargin.bottom + 20 )+")")  // text is drawn off the screen top left, move down and out and rotate
-      .attr("class", "unit-text")
+      .attr("class", "unit-text-scaled")
       .text("Year");
   }
 
@@ -178,9 +178,9 @@ var SingleBarModule = (function(){
 var GroupedBarModule = (function(){
 
   //  Margins and width / height for the graph
-  var margin = { top: 25, right: 85, bottom: 150, left: 50 },
-    width = 850 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
+  var margin = { top: 25, right: 85, bottom: 150, left: 80 },
+    width = 1200 - margin.left - margin.right,
+    height = 750 - margin.top - margin.bottom;
 
   // The array that holds the GroupedBarData objects for every graph on the page
   var barGraphs = [];
@@ -250,16 +250,11 @@ var createNewGroupedBarGraph = function (data, keys, yLabel, divID) {
 
    barGraphs.push(curBarGraph);
 
-    // Create and append the svg
-    curBarGraph.svg = d3.select(divID)
-        .append("div")
-        .classed("svg-container-bar", true) //container class to make it responsive
-        .append("svg")
-        .attr("preserveAspectRatio", "xMinYMin meet")
-        .attr("viewBox", "0 0 "+ (width + margin.left + margin.right) +" "+ (height + margin.top + margin.bottom) + "")
-        .append("g")
-        .attr("transform","translate(" + margin.left + "," + margin.top + ")") // moves by a x and y value in this c
-        .classed("svg-content-responsive-bar", true);
+   curBarGraph.svg =  d3.select(divID).append("svg")
+             .attr("width", width + margin.left + margin.right)
+             .attr("height", height + margin.top + margin.bottom)
+             .append("g") // group allows us to move everything together
+             .attr("transform","translate(" + margin.left + "," + margin.top + ")"); // moves by a x and y value in this case the margins
 
     curBarGraph.x0.domain(data.map(function(d) { return d.edb; }));
     curBarGraph.x1.domain(keys).rangeRound([0, curBarGraph.x0.bandwidth()]);
@@ -308,7 +303,7 @@ var createNewGroupedBarGraph = function (data, keys, yLabel, divID) {
       .selectAll("text")
       .attr("y", 0)
       .attr("x", 9)
-      .attr("dy", ".35em")
+      .attr("dy", ".40em")
       .attr("class", "axis-text-scaled")
       .attr("transform", "rotate(55)")
       .style("text-anchor", "start");
@@ -319,13 +314,14 @@ var createNewGroupedBarGraph = function (data, keys, yLabel, divID) {
         .append("text")
         .attr("x", 2)
         .attr("y", curBarGraph.y(curBarGraph.y.ticks().pop()) + 0.5)
-        .attr("dy", "0.32em")
+        .attr("dy", "0.40em")
+        .attr("class", "axis-text-scaled")
         .attr("text-anchor", "start")
 
 
     curBarGraph.svg.append("text")
       .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-      .attr("transform", "translate("+ -(margin.left/2-10) +","+(height/2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
+      .attr("transform", "translate("+ -(margin.left/2) +","+(height/2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
       .attr("class", "unit-text-scaled")
       .text(yLabel);
 
@@ -765,9 +761,9 @@ var BoxPlotModule = (function () {
     var labels = false; // show the text labels beside individual boxplots?
 
 // Margins and graph width / height
-    var boxMargin = {top: 25, right: 85, bottom: 150, left:100},
-      boxWidth = 850 - boxMargin.left - boxMargin.right,
-      boxHeight = 500  - boxMargin.top  - boxMargin.bottom;
+var boxMargin = {top: 30, right: 50, bottom: 100, left: 100},
+     boxWidth = 1200 - boxMargin.left - boxMargin.right,
+     boxHeight = 800  - boxMargin.top  - boxMargin.bottom;
 
 
 // Encapsulate all properties of graph
@@ -821,20 +817,13 @@ var BoxPlotModule = (function () {
           .domain(boxPlotObjects.y.domain())
           .showLabels(labels);
 
-        // Create the responsive SVG
-        boxPlotObjects.svg =  d3.select(divID)
-          .append("div")
-          .classed("svg-container-boxplot", true) //container class to make it responsive
-          .append("svg")
-          //responsive SVG needs these 2 attributes and no width and height attr
-          .attr("preserveAspectRatio", "xMinYMin meet")
-          .attr("viewBox", "0 0 " + (boxWidth + boxMargin.left + boxMargin.right) +" "+ (boxHeight + boxMargin.top + boxMargin.bottom) + "") //
-          .classed("svg-content-responsive-boxplot", true)
-          .attr("class", "box")
-          .append("g") // group allows us to move everything together
-          .attr("transform",
-            "translate(" + boxMargin.left + "," + boxMargin.top + ")"); // moves by a x and y value in this c
-          //class to make it responsive
+
+    boxPlotObjects.svg = d3.select(divID).append("svg")
+             .attr("width", boxWidth + boxMargin.left + boxMargin.right)
+             .attr("height", boxHeight + boxMargin.top + boxMargin.bottom)
+             .attr("class", "box")
+             .append("g")
+             .attr("transform", "translate(" + boxMargin.left + "," + boxMargin.top + ")");
 
         boxPlotObjects.x.domain( data.map(function(d) {return d[0] } ) );
         boxPlotObjects.xAxis = d3.axisBottom(boxPlotObjects.x);
@@ -870,7 +859,7 @@ var BoxPlotModule = (function () {
           .data(scatterData)
           .enter().append("circle")
           .attr("class",function(d){return "dot "+d.edb.replace(/ /g , "");})
-          .attr("r", 2)
+          .attr("r", 4)
           .attr("cx", function(d) { return boxPlotObjects.x(d.year) + whiskBoxWidth/2; })
           .attr("cy", function(d) { return boxPlotObjects.y(d.value); })
           .on('mouseover', tip.show)
@@ -882,10 +871,8 @@ var BoxPlotModule = (function () {
           .call(boxPlotObjects.yAxis)
           .append("text")
           .attr("transform", "rotate(-90)")
-          // .attr("y", 6)
-          // .attr("dy", ".71em")
-          .style("text-anchor", "end")
-          .style("font-size", "12px");
+          .attr("class", "axis-text-scaled")
+          .style("text-anchor", "end");
 
         // draw x axis
         boxPlotObjects.svg.append("g")
@@ -897,8 +884,7 @@ var BoxPlotModule = (function () {
           .attr("y",  10 )
           .attr("dy", ".71em")
           .style("text-anchor", "middle")
-          .style("font-size", "12px")
-          .text("Quarter");
+          .attr("class", "axis-text-scaled");
 
         // Add the y axis unit
         boxPlotObjects.svg.append("text")
