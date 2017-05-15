@@ -2,9 +2,9 @@ var BoxPlotModule = (function () {
     var labels = false; // show the text labels beside individual boxplots?
 
 // Margins and graph width / height
-    var boxMargin = {top: 25, right: 85, bottom: 150, left:100},
-      boxWidth = 850 - boxMargin.left - boxMargin.right,
-      boxHeight = 500  - boxMargin.top  - boxMargin.bottom;
+var boxMargin = {top: 30, right: 50, bottom: 100, left: 100},
+     boxWidth = 1200 - boxMargin.left - boxMargin.right,
+     boxHeight = 800  - boxMargin.top  - boxMargin.bottom;
 
 
 // Encapsulate all properties of graph
@@ -58,20 +58,13 @@ var BoxPlotModule = (function () {
           .domain(boxPlotObjects.y.domain())
           .showLabels(labels);
 
-        // Create the responsive SVG
-        boxPlotObjects.svg =  d3.select(divID)
-          .append("div")
-          .classed("svg-container-boxplot", true) //container class to make it responsive
-          .append("svg")
-          //responsive SVG needs these 2 attributes and no width and height attr
-          .attr("preserveAspectRatio", "xMinYMin meet")
-          .attr("viewBox", "0 0 " + (boxWidth + boxMargin.left + boxMargin.right) +" "+ (boxHeight + boxMargin.top + boxMargin.bottom) + "") //
-          .classed("svg-content-responsive-boxplot", true)
-          .attr("class", "box")
-          .append("g") // group allows us to move everything together
-          .attr("transform",
-            "translate(" + boxMargin.left + "," + boxMargin.top + ")"); // moves by a x and y value in this c
-          //class to make it responsive
+
+    boxPlotObjects.svg = d3.select(divID).append("svg")
+             .attr("width", boxWidth + boxMargin.left + boxMargin.right)
+             .attr("height", boxHeight + boxMargin.top + boxMargin.bottom)
+             .attr("class", "box")
+             .append("g")
+             .attr("transform", "translate(" + boxMargin.left + "," + boxMargin.top + ")");
 
         boxPlotObjects.x.domain( data.map(function(d) {return d[0] } ) );
         boxPlotObjects.xAxis = d3.axisBottom(boxPlotObjects.x);
@@ -107,7 +100,7 @@ var BoxPlotModule = (function () {
           .data(scatterData)
           .enter().append("circle")
           .attr("class",function(d){return "dot "+d.edb.replace(/ /g , "");})
-          .attr("r", 2)
+          .attr("r", 4)
           .attr("cx", function(d) { return boxPlotObjects.x(d.year) + whiskBoxWidth/2; })
           .attr("cy", function(d) { return boxPlotObjects.y(d.value); })
           .on('mouseover', tip.show)
@@ -119,10 +112,8 @@ var BoxPlotModule = (function () {
           .call(boxPlotObjects.yAxis)
           .append("text")
           .attr("transform", "rotate(-90)")
-          // .attr("y", 6)
-          // .attr("dy", ".71em")
-          .style("text-anchor", "end")
-          .style("font-size", "12px");
+          .attr("class", "axis-text-scaled")
+          .style("text-anchor", "end");
 
         // draw x axis
         boxPlotObjects.svg.append("g")
@@ -134,8 +125,7 @@ var BoxPlotModule = (function () {
           .attr("y",  10 )
           .attr("dy", ".71em")
           .style("text-anchor", "middle")
-          .style("font-size", "12px")
-          .text("Quarter");
+          .attr("class", "axis-text-scaled");
 
         // Add the y axis unit
         boxPlotObjects.svg.append("text")

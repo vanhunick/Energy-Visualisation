@@ -142,14 +142,14 @@ var SingleBarModule = (function(){
     barGraph.svg.append("text")
       .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
       .attr("transform", "translate("+ -(barMargin.left/2+10) +","+(barHeight/2 )+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
-      .attr("class", "unit-text")
+      .attr("class", "unit-text-scaled")
       .text(yLabel);
 
     // Add year as the x-axis label
     barGraph.svg.append("text")
       .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
       .attr("transform", "translate("+ +(barWidth/2) +","+( barMargin.top + barHeight -barMargin.bottom + 20 )+")")  // text is drawn off the screen top left, move down and out and rotate
-      .attr("class", "unit-text")
+      .attr("class", "unit-text-scaled")
       .text("Year");
   }
 

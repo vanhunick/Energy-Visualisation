@@ -1,9 +1,9 @@
 var GroupedBarModule = (function(){
 
   //  Margins and width / height for the graph
-  var margin = { top: 25, right: 85, bottom: 150, left: 50 },
-    width = 850 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
+  var margin = { top: 25, right: 85, bottom: 150, left: 80 },
+    width = 1200 - margin.left - margin.right,
+    height = 750 - margin.top - margin.bottom;
 
   // The array that holds the GroupedBarData objects for every graph on the page
   var barGraphs = [];
@@ -73,16 +73,11 @@ var createNewGroupedBarGraph = function (data, keys, yLabel, divID) {
 
    barGraphs.push(curBarGraph);
 
-    // Create and append the svg
-    curBarGraph.svg = d3.select(divID)
-        .append("div")
-        .classed("svg-container-bar", true) //container class to make it responsive
-        .append("svg")
-        .attr("preserveAspectRatio", "xMinYMin meet")
-        .attr("viewBox", "0 0 "+ (width + margin.left + margin.right) +" "+ (height + margin.top + margin.bottom) + "")
-        .append("g")
-        .attr("transform","translate(" + margin.left + "," + margin.top + ")") // moves by a x and y value in this c
-        .classed("svg-content-responsive-bar", true);
+   curBarGraph.svg =  d3.select(divID).append("svg")
+             .attr("width", width + margin.left + margin.right)
+             .attr("height", height + margin.top + margin.bottom)
+             .append("g") // group allows us to move everything together
+             .attr("transform","translate(" + margin.left + "," + margin.top + ")"); // moves by a x and y value in this case the margins
 
     curBarGraph.x0.domain(data.map(function(d) { return d.edb; }));
     curBarGraph.x1.domain(keys).rangeRound([0, curBarGraph.x0.bandwidth()]);
@@ -131,7 +126,7 @@ var createNewGroupedBarGraph = function (data, keys, yLabel, divID) {
       .selectAll("text")
       .attr("y", 0)
       .attr("x", 9)
-      .attr("dy", ".35em")
+      .attr("dy", ".40em")
       .attr("class", "axis-text-scaled")
       .attr("transform", "rotate(55)")
       .style("text-anchor", "start");
@@ -142,13 +137,14 @@ var createNewGroupedBarGraph = function (data, keys, yLabel, divID) {
         .append("text")
         .attr("x", 2)
         .attr("y", curBarGraph.y(curBarGraph.y.ticks().pop()) + 0.5)
-        .attr("dy", "0.32em")
+        .attr("dy", "0.40em")
+        .attr("class", "axis-text-scaled")
         .attr("text-anchor", "start")
 
 
     curBarGraph.svg.append("text")
       .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-      .attr("transform", "translate("+ -(margin.left/2-10) +","+(height/2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
+      .attr("transform", "translate("+ -(margin.left/2) +","+(height/2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
       .attr("class", "unit-text-scaled")
       .text(yLabel);
 

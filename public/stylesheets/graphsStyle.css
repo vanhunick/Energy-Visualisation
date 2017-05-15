@@ -1,12 +1,13 @@
 /*The text for graph axis*/
 .axis-text {
     fill : black;
+    font-size: 2em;
 }
 
 /*The text for scaled graph axis*/
 .axis-text-scaled {
     fill : black;
-    font-size: 1em;
+    font-size: 1.5em;
 }
 
 /*The text for the units on the graphs*/
@@ -14,7 +15,7 @@
     fill: steelblue;
     shape-rendering: crispEdges;
     font-family: sans-serif;
-    font-size: 1em;
+    font-size: 1.5em;
 }
 
 /*The text for the units on the scaled graphs*/
@@ -22,7 +23,7 @@
     fill: steelblue;
     shape-rendering: crispEdges;
     font-family: sans-serif;
-    font-size: 0.8em;
+    font-size: 1.1em;
 }
 
 /*Box plot CSS*/
@@ -62,7 +63,7 @@
 
 /* The font size of the axis*/
 .axis {
-    font: 8px sans-serif;
+    /*font: 8px sans-serif;*/
     shape-rendering: crispEdges;
 }
 
