@@ -120,7 +120,7 @@ var createNewGroupedBarGraph = function (data, keys, yLabel, divID) {
 
     // Add x axis
     curBarGraph.svg.append("g")
-      .attr("class", "xAxis axis")
+      .attr("class", "xAxis axis group-xAxis")
       .attr("transform", "translate(0," + height + ")")
       .call(d3.axisBottom(curBarGraph.x0))
       .selectAll("text")

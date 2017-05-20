@@ -123,18 +123,14 @@ var boxMargin = {top: 30, right: 50, bottom: 100, left: 50},
         boxPlotObjects.svg.attr("transform","translate(" + ( boxMargin.left+maxw) + "," + boxMargin.top + ")"); // moves by a x and y value in this case the barMargins
 
 
-
         // draw x axis
         boxPlotObjects.svg.append("g")
           .attr("class", "xAxis axis")
           .attr("transform", "translate(0," + (boxHeight + boxMargin.top  + 10) + ")")
-          .call(boxPlotObjects.xAxis)
-          .append("text")             // text label for the x axis
-          .attr("x", (boxWidth / 2) )
-          .attr("y",  10 )
-          .attr("dy", ".71em")
-          .style("text-anchor", "middle")
-          .attr("class", "axis-text-scaled");
+          .call(boxPlotObjects.xAxis)          
+          .append("text")
+          .attr("class", "axis-text-scaled")
+          .style("text-anchor", "end");
 
         // Add the y axis unit
         boxPlotObjects.svg.append("text")

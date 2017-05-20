@@ -203,14 +203,14 @@ var VectorModule = (function(){
     vectorGraph.svg.append("text")
       .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
       .attr("transform", "translate("+ -(vMargin.left/2) +","+ ( +vHeight/2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
-      .attr("class", "unit-text")
+      .attr("class", "unit-text-scaled")
       .text(yMetricLabel + "     (" + yLabel + ")");
 
     // Add X label
     vectorGraph.svg.append("text")
       .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
       .attr("transform", "translate("+ (vWidth/2) +","+ +(vHeight + vMargin.bottom/4) + ")")  // text is drawn off the screen top left, move down and out and rotate
-      .attr("class", "unit-text")
+      .attr("class", "unit-text-scaled")
       .text(xMetricLabel+ "     (" + xLabel + ")");
 
 

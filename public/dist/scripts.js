@@ -81,7 +81,6 @@ var SingleBarModule = (function(){
 
   function createNewGraph(divID, tableMax,tableMin, data,edb, yLabel){
     var barGraph = new BarGraph(divID);
-    singlebarGraphs.push(barGraph);
 
     var mixed = (tableMin < 0 && tableMax > 0);
     var max = 0;
@@ -127,13 +126,11 @@ var SingleBarModule = (function(){
 
     // add the y Axis
     barGraph.svg.append("g").attr("class","yAxis").call(barGraph.yAxis);
-    barGraph.created = true;
 
     var maxw = 0;
     barGraph.svg.select('.yAxis').selectAll('text').each(function(){
       if (this.getBBox().width > maxw) maxw = this.getBBox().width;
     });
-    console.log("Max Y", maxw);
 
     barGraph.svg.attr("transform","translate(" + (barMargin.left+maxw) + "," + barMargin.top + ")"); // moves by a x and y value in this case the barMargins
 
@@ -158,6 +155,9 @@ var SingleBarModule = (function(){
       .attr("transform", "translate("+ +(barWidth/2) +","+( barMargin.top + barHeight -barMargin.bottom + 20 )+")")  // text is drawn off the screen top left, move down and out and rotate
       .attr("class", "unit-text-scaled")
       .text("Year");
+
+    barGraph.created = true;
+    singlebarGraphs.push(barGraph);
   }
 
 // We do not need table max and the axis should never be updated for a graph
@@ -185,9 +185,9 @@ var SingleBarModule = (function(){
 var GroupedBarModule = (function(){
 
   //  Margins and width / height for the graph
-  var margin = { top: 25, right: 85, bottom: 150, left: 80 },
+  var margin = { top: 25, right: 50, bottom: 150, left: 50 },
     width = 1200 - margin.left - margin.right,
-    height = 750 - margin.top - margin.bottom;
+    height = 700 - margin.top - margin.bottom;
 
   // The array that holds the GroupedBarData objects for every graph on the page
   var barGraphs = [];
@@ -304,7 +304,7 @@ var createNewGroupedBarGraph = function (data, keys, yLabel, divID) {
 
     // Add x axis
     curBarGraph.svg.append("g")
-      .attr("class", "xAxis axis")
+      .attr("class", "xAxis axis group-xAxis")
       .attr("transform", "translate(0," + height + ")")
       .call(d3.axisBottom(curBarGraph.x0))
       .selectAll("text")
@@ -326,9 +326,18 @@ var createNewGroupedBarGraph = function (data, keys, yLabel, divID) {
         .attr("text-anchor", "start")
 
 
+    var maxw = 0;
+    curBarGraph.svg.select('.yAxis').selectAll('text').each(function(){
+      if (this.getBBox().width > maxw) maxw = this.getBBox().width;
+    });
+
+
+    curBarGraph.svg.attr("transform","translate(" + (margin.left+maxw) + "," + margin.top + ")"); // moves by a x and y value in this case the barMargins
+
+
     curBarGraph.svg.append("text")
       .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-      .attr("transform", "translate("+ -(margin.left/2) +","+(height/2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
+      .attr("transform", "translate("+ -(maxw + 20) +","+(height/2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
       .attr("class", "unit-text-scaled")
       .text(yLabel);
 
@@ -768,9 +777,9 @@ var BoxPlotModule = (function () {
     var labels = false; // show the text labels beside individual boxplots?
 
 // Margins and graph width / height
-var boxMargin = {top: 30, right: 50, bottom: 100, left: 100},
+var boxMargin = {top: 30, right: 50, bottom: 100, left: 50},
      boxWidth = 1200 - boxMargin.left - boxMargin.right,
-     boxHeight = 800  - boxMargin.top  - boxMargin.bottom;
+     boxHeight = 700  - boxMargin.top  - boxMargin.bottom;
 
 
 // Encapsulate all properties of graph
@@ -881,22 +890,27 @@ var boxMargin = {top: 30, right: 50, bottom: 100, left: 100},
           .attr("class", "axis-text-scaled")
           .style("text-anchor", "end");
 
+        var maxw = 0;
+        boxPlotObjects.svg.select('.yAxis').selectAll('text').each(function(){
+          if (this.getBBox().width > maxw) maxw = this.getBBox().width;
+        });
+
+        boxPlotObjects.svg.attr("transform","translate(" + ( boxMargin.left+maxw) + "," + boxMargin.top + ")"); // moves by a x and y value in this case the barMargins
+
+
         // draw x axis
         boxPlotObjects.svg.append("g")
           .attr("class", "xAxis axis")
           .attr("transform", "translate(0," + (boxHeight + boxMargin.top  + 10) + ")")
-          .call(boxPlotObjects.xAxis)
-          .append("text")             // text label for the x axis
-          .attr("x", (boxWidth / 2) )
-          .attr("y",  10 )
-          .attr("dy", ".71em")
-          .style("text-anchor", "middle")
-          .attr("class", "axis-text-scaled");
+          .call(boxPlotObjects.xAxis)          
+          .append("text")
+          .attr("class", "axis-text-scaled")
+          .style("text-anchor", "end");
 
         // Add the y axis unit
         boxPlotObjects.svg.append("text")
           .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-          .attr("transform", "translate("+ -(boxMargin.left/2-10) +","+(boxHeight/2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
+          .attr("transform", "translate("+ -(maxw + 20) +","+(boxHeight/2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
           .attr("class", "unit-text-scaled")
           .text(unit);
 
@@ -1579,14 +1593,14 @@ var VectorModule = (function(){
     vectorGraph.svg.append("text")
       .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
       .attr("transform", "translate("+ -(vMargin.left/2) +","+ ( +vHeight/2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
-      .attr("class", "unit-text")
+      .attr("class", "unit-text-scaled")
       .text(yMetricLabel + "     (" + yLabel + ")");
 
     // Add X label
     vectorGraph.svg.append("text")
       .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
       .attr("transform", "translate("+ (vWidth/2) +","+ +(vHeight + vMargin.bottom/4) + ")")  // text is drawn off the screen top left, move down and out and rotate
-      .attr("class", "unit-text")
+      .attr("class", "unit-text-scaled")
       .text(xMetricLabel+ "     (" + xLabel + ")");
 
 

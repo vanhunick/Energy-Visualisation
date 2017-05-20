@@ -966,12 +966,21 @@ var CompareModule = (function(){
     selectionRows.init(urlSelections,true); // Set ups the selection rows
 
     Database.getRowsForSearch(urlSelections, function(rows){
+
+      // TODO QUICK FIND A BETTER WAY 
+      if(rows.length > 0 && rows[0].fcast_yr !== null){
+        rows.forEach(function(r){
+          r.obs_yr = r.fcast_yr;
+        });  
+      }  
+
       // set the rows tables and create a copy
       backup.selection  = new Selection(urlSelections[0],urlSelections[1],urlSelections[2],urlSelections[3]);
       backup.rows = rows
       backup.sortedRows = dp.filterRowsToTablesAndCopy(rows,backup.selection);
-      console.log(rows);
+      // console.log(rows);
 
+      
       var combinedData = [];
       backup.sortedRows.forEach(function(t){
         if(t.id === 'a'){
@@ -981,6 +990,7 @@ var CompareModule = (function(){
           combinedData.push(t);
         }
           $('#full-dash-'+ t.id).show();
+          $('#tab-'+t.id).addClass("in active"); // Make all active to get sizes for graphs
       });
 
       if(combinedData.length === 2){
@@ -995,9 +1005,20 @@ var CompareModule = (function(){
       events.emit('ROW_CLICKED',  {rowID: "rowa0", rowNumb: 0, edb: "Alpine Energy"});
       events.emit("TOTAL_ROW_CLICKED", {rowID: "row-tot-a0", region: "South Island"});
 
+      // Make all accept a active
+      backup.sortedRows.forEach(function(t){
+        if(t.id !== 'a'){
+          $('#tab-'+t.id).removeClass("in active");
+        }
+      });
+
+       goToByScroll('#top-tab'); 
     });
   }
 
+  var goToByScroll = function(id){
+    $('html,body').animate({scrollTop: $(id).offset().top},'slow');
+  }
 
   /**
    * Called when the apply cpi button is clicked. First checks
@@ -1030,7 +1051,6 @@ var CompareModule = (function(){
       return;
     }
 
-
     // Find the min and max year from the data
     var minYear = applicableRows.reduce(function(prev, curr) {
       return prev.disc_yr < curr.disc_yr ? prev : curr;
@@ -1060,7 +1080,6 @@ var CompareModule = (function(){
 
   // Array with both things in it
   function showFullVectorGraph(data, selections, units) {
-
 
         // Grab a title
         var atitle = selections[0].category + ", " + selections[0].subCategory + ", " + selections[0].description;

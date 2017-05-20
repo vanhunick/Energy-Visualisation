@@ -80,6 +80,14 @@
     font-size: 1em;
 }
 
+.xAxis {
+    font-size: 1em;
+}
+
+.group-xAxis {
+    font-size: 0.7em;   
+}
+
 /*The text of the vector graph key*/
 .vector-key-text {
     font-family: sans-serif;
