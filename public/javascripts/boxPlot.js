@@ -2,9 +2,9 @@ var BoxPlotModule = (function () {
     var labels = false; // show the text labels beside individual boxplots?
 
 // Margins and graph width / height
-var boxMargin = {top: 30, right: 50, bottom: 100, left: 100},
+var boxMargin = {top: 30, right: 50, bottom: 100, left: 50},
      boxWidth = 1200 - boxMargin.left - boxMargin.right,
-     boxHeight = 800  - boxMargin.top  - boxMargin.bottom;
+     boxHeight = 700  - boxMargin.top  - boxMargin.bottom;
 
 
 // Encapsulate all properties of graph
