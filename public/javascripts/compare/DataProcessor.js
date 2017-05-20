@@ -14,17 +14,25 @@ function DataProcessor(){}
  * */
 DataProcessor.prototype.copyDataTables = function(dataTables) {
   var origTables = [dataTables.tableA,dataTables.tableB,dataTables.tableC,dataTables.tableD,dataTables.tableAB,dataTables.tableCD]; // Add tables to array to iterate over them
+  var combinedTables = [dataTables.tableAB,dataTables.tableCD];
   var tables = [[],[],[],[],[],[]]; // Empty arrays to insert new rows with values that are copies of the original
 
   // Iterate over the original tables
   for(var j = 0; j < origTables.length; j++){
       var a = origTables[j]; // Grab the current table with index i
       if(a !== undefined){ // It might not exist due to it not being selected by the user
+        if(j === 4 || j === 5){
           for(var i = 0; i < a.length; i++){ // For every row copy all the fields
+              tables[j].push({description : a[i].description, disc_yr: a[i].disc_yr,edb: a[i].edb,
+                  section:a[i].section, units : a[i].unit, value:a[i].value, unitA :a[i].unitA, unitB :a[i].unitB, obs_yr:a[i].obs_yr })
+          }
+        }else {
+            for(var i = 0; i < a.length; i++){ // For every row copy all the fields
               tables[j].push({category :a[i].category, description : a[i].description,disc_yr: a[i].disc_yr,edb: a[i].edb,
                   fcast_yr: a[i].fcast_yr,network:a[i].network,note:a[i].note,obs_yr:a[i].obs_yr,p_key: a[i].p_key,sch_ref:a[i].sch_ref,
                   schedule:a[i].schedule,section:a[i].section,sub_category: a[i].sub_category,units:a[i].units,value:a[i].value})
           }
+        }
       }
   }
   return new DataTables(tables[0],tables[1],tables[2],tables[3],tables[4],tables[5]); // Return the copy
@@ -125,7 +133,7 @@ DataProcessor.prototype.validateSearchParams = function (selections, validOption
  * */
 DataProcessor.prototype.matchDBRow = function (DBRow, selection) {
   if(DBRow.section === selection.section && DBRow.category === selection.category && DBRow.description === selection.description){
-      if(DBRow.sub_category !== ''){
+      if(DBRow.sub_category !== null){
           return selection.subCategory === DBRow.sub_category; // Sub cat could be null but would still match
       }
       return selection.subCategory === ""; // Has to also be empty
@@ -218,7 +226,9 @@ DataProcessor.prototype.filterRowsToTablesAndCopy = function (rows, search) {
       var cdRows = dp.combineTables(cRows,dRows);
   }
 
+
   var copy = this.copyDataTables(new DataTables(aRows,bRows,cRows,dRows,abRows,cdRows));
+  
 
   var tables = [];
   if(aRows.length > 0){
@@ -245,7 +255,6 @@ DataProcessor.prototype.filterRowsToTablesAndCopy = function (rows, search) {
   }
 
   if(cRows.length > 0 && dRows.length > 0){
-      var cdRows = dp.combineTables(cRows,dRows);
       tables.push({ id : 'cd', rows : copy.tableCD, table1Rows : copy.tableC, table2Rows : copy.tableD, search : search.cTable, search2 : search.dTable, combined : true});
   }
   return tables;
@@ -272,7 +281,7 @@ DataProcessor.prototype.combineTables = function(table1Rows, table2Rows) {
   for(var i = 0; i < at.length; i++){
       for(var j = 0; j < bt.length; j++){
           if(at[i].edb === bt[j].edb && at[i].obs_yr === bt[j].obs_yr && at[i].disc_yr === bt[j].disc_yr){
-              combined.push({ disc_yr : bt[j].disc_yr ,
+              combined.push({ disc_yr : bt[j].disc_yr,
                   edb : bt[j].edb,
                   obs_yr : bt[j].obs_yr,
                   value : at[i].value / (bt[j].value === '0' || bt[j].value === 0 ? 1 : bt[j].value), // Divide the value if va if dividing by 0 make it 1

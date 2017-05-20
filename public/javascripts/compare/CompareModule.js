@@ -86,18 +86,17 @@ var CompareModule = (function(){
     Database.getRowsForSearch(urlSelections, function(rows){
 
       // TODO QUICK FIND A BETTER WAY 
-      if(rows.length > 0 && rows[0].fcast_yr !== null){
-        rows.forEach(function(r){
+      rows.forEach(function(r){
+        if(r.fcast_yr !== null){
           r.obs_yr = r.fcast_yr;
-        });  
-      }  
+        }
+      });  
+
 
       // set the rows tables and create a copy
       backup.selection  = new Selection(urlSelections[0],urlSelections[1],urlSelections[2],urlSelections[3]);
       backup.rows = rows
       backup.sortedRows = dp.filterRowsToTablesAndCopy(rows,backup.selection);
-      // console.log(rows);
-
       
       var combinedData = [];
       backup.sortedRows.forEach(function(t){

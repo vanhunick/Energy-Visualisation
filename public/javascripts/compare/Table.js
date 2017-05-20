@@ -11,6 +11,11 @@ function Table(id, rows, selection, isCombined){
   this.rows = rows;
   this.unit = rows[0].units;
   this.selection = selection;
+  
+  if(isCombined){
+    this.selection1 = selection[0];
+    this.selection2 = selection[1];
+  }
 
   // Create the titles
   this.title = this.getTitle();
@@ -243,6 +248,7 @@ Table.prototype.create = function () {
   }
   this.cellValues = cellValues;
 }
+
 
 Table.prototype.createTotalsTable = function(update, selectedTotalRow) {
 
