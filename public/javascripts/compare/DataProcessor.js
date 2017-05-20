@@ -125,7 +125,7 @@ DataProcessor.prototype.validateSearchParams = function (selections, validOption
  * */
 DataProcessor.prototype.matchDBRow = function (DBRow, selection) {
   if(DBRow.section === selection.section && DBRow.category === selection.category && DBRow.description === selection.description){
-      if(DBRow.sub_category !== null){
+      if(DBRow.sub_category !== ''){
           return selection.subCategory === DBRow.sub_category; // Sub cat could be null but would still match
       }
       return selection.subCategory === ""; // Has to also be empty
@@ -299,6 +299,8 @@ DataProcessor.prototype.combineTables = function(table1Rows, table2Rows) {
  * @returns {Ojbect[]} Data for the vector graph in the form [{ EDB, [ { year1, valueA, valueB }, {year2, valueA, valueB },...]}]
  * */
 DataProcessor.prototype.createDataForVectorGraph = function(table1Rows,table2Rows) {
+    // TODO work out OBS and FCAST
+
     var at = table1Rows;
     var bt = table2Rows;
     var edbDone = []; // The edbs that have been processed
