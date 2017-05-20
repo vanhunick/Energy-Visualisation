@@ -129,6 +129,12 @@ var SingleBarModule = (function(){
     barGraph.svg.append("g").attr("class","yAxis").call(barGraph.yAxis);
     barGraph.created = true;
 
+    var maxw = 0;
+    barGraph.svg.select('.yAxis').selectAll('text').each(function(){
+      if (this.getBBox().width > maxw) maxw = this.getBBox().width;
+    });
+
+    barGraph.svg.attr("transform","translate(" + (barMargin.left+maxw) + "," + barMargin.top + ")"); // moves by a x and y value in this case the barMargins
 
     // Add a title
     barGraph.svg.append("text")
@@ -141,7 +147,7 @@ var SingleBarModule = (function(){
 
     barGraph.svg.append("text")
       .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-      .attr("transform", "translate("+ -(barMargin.left/2+10) +","+(barHeight/2 )+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
+      .attr("transform", "translate("+ -(maxw + 20) +","+(barHeight/2 )+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
       .attr("class", "unit-text-scaled")
       .text(yLabel);
 

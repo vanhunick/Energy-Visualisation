@@ -108,7 +108,7 @@ var boxMargin = {top: 30, right: 50, bottom: 100, left: 100},
 
         // draw y axis
         boxPlotObjects.svg.append("g")
-          .attr("class", "y axis")
+          .attr("class", "yAxis y axis")
           .call(boxPlotObjects.yAxis)
           .append("text")
           .attr("transform", "rotate(-90)")
@@ -117,7 +117,7 @@ var boxMargin = {top: 30, right: 50, bottom: 100, left: 100},
 
         // draw x axis
         boxPlotObjects.svg.append("g")
-          .attr("class", "x axis")
+          .attr("class", "xAxis axis")
           .attr("transform", "translate(0," + (boxHeight + boxMargin.top  + 10) + ")")
           .call(boxPlotObjects.xAxis)
           .append("text")             // text label for the x axis

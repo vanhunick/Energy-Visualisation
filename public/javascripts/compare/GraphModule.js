@@ -100,7 +100,6 @@ var GraphModule = (function(){
   events.on("ROW_CLICKED", rowClicked);
   events.on("ROW_UPDATE", update);
 
-
   return {
     update : update
   }

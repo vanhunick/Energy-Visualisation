@@ -88,6 +88,7 @@ var CompareModule = (function(){
       backup.selection  = new Selection(urlSelections[0],urlSelections[1],urlSelections[2],urlSelections[3]);
       backup.rows = rows
       backup.sortedRows = dp.filterRowsToTablesAndCopy(rows,backup.selection);
+      console.log(rows);
 
       var combinedData = [];
       backup.sortedRows.forEach(function(t){

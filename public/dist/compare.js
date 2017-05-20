@@ -970,6 +970,7 @@ var CompareModule = (function(){
       backup.selection  = new Selection(urlSelections[0],urlSelections[1],urlSelections[2],urlSelections[3]);
       backup.rows = rows
       backup.sortedRows = dp.filterRowsToTablesAndCopy(rows,backup.selection);
+      console.log(rows);
 
       var combinedData = [];
       backup.sortedRows.forEach(function(t){
@@ -2060,7 +2061,6 @@ var GraphModule = (function(){
   events.on("INIT_DATA", init);
   events.on("ROW_CLICKED", rowClicked);
   events.on("ROW_UPDATE", update);
-
 
   return {
     update : update

@@ -73,6 +73,11 @@
     fill: none;
     stroke: black;
     shape-rendering: crispEdges;
+    stroke-width : 2px;
+}
+
+.yAxis {
+    font-size: 1em;
 }
 
 /*The text of the vector graph key*/
