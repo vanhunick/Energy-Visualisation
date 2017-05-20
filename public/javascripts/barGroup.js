@@ -1,9 +1,9 @@
 var GroupedBarModule = (function(){
 
   //  Margins and width / height for the graph
-  var margin = { top: 25, right: 85, bottom: 150, left: 80 },
+  var margin = { top: 25, right: 50, bottom: 150, left: 50 },
     width = 1200 - margin.left - margin.right,
-    height = 750 - margin.top - margin.bottom;
+    height = 700 - margin.top - margin.bottom;
 
   // The array that holds the GroupedBarData objects for every graph on the page
   var barGraphs = [];
@@ -146,6 +146,7 @@ var createNewGroupedBarGraph = function (data, keys, yLabel, divID) {
     curBarGraph.svg.select('.yAxis').selectAll('text').each(function(){
       if (this.getBBox().width > maxw) maxw = this.getBBox().width;
     });
+
 
     curBarGraph.svg.attr("transform","translate(" + (margin.left+maxw) + "," + margin.top + ")"); // moves by a x and y value in this case the barMargins
 
