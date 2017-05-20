@@ -87,6 +87,14 @@ margin-bottom: 5px;
   margin-right: 15%;
 }
 
+.edb-cell {
+  background-color: white;
+}
+
+.reg-cell {
+  background-color: white;
+}
+
 /*The titles above selection boxes*/
 .selection-title{
   color: #172727;
