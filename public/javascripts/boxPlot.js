@@ -115,6 +115,15 @@ var boxMargin = {top: 30, right: 50, bottom: 100, left: 100},
           .attr("class", "axis-text-scaled")
           .style("text-anchor", "end");
 
+        var maxw = 0;
+        boxPlotObjects.svg.select('.yAxis').selectAll('text').each(function(){
+          if (this.getBBox().width > maxw) maxw = this.getBBox().width;
+        });
+
+        boxPlotObjects.svg.attr("transform","translate(" + ( boxMargin.left+maxw) + "," + boxMargin.top + ")"); // moves by a x and y value in this case the barMargins
+
+
+
         // draw x axis
         boxPlotObjects.svg.append("g")
           .attr("class", "xAxis axis")
@@ -130,7 +139,7 @@ var boxMargin = {top: 30, right: 50, bottom: 100, left: 100},
         // Add the y axis unit
         boxPlotObjects.svg.append("text")
           .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-          .attr("transform", "translate("+ -(boxMargin.left/2-10) +","+(boxHeight/2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
+          .attr("transform", "translate("+ -(maxw + 20) +","+(boxHeight/2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
           .attr("class", "unit-text-scaled")
           .text(unit);
 
