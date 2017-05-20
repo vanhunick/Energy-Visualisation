@@ -42,6 +42,8 @@ function search(req, res){
     selections.push({
       id : 3,section  : "",category : "",subCategory : "",description :""});
   }
+  console.log(selections);
+
   res.render('compare', {selections : selections}); // Send the search results and render index
   return;
 }
@@ -78,13 +80,14 @@ router.post('/search', function(req, res, next) {
 
             // Check is the sub category exists
             if(selections[i].subCategory !== ""){
-                andExpr.and("sub_category = '" + selections[i].subCategory + "'");
+                andExpr.and("sub_category = '" + selections[i].subCategory.replace(/'/g , "''") + "'");
             }
-            andExpr.and("description = '" + selections[i].description + "'");
+            andExpr.and("description = '" + selections[i].description.replace(/'/g , "''") + "'");
             expr.or(andExpr);
         }
     }
     q.where(expr); // Add condition the the where clause
+    console.log(q.toString());
 
     // Connect to the database
     pg.connect(global.databaseURI, function(err, client, done) {
