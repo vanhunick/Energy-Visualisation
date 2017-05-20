@@ -81,7 +81,6 @@ var SingleBarModule = (function(){
 
   function createNewGraph(divID, tableMax,tableMin, data,edb, yLabel){
     var barGraph = new BarGraph(divID);
-    singlebarGraphs.push(barGraph);
 
     var mixed = (tableMin < 0 && tableMax > 0);
     var max = 0;
@@ -127,7 +126,6 @@ var SingleBarModule = (function(){
 
     // add the y Axis
     barGraph.svg.append("g").attr("class","yAxis").call(barGraph.yAxis);
-    barGraph.created = true;
 
     var maxw = 0;
     barGraph.svg.select('.yAxis').selectAll('text').each(function(){
@@ -157,6 +155,9 @@ var SingleBarModule = (function(){
       .attr("transform", "translate("+ +(barWidth/2) +","+( barMargin.top + barHeight -barMargin.bottom + 20 )+")")  // text is drawn off the screen top left, move down and out and rotate
       .attr("class", "unit-text-scaled")
       .text("Year");
+
+    barGraph.created = true;
+    singlebarGraphs.push(barGraph);
   }
 
 // We do not need table max and the axis should never be updated for a graph
