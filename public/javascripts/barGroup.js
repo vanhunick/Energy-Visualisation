@@ -142,9 +142,17 @@ var createNewGroupedBarGraph = function (data, keys, yLabel, divID) {
         .attr("text-anchor", "start")
 
 
+    var maxw = 0;
+    curBarGraph.svg.select('.yAxis').selectAll('text').each(function(){
+      if (this.getBBox().width > maxw) maxw = this.getBBox().width;
+    });
+
+    curBarGraph.svg.attr("transform","translate(" + (margin.left+maxw) + "," + margin.top + ")"); // moves by a x and y value in this case the barMargins
+
+
     curBarGraph.svg.append("text")
       .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
-      .attr("transform", "translate("+ -(margin.left/2) +","+(height/2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
+      .attr("transform", "translate("+ -(maxw + 20) +","+(height/2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
       .attr("class", "unit-text-scaled")
       .text(yLabel);
 
